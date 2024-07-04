@@ -7,21 +7,22 @@ WORKDIR /app
 # Copy the package.json and package-lock.json files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
-
-# Copy the rest of the application code
-COPY . .
-
-# Build the Next.js app
-RUN npm run build
+COPY .env ./
 
 # # Copy the rest of the application code
 COPY . .
-# RUN rm -rf node_modules
+
+# Install dependencies
+RUN npm install
+
+# Build the Next.js app
+# production
+# RUN npm run build
 
 # Expose the port the app runs on
 EXPOSE 3000
 
 # Command to run the Next.js app
-CMD ["npm", "start"]
+# production
+# CMD ["npm", "start"]
+CMD ["npm", "run", "dev"]
