@@ -1,15 +1,6 @@
-// src/app/api/products/route.ts
+// src/app/api/products/id/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '../../../../lib/db';
-
-/*
-curl -X PUT http://divine-jewel.local:8000/api/products/3 -H "Content-Type: application/json" -d '{
-  "category_id": 1,
-  "name": "Kuromi",
-  "price": 200,
-  "is_archive": 2
-}'
-*/
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   try {
