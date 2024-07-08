@@ -36,16 +36,6 @@ export async function POST(request: NextRequest) {
 
 }
 
-/*
-curl -X PUT 'http://divine-jewel.local:8000/api/products?id=3' \
--H "Content-Type: application/json" \
--d '{
-  "category_id": 2,
-  "name": "Kuromi",
-  "price": 99.99,
-  "is_archive": 0
-}'
-*/
 
 export async function PUT(request: NextRequest) {
   try {
