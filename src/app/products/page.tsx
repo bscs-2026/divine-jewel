@@ -81,40 +81,11 @@ export default function ProductsPage() {
     };
 
     const handleEdit = (productId: number) => {
-        const product = products.find((product) => product.id === productId);
-        if (product) {
-            setEditProduct(product);
-        }
+
     };
 
     const handleSave = async (event: FormEvent) => {
-        event.preventDefault();
-        if (!editProduct) return;
 
-        const form = event.target as HTMLFormElement;
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-
-        try {
-            const response = await fetch(`/api/products/${editProduct.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to update product');
-            }
-
-            form.reset();
-            setEditProduct(null);
-
-            await fetchProducts();
-        } catch (error: any) {
-            setError(error.message);
-        }
     };
 
     return (
@@ -151,6 +122,7 @@ export default function ProductsPage() {
                             <th>Category</th>
                             <th>Name</th>
                             <th>Price</th>
+                            <th>Stock</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -161,6 +133,7 @@ export default function ProductsPage() {
                                 <td>{product.category_name}</td>
                                 <td>{product.name}</td>
                                 <td>{product.price}</td>
+                                <td>{product.stock}</td>
                                 <td>
                                 <button onClick={() => handleEdit(product.id)}>Edit</button>
                                     <button>Archive</button>
