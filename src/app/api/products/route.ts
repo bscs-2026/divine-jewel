@@ -2,6 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '../../../lib/db';
 
+
+
 export async function GET() {
   try {
     console.log('Fetching products from database...');
@@ -34,6 +36,17 @@ export async function POST(request: NextRequest) {
       [category_id, name, price]
     );
     console.log('Added product:', result);
+
+    const productId = result.insertId;
+    // const productId = await query('SELECT id FROM products ORDER BY id DESC LIMIT 1;');
+    // console.log('Product ID:', productId);
+
+    console.log('Adding product to inventory...');
+    await query(
+      'INSERT INTO `inventory_item` (product_id, quantity) VALUES (?, ?)',
+      [productId, 0]
+    );
+    console.log('Added inventory for product:', productId);
     return NextResponse.json({ message: 'Product added successfully' }, { status: 201 });
   } catch (error: any) {
     console.error('An error occurred while adding product:', error);
