@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '../../../../../lib/db';
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } } ) {
+export async function PUT(request: NextRequest, { params }: { params: {id: string } } ) {
     try{
         const { id } = params;
         const { quantity } = await request.json();
@@ -13,7 +13,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         console.log('updating inventory in database...');
 
         const result = await query(
-            'UPDATE `inventory_item` SET quantity = ? WHERE id = ?', 
+            'UPDATE `inventory_item` SET quantity = quantity + ? WHERE product_id = ?', 
             [quantity, id]
         );
 

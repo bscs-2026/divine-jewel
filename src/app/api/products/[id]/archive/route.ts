@@ -1,6 +1,6 @@
 // src/app/api/products/[id]/archive/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { query } from '../../../../../lib/db'; // Adjust the import path as needed
+import { query } from '../../../../../lib/db';
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     try {
