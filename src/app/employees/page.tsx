@@ -190,6 +190,18 @@ export default function EmployeesPage() {
                             <option value='Full-Time'>Full-Time</option>
                             <option value='Part-Time'>Part-Time</option>
                         </select>
+
+                        <label htmlFor='username'>Username: </label>
+                        <input type='text' id='username' name='username' className='text-black' defaultValue={currentEmployee?.username || ''}/>
+                        <label htmlFor='password'>Password: </label>
+                        <input type='password' id='password' name='password' className='text-black' defaultValue={currentEmployee?.password || ''}/>
+                        <label htmlFor='status'>Status: </label>
+
+                        <select id='status' name='status' className='text-black'>
+                            <option value='' disabled>Select Status</option>
+                            <option value='Active'>Active</option>
+                            <option value='Inactive'>Inactive</option>
+                        </select>
                             
                         <button type='submit' className='px-2 mx-2 border border-white'>{editingEmployee ? 'Save Employee' : 'Add Employee'}</button>
                     </div>
@@ -204,6 +216,9 @@ export default function EmployeesPage() {
                             <th className="px-4 py-2 text-center">Contact Number</th>
                             <th className="px-4 py-2 text-center">Role</th>
                             <th className="px-4 py-2 text-center">Employee Type</th>
+                            <th className="px-4 py-2 text-center">Username</th>
+                            <th className="px-4 py-2 text-center">Password</th>
+                            <th className="px-4 py-2 text-center">Status</th>
                             <th className="px-4 py-2 text-center">Actions</th>
                         </tr>
                     </thead>
@@ -215,9 +230,12 @@ export default function EmployeesPage() {
                                 <td className='px-4'>{employee.contact_number}</td>
                                 <td className='px-4'>{employee.role_name}</td>
                                 <td className='px-4'>{employee.employee_type}</td>
+                                <td className='px-4'>{employee.username}</td>
+                                <td className='px-4'>{employee.password}</td>
+                                <td className='px-4'>{employee.status}</td>
                                 <td>
                                     <button onClick={() => editEmployee(employee.id)} className='px-2'>Edit</button>
-                                    <button className='px-2'>Remove</button>
+                                    <button className='px-2'>Archive</button>
                                 </td>
                             </tr>
                         ))}

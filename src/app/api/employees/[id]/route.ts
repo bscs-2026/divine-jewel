@@ -4,7 +4,7 @@ import { query } from '../../../../lib/db';
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     try {
         const { id } = params;
-        const { first_name, last_name, email_address, contact_number, employee_type, role_id} = await request.json();
+        const { first_name, last_name, email_address, contact_number, employee_type, role_id, username, password, status} = await request.json();
         // const { first_name, last_name, email_address, contact_number, employee_type, role_id, username, password, status, is_archive} = await request.json();
 
         if (!id) {
@@ -13,8 +13,8 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
         console.log('Updating employee in database...');
 
-        const result = await query('UPDATE `employees` SET first_name = ?, last_name = ?, email_address = ?, contact_number = ?, employee_type = ?, role_id = ? WHERE id = ?', 
-            [first_name, last_name, email_address, contact_number, employee_type, role_id, id]);
+        const result = await query('UPDATE `employees` SET first_name = ?, last_name = ?, email_address = ?, contact_number = ?, employee_type = ?, role_id = ?, username = ?, password = ?, status = ? WHERE id = ?', 
+            [first_name, last_name, email_address, contact_number, employee_type, role_id, username, password, status, id]);
 
         console.log('Updated employee:', result);
         return NextResponse.json({ message: 'Employee updated successfully' }, { status: 200 });
