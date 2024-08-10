@@ -173,7 +173,7 @@ export default function ProductsPage() {
         if (!confirmUnarchive) return;
 
         try {
-            const response = await fetch(`/api/products/${productId}/unarchive`, {
+            const response = await fetch(`/api/products/${productId}/archive`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
