@@ -83,6 +83,8 @@ export default function ProductsPage() {
             }
 
             form.reset();
+            setCurrentProduct(null);
+            setSelectedCategory(null);
             await fetchProducts();
         } catch (error: any) {
             setError(error.message);
@@ -157,6 +159,30 @@ export default function ProductsPage() {
 
             if (!response.ok) {
                 throw new Error('Failed to archive product');
+            }
+
+            await fetchProducts();
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
+
+    const unarchiveProduct = async (productId: number) => {
+        const confirmUnarchive = window.confirm('Are you sure you want to unarchive this product?');
+
+        if (!confirmUnarchive) return;
+
+        try {
+            const response = await fetch(`/api/products/${productId}/unarchive`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ is_archive: false }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to unarchive product');
             }
 
             await fetchProducts();
@@ -310,8 +336,14 @@ export default function ProductsPage() {
                                 <td>{product.price}</td>
                                 <td>{product.stock}</td>
                                 <td>
-                                    <button onClick={() => editProduct(product.id)}>Edit</button>
-                                    {listView === 'active' && <button onClick={() => archiveProduct(product.id)}>Archive</button>}
+                                    {listView === 'active' ? (
+                                        <>
+                                            <button onClick={() => editProduct(product.id)}>Edit</button>
+                                            <button onClick={() => archiveProduct(product.id)}>Archive</button>
+                                        </>
+                                    ) : (
+                                        <button onClick={() => unarchiveProduct(product.id)}>Unarchive</button>
+                                    )}
                                 </td>
                             </tr>
                         ))}

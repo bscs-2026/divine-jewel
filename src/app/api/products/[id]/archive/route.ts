@@ -11,7 +11,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             return NextResponse.json({ error: 'ID is required' }, { status: 400 });
         }
 
-        // Validate that `is_archive` is a boolean
         if (typeof is_archive !== 'boolean') {
             return NextResponse.json({ error: 'Invalid value for is_archive' }, { status: 400 });
         }
