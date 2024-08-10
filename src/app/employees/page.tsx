@@ -13,7 +13,7 @@ interface Employee {
     role_name: string;
     username: string;
     password: string;
-    status: string;
+    is_archive: number | boolean;
 }
 
 interface Role {
@@ -31,6 +31,7 @@ export default function EmployeesPage() {
     const [editingEmployee, setEditingEmployee] = useState<boolean>(false);
     const [selectedRole, setSelectedRole] = useState<string>('');
     const [selectedEmployeeType, setSelectedEmployeeType] = useState<string>('');
+    const [listView, setListView] = useState<'active' | 'inactive'>('active');
 
     useEffect(() => {
         fetchEmployees();
@@ -148,6 +149,61 @@ export default function EmployeesPage() {
             setSelectedEmployeeType('');
         }
     };
+    
+    const archiveEmployee = async (id: number) => {
+        const confirmArchive = confirm('Are you sure you want to archive this employee?');
+
+        if (!confirmArchive) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/employees/${id}/archive`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ is_archive: true }),
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to archive employee');
+            }
+            await fetchEmployees();
+        } catch (error: any) {
+            setError(error.message);
+            console.error('An error occurred while archiving employee:', error);
+        }
+    }
+
+    const unarchiveEmployee = async (id: number) => {
+        const confirmUnarchive = confirm('Are you sure you want to unarchive this employee?');
+
+        if (!confirmUnarchive) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/employees/${id}/archive`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ is_archive: false }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to unarchive employee');
+            }
+            await fetchEmployees();
+        } catch (error: any) {
+            setError(error.message);
+            console.error('An error occurred while unarchiving employee:', error);
+        }
+    };
+
+    const activeEmployees = employees.filter(employee => employee.is_archive === 0 || employee.is_archive === false);
+    const inactiveEmployees = employees.filter(employee => employee.is_archive === 1 || employee.is_archive === true);
 
     return (
         <div className='container m-4'>
@@ -195,17 +251,14 @@ export default function EmployeesPage() {
                         <input type='text' id='username' name='username' className='text-black' defaultValue={currentEmployee?.username || ''}/>
                         <label htmlFor='password'>Password: </label>
                         <input type='password' id='password' name='password' className='text-black' defaultValue={currentEmployee?.password || ''}/>
-                        <label htmlFor='status'>Status: </label>
-
-                        <select id='status' name='status' className='text-black'>
-                            <option value='' disabled>Select Status</option>
-                            <option value='Active'>Active</option>
-                            <option value='Inactive'>Inactive</option>
-                        </select>
                             
                         <button type='submit' className='px-2 mx-2 border border-white'>{editingEmployee ? 'Save Employee' : 'Add Employee'}</button>
                     </div>
                 </form>
+            </div>
+            <div className='employee-toggle-view'>
+                <button className='px-2 mx-1 mt-2 border border-white' onClick={() => setListView('active')}>Active</button>
+                <button className='px-2 mx-1 mt-2 border border-white' onClick={() => setListView('inactive')}>Inactive</button>
             </div>
             <div>
                 <table>
@@ -218,12 +271,11 @@ export default function EmployeesPage() {
                             <th className="px-4 py-2 text-center">Employee Type</th>
                             <th className="px-4 py-2 text-center">Username</th>
                             <th className="px-4 py-2 text-center">Password</th>
-                            <th className="px-4 py-2 text-center">Status</th>
                             <th className="px-4 py-2 text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {employees.map((employee) => (
+                        {(listView === 'active' ? activeEmployees : inactiveEmployees).map((employee) => (
                             <tr key={employee.id} >
                                 <td className='px-4'>{employee.last_name + ', ' + employee.first_name}</td>
                                 <td className='px-4'>{employee.email_address}</td>
@@ -232,10 +284,15 @@ export default function EmployeesPage() {
                                 <td className='px-4'>{employee.employee_type}</td>
                                 <td className='px-4'>{employee.username}</td>
                                 <td className='px-4'>{employee.password}</td>
-                                <td className='px-4'>{employee.status}</td>
                                 <td>
-                                    <button onClick={() => editEmployee(employee.id)} className='px-2'>Edit</button>
-                                    <button className='px-2'>Archive</button>
+                                    {listView === 'active' ? (
+                                        <>
+                                            <button onClick={() => editEmployee(employee.id)} className='px-2'>Edit</button>
+                                            <button onClick={() => archiveEmployee(employee.id)} className='px-2'>Archive</button>
+                                        </>
+                                    ) : (
+                                        <button onClick={() => unarchiveEmployee(employee.id)}>Unarchive</button>
+                                    )}
                                 </td>
                             </tr>
                         ))}
