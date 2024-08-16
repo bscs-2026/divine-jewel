@@ -19,9 +19,23 @@ interface Category {
     description: string;
 }
 
+interface Inventory {
+    id: number;
+    product_id: number;
+    shop_location: string;
+    quantity: number;
+}
+
+interface ShopLocation {
+    id: number;
+    address_line: string;
+}
+
 export default function ProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [inventory, setInventory] = useState<Product[]>([]);
+    const [shopLocations, setShopLocation] = useState<ShopLocation[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
@@ -29,10 +43,13 @@ export default function ProductsPage() {
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
     const [listView, setListView] = useState<'active' | 'inactive'>('active');
     const [formView, setFormView] = useState<'product' | 'stock'>('product');
+    const [selectedShopLocation, setSelectedShopLocation] = useState<string | null>(null);
 
     useEffect(() => {
         fetchProducts();
         fetchCategories();
+        fetchInventory();
+        fetchShopLocation();
     }, []);
 
     const fetchProducts = async () => {
@@ -62,6 +79,33 @@ export default function ProductsPage() {
             setError(error.message);
         }
     };
+
+    const fetchInventory = async () => {
+        try {
+            const response = await fetch('/api/products/inventory');
+            if (!response.ok) {
+                throw new Error('Failed to fetch inventory');
+            }
+            const data = await response.json();
+            setInventory(data.inventory);
+        } catch (error: any) {
+            setError(error.message);
+        }
+    }
+
+    const fetchShopLocation = async () => {
+        try {
+            const response = await fetch('/api/products/shop_location');
+            if (!response.ok) {
+                throw new Error('Failed to fetch shop location');
+            }
+            const data = await response.json();
+            setShopLocation(data.shop_location);
+        } catch (error: any) {
+            setError(error.message);
+        }
+    }
+
 
     const addProduct = async (event: FormEvent) => {
         event.preventDefault();
@@ -310,46 +354,96 @@ export default function ProductsPage() {
 
             <br />
 
-            <div className='product-view-toggle'>
-                <button onClick={() => setListView('active')}>Active</button>
-                <button onClick={() => setListView('inactive')}>Inactive</button>
+            <div className='table'>
+                {formView === 'product' && (
+                    <div>
+                        <div className='product-view-toggle'>
+                            <button onClick={() => setListView('active')} className='px-1'>Active</button>
+                            <button onClick={() => setListView('inactive')} className='px-1' >Inactive</button>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th className="px-6 py-2 text-center">ID</th>
+                                    <th className="px-6 py-2 text-center">Category</th>
+                                    <th className="px-6 py-2 text-center">Name</th>
+                                    <th className="px-6 py-2 text-center">Price</th>
+                                    <th className="px-6 py-2 text-center">Stock</th>
+                                    <th >Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {(listView === 'active' ? activeProducts : inactiveProducts).map((product) => (
+                                    <tr key={product.id}>
+                                        <td className='px-6'>{product.id}</td>
+                                        <td className='px-6'>{product.category_name}</td>
+                                        <td className='px-6'>{product.name}</td>
+                                        <td className='px-6'>{product.price}</td>
+                                        <td className='px-6'>{product.stock}</td>
+                                        <td>
+                                            {listView === 'active' ? (
+                                                <>
+                                                    <button onClick={() => editProduct(product.id)} className='px-1'>Edit</button>
+                                                    <button onClick={() => archiveProduct(product.id)} className='px-1'>Archive</button>
+                                                </>
+                                            ) : (
+                                                <button onClick={() => unarchiveProduct(product.id)}>Unarchive</button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
+                {formView === 'stock' && (
+                    <div>
+                        <div>
+                            <label htmlFor='shop_location'>Shop Location:</label>
+                            <select
+                                name='shop_location'
+                                id='shop_location'
+                                value={selectedShopLocation || ''}
+                                onChange={(e) => setSelectedShopLocation(e.target.value)}
+                            >
+                                <option value=''>All Locations</option>
+                                {shopLocations.map((shop_location) => (
+                                    <option key={shop_location.id} value={shop_location.id}>
+                                        {shop_location.address_line}
+                                    </option>
+                                ))}
+                            </select>
+                            <button>Filter</button>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th className="px-6 py-2 text-center">Inventory ID</th>
+                                    <th className="px-6 py-2 text-center">Product</th>
+                                    <th className="px-6 py-2 text-center">Shop Location</th>
+                                    <th className="px-6 py-2 text-center">Stock</th>
+                                    {/* <th >Actions</th> */}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {inventory.map((inventory) => (
+                                    <tr key={inventory.id}>
+                                        <td className='px-6'>{inventory.id}</td>
+                                        <td className='px-6'>{inventory.product_name}</td>
+                                        <td className='px-6'>{inventory.shop_location}</td>
+                                        <td className='px-6'>{inventory.stock}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
             </div>
 
-            <div className='table'>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Category</th>
-                            <th>Name</th>
-                            <th>Price</th>
-                            <th>Stock</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {(listView === 'active' ? activeProducts : inactiveProducts).map((product) => (
-                            <tr key={product.id}>
-                                <td>{product.id}</td>
-                                <td>{product.category_name}</td>
-                                <td>{product.name}</td>
-                                <td>{product.price}</td>
-                                <td>{product.stock}</td>
-                                <td>
-                                    {listView === 'active' ? (
-                                        <>
-                                            <button onClick={() => editProduct(product.id)}>Edit</button>
-                                            <button onClick={() => archiveProduct(product.id)}>Archive</button>
-                                        </>
-                                    ) : (
-                                        <button onClick={() => unarchiveProduct(product.id)}>Unarchive</button>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
         </div>
     );
 }
