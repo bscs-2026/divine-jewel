@@ -7,15 +7,17 @@ export async function GET() {
     console.log('Fetching products from database...');
     const rows = await query(`
       SELECT 
-          p.*, 
+          p.*,
           c.name AS category_name, 
-          ii.quantity AS stock
+          SUM(ii.quantity) AS stock
       FROM 
           products p
       LEFT JOIN 
           category c ON p.category_id = c.id
       LEFT JOIN 
-          inventory_item ii ON p.id = ii.product_id;
+          inventory_item ii ON p.id = ii.product_id
+      GROUP BY 
+          p.id; 
     `);
     console.log('Fetched products:', rows);
     return NextResponse.json({ products: rows }, { status: 200 });

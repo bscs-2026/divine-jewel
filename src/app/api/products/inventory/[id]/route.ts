@@ -4,17 +4,18 @@ import { query } from '../../../../../lib/db';
 export async function PUT(request: NextRequest, { params }: { params: {id: string } } ) {
     try{
         const { id } = params;
-        const { quantity } = await request.json();
+        const { branch_code, quantity } = await request.json();
 
-        if (!id) {
-            return NextResponse.json({error: 'ID is required'}, { status: 400});
+
+        if (!id || !branch_code) {
+            return NextResponse.json({ error: 'Product ID and Branch Code are required' }, { status: 400 });
         }
 
         console.log('updating inventory in database...');
 
         const result = await query(
-            'UPDATE `inventory_item` SET quantity = quantity + ? WHERE product_id = ?', 
-            [quantity, id]
+            'UPDATE `inventory_item` SET quantity = quantity + ? WHERE product_id = ? && branch_code = ?', 
+            [quantity, id, branch_code]
         );
 
         return NextResponse.json({ message: 'Inventory updated successfully' }, { status: 200 });

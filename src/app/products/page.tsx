@@ -22,11 +22,11 @@ interface Category {
 interface Inventory {
     id: number;
     product_id: number;
-    shop_location: string;
+    branch_code: number;
     quantity: number;
 }
 
-interface ShopLocation {
+interface Branch {
     id: number;
     address_line: string;
 }
@@ -35,7 +35,7 @@ export default function ProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [inventory, setInventory] = useState<Product[]>([]);
-    const [shopLocations, setShopLocation] = useState<ShopLocation[]>([]);
+    const [branches, setBranch] = useState<Branch[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [currentProduct, setCurrentProduct] = useState<Product | null>(null);
@@ -43,13 +43,13 @@ export default function ProductsPage() {
     const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
     const [listView, setListView] = useState<'active' | 'inactive'>('active');
     const [formView, setFormView] = useState<'product' | 'stock'>('product');
-    const [selectedShopLocation, setSelectedShopLocation] = useState<string | null>(null);
+    const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
 
     useEffect(() => {
         fetchProducts();
         fetchCategories();
         fetchInventory();
-        fetchShopLocation();
+        fetchBranches();
     }, []);
 
     const fetchProducts = async () => {
@@ -93,14 +93,14 @@ export default function ProductsPage() {
         }
     }
 
-    const fetchShopLocation = async () => {
+    const fetchBranches = async () => {
         try {
-            const response = await fetch('/api/products/shop_location');
+            const response = await fetch('/api/products/inventory/branches');
             if (!response.ok) {
-                throw new Error('Failed to fetch shop location');
+                throw new Error('Failed to fetch branches');
             }
             const data = await response.json();
-            setShopLocation(data.shop_location);
+            setBranch(data.branches);
         } catch (error: any) {
             setError(error.message);
         }
@@ -237,39 +237,41 @@ export default function ProductsPage() {
 
     const addStock = async (event: FormEvent) => {
         event.preventDefault();
-
+    
         const form = event.target as HTMLFormElement;
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
-
+    
         const productId = data.product_id as string;
+        const branchCode = data.branch_code as string;
         const quantity = Number(data.quantity);
-
-        if (!productId || isNaN(quantity)) {
-            setError('Please select a product and enter a valid quantity.');
+    
+        if (!productId || !branchCode || isNaN(quantity)) {
+            setError('Please select a product, branch, and enter a valid quantity.');
             return;
         }
-
+    
         try {
             const response = await fetch(`/api/products/inventory/${productId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ quantity }),
+                body: JSON.stringify({ branch_code: branchCode, quantity }),
             });
-
+    
             if (!response.ok) {
                 throw new Error('Failed to update stock');
             }
-
+    
             setError(null);
             form.reset();
-            await fetchProducts(); // Refresh products to show updated stock
+            await fetchInventory();
         } catch (error: any) {
             setError(error.message);
         }
     };
+    
 
 
 
@@ -341,6 +343,15 @@ export default function ProductsPage() {
                                     </option>
                                 ))}
                             </select>
+                            <label htmlFor='product_id'>Branch:</label>
+                            <select name="branch_code" id="branch_code">
+                                <option value="">Select a branch</option>
+                                {branches.map((branch) => (
+                                    <option key={branch.id} value={branch.id}>
+                                        {branch.address_line}
+                                    </option>
+                                ))}
+                            </select>
 
                             <label htmlFor='quantity'>Quantity:</label>
                             <input type='number' id='quantity' name='quantity' />
@@ -401,17 +412,17 @@ export default function ProductsPage() {
                 {formView === 'stock' && (
                     <div>
                         <div>
-                            <label htmlFor='shop_location'>Shop Location:</label>
+                            <label htmlFor='branch'>Branch:</label>
                             <select
-                                name='shop_location'
-                                id='shop_location'
-                                value={selectedShopLocation || ''}
-                                onChange={(e) => setSelectedShopLocation(e.target.value)}
+                                name='branch'
+                                id='branch'
+                                value={selectedBranch || ''}
+                                onChange={(e) => setSelectedBranch(e.target.value)}
                             >
-                                <option value=''>All Locations</option>
-                                {shopLocations.map((shop_location) => (
-                                    <option key={shop_location.id} value={shop_location.id}>
-                                        {shop_location.address_line}
+                                <option value=''>All Branches</option>
+                                {branches.map((branch) => (
+                                    <option key={branch.id} value={branch.id}>
+                                        {branch.address_line}
                                     </option>
                                 ))}
                             </select>
@@ -423,7 +434,7 @@ export default function ProductsPage() {
                                 <tr>
                                     <th className="px-6 py-2 text-center">Inventory ID</th>
                                     <th className="px-6 py-2 text-center">Product</th>
-                                    <th className="px-6 py-2 text-center">Shop Location</th>
+                                    <th className="px-6 py-2 text-center">Branch</th>
                                     <th className="px-6 py-2 text-center">Stock</th>
                                     {/* <th >Actions</th> */}
                                 </tr>
@@ -433,7 +444,7 @@ export default function ProductsPage() {
                                     <tr key={inventory.id}>
                                         <td className='px-6'>{inventory.id}</td>
                                         <td className='px-6'>{inventory.product_name}</td>
-                                        <td className='px-6'>{inventory.shop_location}</td>
+                                        <td className='px-6'>{inventory.branch_name}</td>
                                         <td className='px-6'>{inventory.stock}</td>
                                     </tr>
                                 ))}
