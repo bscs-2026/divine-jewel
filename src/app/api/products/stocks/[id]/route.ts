@@ -11,17 +11,17 @@ export async function PUT(request: NextRequest, { params }: { params: {id: strin
             return NextResponse.json({ error: 'Product ID and Branch Code are required' }, { status: 400 });
         }
 
-        console.log('updating inventory in database...');
+        console.log('updating stocks in database...');
 
         const result = await query(
-            'UPDATE `inventory_item` SET quantity = quantity + ? WHERE product_id = ? && branch_code = ?', 
+            'UPDATE `stocks` SET quantity = quantity + ? WHERE product_id = ? && branch_code = ?', 
             [quantity, id, branch_code]
         );
 
-        return NextResponse.json({ message: 'Inventory updated successfully' }, { status: 200 });
+        return NextResponse.json({ message: 'stocks updated successfully' }, { status: 200 });
 
     } catch (error: any){
-        console.error('An error occurred while updating inventory_item:', error);
+        console.error('An error occurred while updating stocks:', error);
         return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
 
     }

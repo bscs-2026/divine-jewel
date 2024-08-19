@@ -19,7 +19,7 @@ interface Category {
     description: string;
 }
 
-interface Inventory {
+interface Stocks {
     id: number;
     product_id: number;
     branch_code: number;
@@ -34,7 +34,7 @@ interface Branch {
 export default function ProductsPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
-    const [inventory, setInventory] = useState<Product[]>([]);
+    const [stocks, setStocks] = useState<Product[]>([]);
     const [branches, setBranch] = useState<Branch[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
@@ -48,7 +48,7 @@ export default function ProductsPage() {
     useEffect(() => {
         fetchProducts();
         fetchCategories();
-        fetchInventory();
+        fetchStocks();
         fetchBranches();
     }, []);
 
@@ -80,14 +80,14 @@ export default function ProductsPage() {
         }
     };
 
-    const fetchInventory = async () => {
+    const fetchStocks = async () => {
         try {
-            const response = await fetch('/api/products/inventory');
+            const response = await fetch('/api/products/stocks');
             if (!response.ok) {
-                throw new Error('Failed to fetch inventory');
+                throw new Error('Failed to fetch stocks');
             }
             const data = await response.json();
-            setInventory(data.inventory);
+            setStocks(data.stocks);
         } catch (error: any) {
             setError(error.message);
         }
@@ -95,7 +95,7 @@ export default function ProductsPage() {
 
     const fetchBranches = async () => {
         try {
-            const response = await fetch('/api/products/inventory/branches');
+            const response = await fetch('/api/products/stocks/branches');
             if (!response.ok) {
                 throw new Error('Failed to fetch branches');
             }
@@ -130,6 +130,7 @@ export default function ProductsPage() {
             setCurrentProduct(null);
             setSelectedCategory(null);
             await fetchProducts();
+            await fetchStocks();
         } catch (error: any) {
             setError(error.message);
         }
@@ -252,7 +253,7 @@ export default function ProductsPage() {
         }
     
         try {
-            const response = await fetch(`/api/products/inventory/${productId}`, {
+            const response = await fetch(`/api/products/stocks/${productId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -266,7 +267,7 @@ export default function ProductsPage() {
     
             setError(null);
             form.reset();
-            await fetchInventory();
+            await fetchStocks();
         } catch (error: any) {
             setError(error.message);
         }
@@ -426,13 +427,13 @@ export default function ProductsPage() {
                                     </option>
                                 ))}
                             </select>
-                            <button>Filter</button>
+                            {/* <button>Filter</button> */}
                         </div>
 
                         <table>
                             <thead>
                                 <tr>
-                                    <th className="px-6 py-2 text-center">Inventory ID</th>
+                                    <th className="px-6 py-2 text-center">stocks ID</th>
                                     <th className="px-6 py-2 text-center">Product</th>
                                     <th className="px-6 py-2 text-center">Branch</th>
                                     <th className="px-6 py-2 text-center">Stock</th>
@@ -440,12 +441,12 @@ export default function ProductsPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {inventory.map((inventory) => (
-                                    <tr key={inventory.id}>
-                                        <td className='px-6'>{inventory.id}</td>
-                                        <td className='px-6'>{inventory.product_name}</td>
-                                        <td className='px-6'>{inventory.branch_name}</td>
-                                        <td className='px-6'>{inventory.stock}</td>
+                                {stocks.map((stocks) => (
+                                    <tr key={stocks.id}>
+                                        <td className='px-6'>{stocks.id}</td>
+                                        <td className='px-6'>{stocks.product_name}</td>
+                                        <td className='px-6'>{stocks.branch_name}</td>
+                                        <td className='px-6'>{stocks.stock}</td>
                                     </tr>
                                 ))}
                             </tbody>

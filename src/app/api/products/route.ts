@@ -9,13 +9,13 @@ export async function GET() {
       SELECT 
           p.*,
           c.name AS category_name, 
-          SUM(ii.quantity) AS stock
+          SUM(s.quantity) AS stock
       FROM 
           products p
       LEFT JOIN 
           category c ON p.category_id = c.id
       LEFT JOIN 
-          inventory_item ii ON p.id = ii.product_id
+          stocks s ON p.id = s.product_id
       GROUP BY 
           p.id; 
     `);
@@ -41,12 +41,12 @@ export async function POST(request: NextRequest) {
     // const productId = await query('SELECT id FROM products ORDER BY id DESC LIMIT 1;');
     // console.log('Product ID:', productId);
 
-    console.log('Adding product to inventory...');
+    console.log('Adding product to stocks...');
     await query(
-      'INSERT INTO `inventory_item` (product_id, quantity) VALUES (?, ?)',
+      'INSERT INTO `stocks` (product_id, quantity) VALUES (?, ?)',
       [productId, 0]
     );
-    console.log('Added inventory for product:', productId);
+    console.log('Added stocks for product:', productId);
     return NextResponse.json({ message: 'Product added successfully' }, { status: 201 });
   } catch (error: any) {
     console.error('An error occurred while adding product:', error);
