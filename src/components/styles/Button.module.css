@@ -1,0 +1,45 @@
+/* src/components/styles/Button.module.css */
+
+.smallButton {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1.5rem;
+  color: #575757;
+  font-size: 13px;
+}
+
+.mediumButton {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1.5rem;
+  color: #575757;
+  font-size: 14px;
+}
+
+/* Button States */
+.activeButton {
+  background-color: #FCB6D7;
+}
+
+.inactiveButton {
+  background-color: #F9F9F9;
+}
+
+.addButton {
+  background-color: #FCB6D7;
+}
+
+.cancelButton {
+  background-color: #D1D5DB;
+}
+
+.editButton {
+  background-color: #FCE4EC;
+  margin-right: 0.5rem;
+}
+
+.archiveButton {
+  background-color: #D1D5DB;
+}
+
+.unarchiveButton {
+  background-color: #FCB6D7;
+}

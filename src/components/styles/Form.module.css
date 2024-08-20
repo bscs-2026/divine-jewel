@@ -1,0 +1,41 @@
+/* src/components/styles/Form.module.css */
+
+.container {
+  width: 100%;
+  background-color: #FFE7EF;
+  padding: 1.5rem;
+  padding-top: 60px;
+  box-sizing: border-box;
+}
+
+.heading {
+  color: #575757;
+  font-weight: normal;
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  color: #575757
+}
+
+.select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #FFE7EF;
+  border-radius: 0.5rem;
+  color: #575757;
+  font-size: 13px;
+}
+
+.input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #FFE7EF;
+  border-radius: 0.5rem;
+  color: #575757;
+  font-size: 13px;
+}
