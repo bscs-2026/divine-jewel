@@ -1,0 +1,123 @@
+import { useEffect, useState, FormEvent } from 'react';
+import Head from 'next/head';
+
+export default function ProductsPage() {
+    return (
+        <>
+            <Head>
+                <style>
+                    {`
+                        @font-face {
+                            font-family: 'DivineFont';
+                            src: url('/fonts/DivineFont.ttf') format('truetype');
+                            font-weight: normal;
+                            font-style: normal;
+                        }
+
+                        body {
+                            font-family: 'DivineFont', sans-serif;
+                            color: #ff6ea4; /* Assuming this is the correct text color */
+                        }
+
+                        h1, h2, h3, h4, h5, h6 {
+                            font-family: 'DivineFont', sans-serif;
+                            color: #ff6ea4; /* Ensuring headers use the correct color */
+                        }
+
+                        button {
+                            font-family: 'DivineFont', sans-serif;
+                            color: #fff;
+                        }
+                    `}
+                </style>
+            </Head>
+            <div className="flex h-screen bg-pink-50">
+                {/* Sidebar */}
+                <div className="w-1/5 bg-[#FB82AB] flex flex-col justify-between py-8 px-4">
+                    <div>
+                        <h1 className="text-3xl font-bold">Divine Jewel</h1>
+                        <ul className="mt-8 space-y-4">
+                            <li>Sales</li>
+                            <li>Transactions</li>
+                            <li>History</li>
+                            <li>Products</li>
+                            <li>Employees</li>
+                        </ul>
+                    </div>
+                    <button className="mt-auto">Log Out</button>
+                </div>
+
+                {/* Main Content */}
+                <div className="flex-1 p-8">
+                    {/* Search Bar */}
+                    <div className="flex justify-between items-center mb-8">
+                        <input
+                            type="text"
+                            placeholder="Search products"
+                            className="w-full p-2 border border-pink-300 rounded-lg"
+                        />
+                    </div>
+
+                    {/* Category Tabs */}
+                    <div className="flex space-x-4 mb-8">
+                        <button className="px-4 py-2 bg-pink-300 text-white rounded-full">Bracelets</button>
+                        <button className="px-4 py-2 text-pink-800">Keychains</button>
+                        <button className="px-4 py-2 text-pink-800">Necklaces</button>
+                        <button className="px-4 py-2 text-pink-800">Stickers</button>
+                        <button className="px-4 py-2 text-pink-800">Crochet</button>
+                    </div>
+
+                    {/* Product Table */}
+                    <div className="bg-white p-4 rounded-lg shadow-md">
+                        <table className="w-full text-pink-800">
+                            <thead>
+                                <tr className="text-left">
+                                    <th className="p-4">ID</th>
+                                    <th className="p-4">Name</th>
+                                    <th className="p-4">Stock</th>
+                                    <th className="p-4">Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {/* Assuming you have a products array */}
+                                {products.map((product) => (
+                                    <tr key={product.id} className="border-t">
+                                        <td className="p-4">{product.id}</td>
+                                        <td className="p-4">{product.name}</td>
+                                        <td className="p-4">{product.quantity}</td>
+                                        <td className="p-4">₱{product.price}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {/* Product Management */}
+                <div className="w-1/4 bg-pink-100 p-8">
+                    <div className="mb-4">
+                        <button className="px-4 py-2 bg-pink-300 text-white rounded-full">Active</button>
+                        <button className="px-4 py-2 text-pink-800">Inactive</button>
+                    </div>
+
+                    <form onSubmit={addProduct} className="space-y-4">
+                        <select name="category_id" className="w-full p-2 border border-pink-300 rounded-lg">
+                            <option value="">Product Category</option>
+                            {/* Assuming you have a categories array */}
+                            {categories.map((category) => (
+                                <option key={category.id} value={category.id}>
+                                    {category.name}
+                                </option>
+                            ))}
+                        </select>
+                        <input type="text" name="name" placeholder="Product Name" className="w-full p-2 border border-pink-300 rounded-lg" />
+                        <input type="number" name="price" placeholder="Price" className="w-full p-2 border border-pink-300 rounded-lg" />
+                        <button type="submit" className="w-full bg-pink-400 p-2 rounded-lg text-white">Update</button>
+                    </form>
+
+                    <button className="w-full bg-red-400 mt-4 p-2 rounded-lg text-white">Deactivate Product</button>
+                </div>
+            </div>
+        </>
+    );
+}

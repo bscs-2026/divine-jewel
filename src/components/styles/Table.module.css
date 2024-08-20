@@ -1,0 +1,38 @@
+/* src/components/styles/Table.module.css */
+
+.container {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 -0.5rem 1rem rgba(0, 0, 0, 0.1),
+    /* Top shadow */
+    0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  /* Bottom and side shadows */
+  overflow-y: auto;
+  height: 700px;
+  width: 100%;
+  max-width: 1024px;
+}
+
+.table {
+  width: 100%;
+  text-align: left;
+  color: black;
+}
+
+.th {
+  padding: 1rem;
+  color: #575757;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.td {
+  padding: 1rem;
+  color: #575757;
+  font-size: 13px;
+}
+
+.borderT {
+  border-top: 1px solid #e2e8f0;
+}
