@@ -185,7 +185,7 @@ export default function ProductsPage() {
                             <th className="px-6 py-2 text-center">Stock ID</th>
                             <th className="px-6 py-2 text-center">Product</th>
                             <th className="px-6 py-2 text-center">Branch</th>
-                            <th className="px-6 py-2 text-center">Stock</th>
+                            <th className="px-6 py-2 text-center">Quantity</th>
                             {/* <th >Actions</th> */}
                         </tr>
                     </thead>
