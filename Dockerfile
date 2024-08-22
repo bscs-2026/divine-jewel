@@ -13,6 +13,8 @@ COPY .env ./
 COPY . .
 
 # Install dependencies
+RUN rm -rf node_modules package-lock.json
+RUN npm cache clean --force
 RUN npm install
 
 # Build the Next.js app

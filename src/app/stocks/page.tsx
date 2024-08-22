@@ -54,7 +54,7 @@ export default function ProductsPage() {
     }
     const fetchStocks = async () => {
         try {
-            const response = await fetch('/api/products/stocks');
+            const response = await fetch('/api/stocks');
             if (!response.ok) {
                 throw new Error('Failed to fetch stocks');
             }
@@ -67,7 +67,7 @@ export default function ProductsPage() {
 
     const fetchBranches = async () => {
         try {
-            const response = await fetch('/api/products/stocks/branches');
+            const response = await fetch('/api/stocks/branches');
             if (!response.ok) {
                 throw new Error('Failed to fetch branches');
             }
@@ -95,7 +95,7 @@ export default function ProductsPage() {
         }
 
         try {
-            const response = await fetch(`/api/products/stocks/${productId}`, {
+            const response = await fetch(`/api/stocks/${productId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -185,7 +185,7 @@ export default function ProductsPage() {
                             <th className="px-6 py-2 text-center">Stock ID</th>
                             <th className="px-6 py-2 text-center">Product</th>
                             <th className="px-6 py-2 text-center">Branch</th>
-                            <th className="px-6 py-2 text-center">Stock</th>
+                            <th className="px-6 py-2 text-center">Quantity</th>
                             {/* <th >Actions</th> */}
                         </tr>
                     </thead>
