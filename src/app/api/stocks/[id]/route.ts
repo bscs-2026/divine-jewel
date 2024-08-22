@@ -18,7 +18,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
         console.log('Adding record to stock_details:', result);
         await query(
-            'INSERT INTO `stock_details` (product_id, source_branch, quantity, employee_id) VALUES (?, ?, ?, ?)',
+            'INSERT INTO `stock_details` (product_id, destination_branch, quantity, employee_id) VALUES (?, ?, ?, ?)',
             [id, branch_code, quantity, employee || null]
         );
 
