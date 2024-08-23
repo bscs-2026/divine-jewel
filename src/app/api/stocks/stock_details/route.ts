@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
         console.log('Adding stock details to database...');
         const result = await query(
             'INSERT INTO `stock_details` (product_id, source_branch, destination_branch, quantity, employee_id, note) VALUES (?, ?, ?, ?, ?, ?)',
-            [product_id, source_branch, destination_branch, quantity, employee_id || null, note]
+            [product_id, source_branch, destination_branch, quantity, employee_id || null, note || null]
         );
         console.log('Added stock_details:', result);
 

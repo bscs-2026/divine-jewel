@@ -10,7 +10,7 @@ export async function GET() {
         s.id,
         p.name AS product_name,
         bc.address_line AS branch_name,
-        s.quantity AS stock
+        s.quantity
       FROM 
         stocks s
       LEFT JOIN

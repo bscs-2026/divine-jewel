@@ -13,7 +13,9 @@ interface Product {
 interface Stock {
     id: number;
     product_id: number;
+    product_name: string;
     branch_code: number;
+    branch_name: string;
     quantity: number;
 }
 
@@ -21,14 +23,24 @@ interface Branch {
     id: number;
     address_line: string;
 }
+interface StockDetails {
+    product_id: number;
+    source_branch: string;
+    destination_branch: string;
+    quantity: number;
+    note: string;
+}
 
 export default function StocksPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [stocks, setStocks] = useState<Stock[]>([]);
+
     const [branches, setBranches] = useState<Branch[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
+    const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
+    const [isTransfer, setIsTransfer] = useState(false);
 
     useEffect(() => {
         fetchStocks();
@@ -111,6 +123,40 @@ export default function StocksPage() {
             setError(error.message);
         }
     };
+    const transferStock = async (stockDetails: StockDetails) => {
+        try {
+            const { product_id, source_branch, destination_branch, quantity, note } = stockDetails;
+
+            if (!product_id || !source_branch || !destination_branch || isNaN(quantity)) {
+                setError('Please select a product, source branch, destination branch, and enter a valid quantity.');
+                return;
+            }
+
+            const response = await fetch(`/api/stocks/stock_details`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_id,
+                    source_branch,
+                    destination_branch,
+                    quantity,
+                    note: note || null,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to transfer stock');
+            }
+
+            setSelectedStock(null);
+            setIsTransfer(false);
+            await fetchStocks(); // Refresh the stocks after the transfer
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
 
     return (
         <Layout defaultTitle="Stocks" rightSidebarContent={
@@ -118,15 +164,20 @@ export default function StocksPage() {
                 products={products}
                 branches={branches}
                 addStock={addStock}
-                error={error} />
+                transferStock={transferStock}
+                selectedStock={selectedStock}
+                isTransfer={isTransfer}
+                error={error}
+            />
         }>
             <StockTable
                 stocks={stocks}
                 branches={branches}
                 selectedBranch={selectedBranch}
                 setSelectedBranch={setSelectedBranch}
+                setSelectedStock={setSelectedStock}
+                setIsTransfer={setIsTransfer}
             />
-
         </Layout>
     );
 }
