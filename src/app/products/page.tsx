@@ -216,8 +216,9 @@ export default function ProductsPage() {
                 setFilterCategory={setFilterCategory}
             />
             <ProductTable
-                products={products}
-                filteredProducts={filteredProducts}
+                // products={products}
+                // filteredProducts={filteredProducts}
+                products={filteredProducts}
                 editProduct={editProduct}
                 archiveProduct={archiveProduct}
                 unarchiveProduct={unarchiveProduct}

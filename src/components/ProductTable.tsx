@@ -13,7 +13,8 @@ interface Product {
 }
 
 interface ProductTableProps {
-  filteredProducts: Product[];
+  // filteredProducts: Product[];
+  products: Product[];
   editProduct: (id: number) => void;
   archiveProduct: (id: number) => void;
   unarchiveProduct: (id: number) => void;
@@ -21,7 +22,8 @@ interface ProductTableProps {
 }
 
 const ProductTable: React.FC<ProductTableProps> = ({
-  filteredProducts,
+  // filteredProducts,
+  products,
   editProduct,
   archiveProduct,
   unarchiveProduct,
@@ -42,7 +44,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
           </tr>
         </thead>
         <tbody>
-          {filteredProducts.map((product) => (
+          {/* {filteredProducts.map((product) => ( */}
+          {products.map((product) => (
             <tr key={product.id} className={styles.borderT}>
               <td className={styles.td}>{product.id}</td>
               <td className={styles.td}>{product.name}</td>

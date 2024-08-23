@@ -7,16 +7,17 @@ export async function GET() {
     console.log('Fetching stocks from database...');
     const rows = await query(`
       SELECT
-        s.id,
+        s.*,
         p.name AS product_name,
-        bc.address_line AS branch_name,
-        s.quantity AS stock
+        bc.address_line AS branch_name
       FROM 
         stocks s
       LEFT JOIN
         products p ON s.product_id = p.id
       LEFT JOIN
-        branches bc ON s.branch_code = bc.id;
+        branches bc ON s.branch_code = bc.id
+      ORDER BY
+        p.name ASC;
     `);
     console.log('Fetched stocks:', rows);
     return NextResponse.json({ stocks: rows }, { status: 200 });

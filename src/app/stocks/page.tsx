@@ -1,24 +1,22 @@
-// src/app/products/page.tsx
 'use client';
-import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import Layout from '../../components/Layout';
+import StockTable from '../../components/StockTable';
+import StockForm from '../../components/StockForm';
+import StockFilterTab from '../../components/StockFilterTab';
 
-import { useEffect, useState, FormEvent } from 'react';
-
-interface Product {
-    id: number;
-    category_id: number;
-    name: string;
-    price: number;
-    quantity: number;
-    is_archive: number | boolean;
-    [key: string]: any;
-}
-
-interface Stocks {
+interface Stock {
     id: number;
     product_id: number;
     branch_code: number;
     quantity: number;
+    product_name: string;
+    branch_name: string;
+}
+
+interface Product {
+    id: number;
+    name: string;
 }
 
 interface Branch {
@@ -26,13 +24,24 @@ interface Branch {
     address_line: string;
 }
 
-export default function ProductsPage() {
+interface StockDetails {
+    product_id: number;
+    source_branch: number;
+    destination_branch: number;
+    quantity: number;
+    note: string;
+}
+
+export default function StocksPage() {
     const [products, setProducts] = useState<Product[]>([]);
-    const [stocks, setStocks] = useState<Product[]>([]);
-    const [branches, setBranch] = useState<Branch[]>([]);
+    const [stocks, setStocks] = useState<Stock[]>([]);
+    const [branches, setBranches] = useState<Branch[]>([]);
+    const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
+    const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
+    const [isTransfer, setIsTransfer] = useState(false);
+    const [filterBranch, setFilterBranch] = useState<number | string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-    const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
 
     useEffect(() => {
         fetchStocks();
@@ -51,7 +60,8 @@ export default function ProductsPage() {
         } catch (error: any) {
             setError(error.message);
         }
-    }
+    };
+
     const fetchStocks = async () => {
         try {
             const response = await fetch('/api/stocks');
@@ -63,7 +73,7 @@ export default function ProductsPage() {
         } catch (error: any) {
             setError(error.message);
         }
-    }
+    };
 
     const fetchBranches = async () => {
         try {
@@ -72,35 +82,25 @@ export default function ProductsPage() {
                 throw new Error('Failed to fetch branches');
             }
             const data = await response.json();
-            setBranch(data.branches);
+            setBranches(data.branches);
         } catch (error: any) {
             setError(error.message);
         }
-    }
+    };
 
-    const addStock = async (event: FormEvent) => {
-        event.preventDefault();
-
-        const form = event.target as HTMLFormElement;
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-
-        const productId = data.product_id as string;
-        const branchCode = data.branch_code as string;
-        const quantity = Number(data.quantity);
-
-        if (!productId || !branchCode || isNaN(quantity)) {
+    const addStock = async (stock: Stock) => {
+        if (!stock.product_id || !stock.branch_code || isNaN(stock.quantity)) {
             setError('Please select a product, branch, and enter a valid quantity.');
             return;
         }
 
         try {
-            const response = await fetch(`/api/stocks/${productId}`, {
+            const response = await fetch(`/api/stocks/${stock.product_id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ branch_code: branchCode, quantity }),
+                body: JSON.stringify({ branch_code: stock.branch_code, quantity: stock.quantity }),
             });
 
             if (!response.ok) {
@@ -108,102 +108,76 @@ export default function ProductsPage() {
             }
 
             setError(null);
-            form.reset();
+            setSelectedStock(null);
             await fetchStocks();
         } catch (error: any) {
             setError(error.message);
         }
     };
 
+    const transferStock = async (stockDetails: StockDetails) => {
 
-    const activeProducts = products.filter(product => product.is_archive === 0 || product.is_archive === false);
+        if (!stockDetails.product_id || !stockDetails.source_branch || !stockDetails.destination_branch || isNaN(stockDetails.quantity)) {
+            setError('Please select a product, source branch, destination branch, and enter a valid quantity.');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/stocks/stock_details`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    product_id: stockDetails.product_id,
+                    source_branch: stockDetails.source_branch,
+                    destination_branch: stockDetails.destination_branch,
+                    quantity: stockDetails.quantity,
+                    note: stockDetails.note,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to transfer stock');
+            }
+
+            setSelectedStock(null);
+            setIsTransfer(false);
+            await fetchStocks();
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
+
+    const filteredStocks = filterBranch
+    ? stocks.filter(stock => stock.branch_code === filterBranch)
+    : stocks;  
 
     return (
-        <div>
-            <div>
-                <h1 className='font-bold' >Stocks</h1>
-                <div>
-                    <Link href="/products">
-                        <button>Products</button>
-                    </Link>
-                    <Link href="/stocks">
-                        <button>Stocks</button>
-                    </Link>
-                </div>
-                <div>
-                    <form onSubmit={addStock}>
-                        <label htmlFor='product_id'>Product:</label>
-                        <select name="product_id" id="product_id">
-                            <option value="">Select a product</option>
-                            {activeProducts.map((product) => (
-                                <option key={product.id} value={product.id}>
-                                    {product.name}
-                                </option>
-                            ))}
-                        </select>
-                        <label htmlFor='product_id'>Branch:</label>
-                        <select name="branch_code" id="branch_code">
-                            <option value="">Select a branch</option>
-                            {branches.map((branch) => (
-                                <option key={branch.id} value={branch.id}>
-                                    {branch.address_line}
-                                </option>
-                            ))}
-                        </select>
+        <Layout
+            defaultTitle="Stocks"
+            rightSidebarContent={
+                <StockForm
+                    products={products}
+                    branches={branches}
+                    addStock={addStock}
+                    transferStock={transferStock}
+                    selectedStock={selectedStock}
+                    isTransfer={isTransfer}
+                />
+            }
+        >
+            <StockFilterTab
+                branches={branches}
+                filterBranch={filterBranch}
+                setFilterBranch={setFilterBranch}
+            />
 
-                        <label htmlFor='quantity'>Quantity:</label>
-                        <input type='number' id='quantity' name='quantity' />
-
-                        <button type='submit'>Add Stock</button>
-                    </form>
-                </div>
-            </div>
-
-            <br />
-
-            <div className='table'>
-                <div>
-                    <label htmlFor='branch'>Branch:</label>
-                    <select
-                        name='branch'
-                        id='branch'
-                        value={selectedBranch || ''}
-                        onChange={(e) => setSelectedBranch(e.target.value)}
-                    >
-                        <option value=''>All Branches</option>
-                        {branches.map((branch) => (
-                            <option key={branch.id} value={branch.id}>
-                                {branch.address_line}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th className="px-6 py-2 text-center">Stock ID</th>
-                            <th className="px-6 py-2 text-center">Product</th>
-                            <th className="px-6 py-2 text-center">Branch</th>
-                            <th className="px-6 py-2 text-center">Quantity</th>
-                            {/* <th >Actions</th> */}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {stocks.map((stocks) => (
-                            <tr key={stocks.id}>
-                                <td className='px-6'>{stocks.id}</td>
-                                <td className='px-6'>{stocks.product_name}</td>
-                                <td className='px-6'>{stocks.branch_name}</td>
-                                <td className='px-6'>{stocks.stock}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-
-        </div>
+            <StockTable
+                stocks={filteredStocks}
+                setSelectedStock={setSelectedStock}
+                setIsTransfer={setIsTransfer}
+            />
+        </Layout>
     );
 }
-
-

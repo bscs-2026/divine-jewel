@@ -17,7 +17,9 @@ export async function GET() {
       LEFT JOIN 
           stocks s ON p.id = s.product_id
       GROUP BY 
-          p.id; 
+          p.id
+      ORDER BY
+        p.name ASC; 
     `);
     console.log('Fetched products:', rows);
     return NextResponse.json({ products: rows }, { status: 200 });
@@ -42,9 +44,10 @@ export async function POST(request: NextRequest) {
     // console.log('Product ID:', productId);
 
     console.log('Adding product to stocks...');
+    //add stock record for product. defualt 0 quantity and default branch code 1/main branch
     await query(
-      'INSERT INTO `stocks` (product_id, quantity) VALUES (?, ?)',
-      [productId, 0]
+      'INSERT INTO `stocks` (product_id, quantity, branch_code) VALUES (?, ?, ?)',
+      [productId, 0, 1]
     );
     console.log('Added stocks for product:', productId);
     return NextResponse.json({ message: 'Product added successfully' }, { status: 201 });
