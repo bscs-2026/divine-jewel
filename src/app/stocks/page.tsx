@@ -1,32 +1,32 @@
 'use client';
-import { useEffect, useState, FormEvent } from 'react';
-import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import Layout from '../../components/Layout';
 import StockTable from '../../components/StockTable';
 import StockForm from '../../components/StockForm';
+
+interface Stock {
+    id: number;
+    product_id: number;
+    branch_code: number;
+    quantity: number;
+    product_name: string;
+    branch_name: string;
+}
 
 interface Product {
     id: number;
     name: string;
 }
 
-interface Stock {
-    id: number;
-    product_id: number;
-    product_name: string;
-    branch_code: number;
-    branch_name: string;
-    quantity: number;
-}
-
 interface Branch {
     id: number;
     address_line: string;
 }
+
 interface StockDetails {
     product_id: number;
-    source_branch: string;
-    destination_branch: string;
+    source_branch: number;
+    destination_branch: number;
     quantity: number;
     note: string;
 }
@@ -34,13 +34,12 @@ interface StockDetails {
 export default function StocksPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [stocks, setStocks] = useState<Stock[]>([]);
-
     const [branches, setBranches] = useState<Branch[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
     const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
     const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
     const [isTransfer, setIsTransfer] = useState(false);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         fetchStocks();
@@ -87,29 +86,19 @@ export default function StocksPage() {
         }
     };
 
-    const addStock = async (event: FormEvent) => {
-        event.preventDefault();
-
-        const form = event.target as HTMLFormElement;
-        const formData = new FormData(form);
-        const data = Object.fromEntries(formData.entries());
-
-        const productId = data.product_id as string;
-        const branchCode = data.branch_code as string;
-        const quantity = Number(data.quantity);
-
-        if (!productId || !branchCode || isNaN(quantity)) {
+    const addStock = async (stock: Stock) => {
+        if (!stock.product_id || !stock.branch_code || isNaN(stock.quantity)) {
             setError('Please select a product, branch, and enter a valid quantity.');
             return;
         }
 
         try {
-            const response = await fetch(`/api/stocks/${productId}`, {
+            const response = await fetch(`/api/stocks/${stock.product_id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ branch_code: branchCode, quantity }),
+                body: JSON.stringify({ branch_code: stock.branch_code, quantity: stock.quantity }),
             });
 
             if (!response.ok) {
@@ -117,32 +106,32 @@ export default function StocksPage() {
             }
 
             setError(null);
-            form.reset();
+            setSelectedStock(null);
             await fetchStocks();
         } catch (error: any) {
             setError(error.message);
         }
     };
+
     const transferStock = async (stockDetails: StockDetails) => {
+
+        if (!stockDetails.product_id || !stockDetails.source_branch || !stockDetails.destination_branch || isNaN(stockDetails.quantity)) {
+            setError('Please select a product, source branch, destination branch, and enter a valid quantity.');
+            return;
+        }
+
         try {
-            const { product_id, source_branch, destination_branch, quantity, note } = stockDetails;
-
-            if (!product_id || !source_branch || !destination_branch || isNaN(quantity)) {
-                setError('Please select a product, source branch, destination branch, and enter a valid quantity.');
-                return;
-            }
-
             const response = await fetch(`/api/stocks/stock_details`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    product_id,
-                    source_branch,
-                    destination_branch,
-                    quantity,
-                    note: note || null,
+                    product_id: stockDetails.product_id,
+                    source_branch: stockDetails.source_branch,
+                    destination_branch: stockDetails.destination_branch,
+                    quantity: stockDetails.quantity,
+                    note: stockDetails.note,
                 }),
             });
 
@@ -152,29 +141,28 @@ export default function StocksPage() {
 
             setSelectedStock(null);
             setIsTransfer(false);
-            await fetchStocks(); // Refresh the stocks after the transfer
+            await fetchStocks();
         } catch (error: any) {
             setError(error.message);
         }
     };
 
     return (
-        <Layout defaultTitle="Stocks" rightSidebarContent={
-            <StockForm
-                products={products}
-                branches={branches}
-                addStock={addStock}
-                transferStock={transferStock}
-                selectedStock={selectedStock}
-                isTransfer={isTransfer}
-                error={error}
-            />
-        }>
+        <Layout
+            defaultTitle="Stocks"
+            rightSidebarContent={
+                <StockForm
+                    products={products}
+                    branches={branches}
+                    addStock={addStock}
+                    transferStock={transferStock}
+                    selectedStock={selectedStock}
+                    isTransfer={isTransfer}
+                />
+            }
+        >
             <StockTable
                 stocks={stocks}
-                branches={branches}
-                selectedBranch={selectedBranch}
-                setSelectedBranch={setSelectedBranch}
                 setSelectedStock={setSelectedStock}
                 setIsTransfer={setIsTransfer}
             />

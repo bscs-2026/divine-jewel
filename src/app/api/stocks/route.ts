@@ -7,10 +7,9 @@ export async function GET() {
     console.log('Fetching stocks from database...');
     const rows = await query(`
       SELECT
-        s.id,
+        s.*,
         p.name AS product_name,
-        bc.address_line AS branch_name,
-        s.quantity
+        bc.address_line AS branch_name
       FROM 
         stocks s
       LEFT JOIN
