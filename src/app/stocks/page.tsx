@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import Layout from '../../components/Layout';
 import StockTable from '../../components/StockTable';
 import StockForm from '../../components/StockForm';
+import StockFilterTab from '../../components/StockFilterTab';
 
 interface Stock {
     id: number;
@@ -38,6 +39,7 @@ export default function StocksPage() {
     const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
     const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
     const [isTransfer, setIsTransfer] = useState(false);
+    const [filterBranch, setFilterBranch] = useState<number | string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -147,6 +149,10 @@ export default function StocksPage() {
         }
     };
 
+    const filteredStocks = filterBranch
+    ? stocks.filter(stock => stock.branch_code === filterBranch)
+    : stocks;  
+
     return (
         <Layout
             defaultTitle="Stocks"
@@ -161,8 +167,14 @@ export default function StocksPage() {
                 />
             }
         >
+            <StockFilterTab
+                branches={branches}
+                filterBranch={filterBranch}
+                setFilterBranch={setFilterBranch}
+            />
+
             <StockTable
-                stocks={stocks}
+                stocks={filteredStocks}
                 setSelectedStock={setSelectedStock}
                 setIsTransfer={setIsTransfer}
             />

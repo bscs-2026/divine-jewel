@@ -17,7 +17,9 @@ export async function GET() {
       LEFT JOIN 
           stocks s ON p.id = s.product_id
       GROUP BY 
-          p.id; 
+          p.id
+      ORDER BY
+        p.name ASC; 
     `);
     console.log('Fetched products:', rows);
     return NextResponse.json({ products: rows }, { status: 200 });

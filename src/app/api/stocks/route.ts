@@ -15,7 +15,9 @@ export async function GET() {
       LEFT JOIN
         products p ON s.product_id = p.id
       LEFT JOIN
-        branches bc ON s.branch_code = bc.id;
+        branches bc ON s.branch_code = bc.id
+      ORDER BY
+        p.name ASC;
     `);
     console.log('Fetched stocks:', rows);
     return NextResponse.json({ stocks: rows }, { status: 200 });
