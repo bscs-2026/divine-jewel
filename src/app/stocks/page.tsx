@@ -41,6 +41,7 @@ export default function StocksPage() {
     const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
     const [isTransfer, setIsTransfer] = useState(false);
     const [filterBranch, setFilterBranch] = useState<number | string | null>(null);
+    const [showManageBranches, setShowManageBranches] = useState(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -49,6 +50,10 @@ export default function StocksPage() {
         fetchBranches();
         fetchProducts();
     }, []);
+
+    const toggleManageBranches = () => {
+        setShowManageBranches(!showManageBranches);
+    }
 
     const fetchProducts = async () => {
         try {
@@ -89,6 +94,66 @@ export default function StocksPage() {
             setError(error.message);
         }
     };
+
+    const addBranch = async (branch: Branch) => {
+        try {
+            const response = await fetch('/api/stocks/branches', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ address_line: branch.address_line }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add branch');
+            }
+
+            await fetchBranches();
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
+
+    const editBranch = async (branch: Branch) => {
+        try {
+            const response = await fetch(`/api/stocks/branches/${branch.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ address_line: branch.address_line }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to edit branch');
+            }
+
+            await fetchBranches();
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
+
+    const deleteBranch = async (id: number) => {
+        try {
+            const response = await fetch(`/api/stocks/branches/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete branch');
+            }
+
+            await fetchBranches();
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
+
 
     const addStock = async (stock: Stock) => {
         if (!stock.product_id || !stock.branch_code || isNaN(stock.quantity)) {
@@ -169,6 +234,11 @@ export default function StocksPage() {
                     transferStock={transferStock}
                     selectedStock={selectedStock}
                     isTransfer={isTransfer}
+                    addBranch={addBranch} 
+                    editBranch={editBranch}  
+                    deleteBranch={deleteBranch}
+                    showManageBranches={showManageBranches} 
+                    toggleManageBranches={toggleManageBranches}
                 />
             }
         >
@@ -176,6 +246,7 @@ export default function StocksPage() {
                 branches={branches}
                 filterBranch={filterBranch}
                 setFilterBranch={setFilterBranch}
+                toggleManageBranches={toggleManageBranches}
             />
 
             <StockTable

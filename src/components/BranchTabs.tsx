@@ -7,13 +7,15 @@ interface Branch {
   address_line: string;
 }
 
-interface StockFilterTabsProps {
+interface BranchTabs {
   branches: Branch[];
   filterBranch: number | string | null;
   setFilterBranch: (id: number | string | null) => void;
+  toggleManageBranches: () => void;
+  
 }
 
-const StockFilterTabs: React.FC<StockFilterTabsProps> = ({ branches, filterBranch, setFilterBranch }) => {
+const StockFilterTabs: React.FC<BranchTabs> = ({ branches, filterBranch, setFilterBranch, toggleManageBranches }) => {
   return (
     <div className={styles.categoryTabsContainer}>
       <button
@@ -31,8 +33,11 @@ const StockFilterTabs: React.FC<StockFilterTabsProps> = ({ branches, filterBranc
           {branch.address_line}
         </button>
       ))}
-      <button>
-        
+      <button
+        className={`${styles2.mediumButton}`}
+        onClick={toggleManageBranches}
+      >
+        Manage Branches
       </button>
     </div>
   );

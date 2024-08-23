@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './styles/Form.module.css';
 import styles2 from './styles/Button.module.css';
+import ManageBranches from './ManageBranches';
 
 interface Stock {
     id: number;
@@ -36,6 +37,11 @@ interface StockFormProps {
     isTransfer: boolean;
     addStock: (stock: Stock) => void;
     transferStock: (stockDetails: StockDetails) => void;
+    addBranch: (branch: Branch) => void;
+    editBranch: (branch: Branch) => void;
+    deleteBranch: (id: number) => void;
+    showManageBranches: boolean; 
+    toggleManageBranches: () => void;
 }
 
 const StockForm: React.FC<StockFormProps> = ({
@@ -45,6 +51,11 @@ const StockForm: React.FC<StockFormProps> = ({
     isTransfer,
     addStock,
     transferStock,
+    addBranch,
+    editBranch,
+    deleteBranch,
+    showManageBranches, // Receive the prop to show/hide ManageBranches
+    toggleManageBranches // Function to toggle ManageBranches
 }) => {
     const initialFormData = {
         product_id: "",
@@ -213,6 +224,16 @@ const StockForm: React.FC<StockFormProps> = ({
                     onClick={resetForm}
                 >   Cancel
                 </button> 
+                <br />
+                {showManageBranches && (
+                    <ManageBranches
+                        branches={branches}
+                        addBranch={addBranch}
+                        editBranch={editBranch}
+                        deleteBranch={deleteBranch}
+                    />
+                )}
+
             </form>
         </div>
     );
