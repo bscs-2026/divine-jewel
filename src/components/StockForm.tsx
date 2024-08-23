@@ -46,22 +46,24 @@ const StockForm: React.FC<StockFormProps> = ({
     addStock,
     transferStock,
 }) => {
-    const [formData, setFormData] = useState({
+    const initialFormData = {
         product_id: "",
         branch_code: "",
-        quantity: "",
         destination_branch: "",
-        note: ""
-    });
+        note: "",
+        quantity: ""
+    };
+
+    const [formData, setFormData] = useState(initialFormData);
 
     useEffect(() => {
         if (selectedStock) {
             setFormData({
                 product_id: selectedStock.product_id.toString(),
                 branch_code: selectedStock.branch_code.toString(),
-                quantity: selectedStock.quantity.toString(),
                 destination_branch: "",
                 note: "",
+                quantity: ""
             });
         }
     }, [selectedStock]);
@@ -95,6 +97,11 @@ const StockForm: React.FC<StockFormProps> = ({
             };
             addStock(stock as Stock);
         }
+        resetForm();
+    };
+
+    const resetForm = () => {
+        setFormData(initialFormData);
     };
 
     return (
@@ -129,8 +136,8 @@ const StockForm: React.FC<StockFormProps> = ({
                             onChange={handleInputChange}
                             required
                         >
-                            <option value={formData.branch_code}>
-                                {selectedStock?.branch_name || "Select source branch"}
+                            <option value="">
+                                Select source branch
                             </option>
                             {branches.map((branch) => (
                                 <option key={branch.id} value={branch.id}>
@@ -172,8 +179,8 @@ const StockForm: React.FC<StockFormProps> = ({
                         onChange={handleInputChange}
                         required
                     >
-                        <option value={formData.branch_code}>
-                            {selectedStock?.branch_name || "Select a branch"}
+                        <option value="">
+                            Select a branch
                         </option>
                         {branches.map((branch) => (
                             <option key={branch.id} value={branch.id}>
@@ -189,7 +196,7 @@ const StockForm: React.FC<StockFormProps> = ({
                     name='quantity'
                     placeholder='Quantity'
                     className={styles.input}
-                    // value={formData.quantity}
+                    value={formData.quantity}
                     onChange={handleInputChange}
                     required
                 />
@@ -200,6 +207,12 @@ const StockForm: React.FC<StockFormProps> = ({
                 >
                     {isTransfer ? 'Transfer Stock' : 'Add Stock'}
                 </button>
+                <button
+                    type='button'
+                    className={`${styles2.smallButton} ${styles2.cancelButton}`}
+                    onClick={resetForm}
+                >   Cancel
+                </button> 
             </form>
         </div>
     );
