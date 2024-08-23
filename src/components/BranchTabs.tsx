@@ -31,6 +31,9 @@ const StockFilterTabs: React.FC<StockFilterTabsProps> = ({ branches, filterBranc
           {branch.address_line}
         </button>
       ))}
+      <button>
+        
+      </button>
     </div>
   );
 };

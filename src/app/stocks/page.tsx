@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import Layout from '../../components/Layout';
 import StockTable from '../../components/StockTable';
 import StockForm from '../../components/StockForm';
-import StockFilterTab from '../../components/StockFilterTab';
+import BranchTabs from '../../components/BranchTabs';
 
 interface Stock {
     id: number;
@@ -17,6 +17,7 @@ interface Stock {
 interface Product {
     id: number;
     name: string;
+    is_archive: number | boolean;
 }
 
 interface Branch {
@@ -56,7 +57,8 @@ export default function StocksPage() {
                 throw new Error('Failed to fetch products');
             }
             const data = await response.json();
-            setProducts(data.products);
+            const activeProducts = data.products.filter((product: Product) => !product.is_archive); 
+            setProducts(activeProducts);
         } catch (error: any) {
             setError(error.message);
         }
@@ -149,9 +151,12 @@ export default function StocksPage() {
         }
     };
 
-    const filteredStocks = filterBranch
-    ? stocks.filter(stock => stock.branch_code === filterBranch)
-    : stocks;  
+    const activeProductIds = products.map(product => product.id);
+    const filteredStocks = stocks.filter(stock => 
+        activeProductIds.includes(stock.product_id) &&
+        (!filterBranch || stock.branch_code === filterBranch)
+    );
+
 
     return (
         <Layout
@@ -167,7 +172,7 @@ export default function StocksPage() {
                 />
             }
         >
-            <StockFilterTab
+            <BranchTabs
                 branches={branches}
                 filterBranch={filterBranch}
                 setFilterBranch={setFilterBranch}
