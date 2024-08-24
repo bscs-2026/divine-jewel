@@ -18,7 +18,7 @@ interface BranchTabs {
 
 const StockFilterTabs: React.FC<BranchTabs> = ({ branches, filterBranch, setFilterBranch, toggleManageBranches }) => {
   return (
-    <div className={styles.categoryTabsContainer}>
+    <div className={styles.tabsContainer}>
       <button
         className={`${styles2.mediumButton} ${filterBranch === null ? styles2.activeButton : styles2.inactiveButton}`}
         onClick={() => setFilterBranch(null)}

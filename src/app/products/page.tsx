@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Layout from '../../components/Layout';
+import Layout from '../../components/PageLayout';
 import ProductTable from '../../components/ProductTable';
 import CategoryTabs from '../../components/CategoryTabs';
 import ProductForm from '../../components/ProductForm';
@@ -44,7 +44,7 @@ export default function ProductsPage() {
   }
 
   const fetchProducts = async () => {
-    setLoading(true); // Set loading to true before starting the fetch
+    setLoading(true);
     try {
       const response = await fetch('/api/products');
       if (!response.ok) {
@@ -55,7 +55,7 @@ export default function ProductsPage() {
     } catch (error: any) {
       setError(error.message);
     } finally {
-      setLoading(false); // Set loading to false after the fetch is complete
+      setLoading(false);
     }
   };
 

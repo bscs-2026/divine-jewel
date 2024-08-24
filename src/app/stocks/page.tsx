@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Layout from '../../components/Layout';
+import Layout from '../../components/PageLayout';
 import StockTable from '../../components/StockTable';
 import StockForm from '../../components/StockForm';
 import BranchTabs from '../../components/BranchTabs';

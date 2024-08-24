@@ -32,16 +32,16 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     try {
-        console.log(`Deleting supplier with ID ${id}...`);
+        console.log(`Soft deleting supplier with ID ${id}...`);
         const result = await query(
-            'DELETE FROM `suppliers` WHERE id = ?',
+            'UPDATE `suppliers` SET is_deleted = 1 WHERE id = ?',
             [id]
         );
 
-        console.log('Deleted Supplier:', result);
-        return NextResponse.json({ message: 'Supplier deleted successfully' }, { status: 200 });
+        console.log('Soft Deleted Supplier:', result);
+        return NextResponse.json({ message: 'Supplier marked as deleted successfully' }, { status: 200 });
     } catch (error: any) {
-        console.error('An error occurred while deleting the supplier:', error);
+        console.error('An error occurred while soft deleting the supplier:', error);
         return NextResponse.json({ error: 'Internal Server Error', data: error.message }, { status: 500 });
     }
 }
