@@ -1,5 +1,4 @@
 // src/components/CategoryTabs.tsx
-
 import React from 'react';
 import styles from './styles/Layout.module.css';
 import styles2 from './styles/Button.module.css';
@@ -13,9 +12,10 @@ interface CategoryTabsProps {
   categories: Category[];
   filterCategory: number | string | null;
   setFilterCategory: (id: number | string | null) => void;
+  toggleManageCategories: () => void;
 }
 
-const CategoryTabs: React.FC<CategoryTabsProps> = ({ categories, filterCategory, setFilterCategory }) => {
+const CategoryTabs: React.FC<CategoryTabsProps> = ({ categories, filterCategory, setFilterCategory, toggleManageCategories }) => {
   return (
     <div className={styles.categoryTabsContainer}>
       <button
@@ -37,7 +37,14 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({ categories, filterCategory,
         className={`${styles2.mediumButton} ${filterCategory === 'Archive' ? styles2.activeButton : styles2.inactiveButton}`}
         onClick={() => setFilterCategory('Archive')}
       >
-        Archive
+        Archived
+      </button>
+
+      <button
+         className={`${styles2.mediumButton}`}
+         onClick={toggleManageCategories}
+         >
+        Manage Categories
       </button>
     </div>
   );

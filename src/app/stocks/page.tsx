@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import Layout from '../../components/Layout';
 import StockTable from '../../components/StockTable';
 import StockForm from '../../components/StockForm';
-import StockFilterTab from '../../components/StockFilterTab';
+import BranchTabs from '../../components/BranchTabs';
+import ManageBranches from '../../components/ManageBranches';
 
 interface Stock {
     id: number;
@@ -17,6 +18,7 @@ interface Stock {
 interface Product {
     id: number;
     name: string;
+    is_archive: number | boolean;
 }
 
 interface Branch {
@@ -40,6 +42,7 @@ export default function StocksPage() {
     const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
     const [isTransfer, setIsTransfer] = useState(false);
     const [filterBranch, setFilterBranch] = useState<number | string | null>(null);
+    const [showManageBranches, setShowManageBranches] = useState(false);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -49,6 +52,10 @@ export default function StocksPage() {
         fetchProducts();
     }, []);
 
+    const toggleManageBranches = () => {
+        setShowManageBranches(!showManageBranches);
+    }
+
     const fetchProducts = async () => {
         try {
             const response = await fetch('/api/products');
@@ -56,7 +63,8 @@ export default function StocksPage() {
                 throw new Error('Failed to fetch products');
             }
             const data = await response.json();
-            setProducts(data.products);
+            const activeProducts = data.products.filter((product: Product) => !product.is_archive);
+            setProducts(activeProducts);
         } catch (error: any) {
             setError(error.message);
         }
@@ -87,6 +95,66 @@ export default function StocksPage() {
             setError(error.message);
         }
     };
+
+    const addBranch = async (branch: Branch) => {
+        try {
+            const response = await fetch('/api/stocks/branches', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ address_line: branch.address_line }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add branch');
+            }
+
+            await fetchBranches();
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
+
+    const editBranch = async (branch: Branch) => {
+        try {
+            const response = await fetch(`/api/stocks/branches/${branch.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ address_line: branch.address_line }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to edit branch');
+            }
+
+            await fetchBranches();
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
+
+    const deleteBranch = async (id: number) => {
+        try {
+            const response = await fetch(`/api/stocks/branches/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete branch');
+            }
+
+            await fetchBranches();
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
+
 
     const addStock = async (stock: Stock) => {
         if (!stock.product_id || !stock.branch_code || isNaN(stock.quantity)) {
@@ -149,28 +217,46 @@ export default function StocksPage() {
         }
     };
 
-    const filteredStocks = filterBranch
-    ? stocks.filter(stock => stock.branch_code === filterBranch)
-    : stocks;  
+    const activeProductIds = products.map(product => product.id);
+    const filteredStocks = stocks.filter(stock =>
+        activeProductIds.includes(stock.product_id) &&
+        (!filterBranch || stock.branch_code === filterBranch)
+    );
+
 
     return (
         <Layout
             defaultTitle="Stocks"
             rightSidebarContent={
-                <StockForm
-                    products={products}
-                    branches={branches}
-                    addStock={addStock}
-                    transferStock={transferStock}
-                    selectedStock={selectedStock}
-                    isTransfer={isTransfer}
-                />
+                <>
+                    <StockForm
+                        products={products}
+                        branches={branches}
+                        addStock={addStock}
+                        transferStock={transferStock}
+                        selectedStock={selectedStock}
+                        isTransfer={isTransfer}
+                        addBranch={addBranch}
+                        editBranch={editBranch}
+                        deleteBranch={deleteBranch}
+                    />
+
+                    {showManageBranches && (
+                        <ManageBranches
+                            branches={branches}
+                            addBranch={addBranch}
+                            editBranch={editBranch}
+                            deleteBranch={deleteBranch}
+                        />
+                    )}
+                </>
             }
         >
-            <StockFilterTab
+            <BranchTabs
                 branches={branches}
                 filterBranch={filterBranch}
                 setFilterBranch={setFilterBranch}
+                toggleManageBranches={toggleManageBranches}
             />
 
             <StockTable

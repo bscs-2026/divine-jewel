@@ -10,7 +10,6 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         if (!id) {
             return NextResponse.json({ error: 'ID is required' }, { status: 400 });
         }
-
         console.log('Updating category in database...');
 
         const result = await query(
@@ -24,6 +23,24 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
     } catch (error: any){
         console.error('An error occurred while updating category:', error);
+        return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
+    }
+}
+
+export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+    try {
+        const { id } = params;
+        if (!id) {
+            return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+        }
+        console.log('Deleting category from database...');
+        const result = await query('DELETE FROM `category` WHERE id = ?', [id]);
+
+        console.log('Deleted category:', result);
+        return NextResponse.json({ message: 'Category deleted successfully' }, { status: 200 });
+
+    } catch (error: any) {
+        console.error('An error occurred while deleting the category:', error);
         return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
     }
 }
