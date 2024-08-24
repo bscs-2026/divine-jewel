@@ -17,7 +17,7 @@ interface CategoryTabsProps {
 
 const CategoryTabs: React.FC<CategoryTabsProps> = ({ categories, filterCategory, setFilterCategory, toggleManageCategories }) => {
   return (
-    <div className={styles.categoryTabsContainer}>
+    <div className={styles.tabsContainer}>
       <button
         className={`${styles2.mediumButton} ${filterCategory === null ? styles2.activeButton : styles2.inactiveButton}`}
         onClick={() => setFilterCategory(null)}

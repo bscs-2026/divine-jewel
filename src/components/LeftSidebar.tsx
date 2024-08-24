@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChartLine, faMoneyCheck, faHistory, faBox, faWarehouse, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faChartLine, faMoneyCheck, faHistory, faBox, faBoxes, faWarehouse, faUsers } from '@fortawesome/free-solid-svg-icons';
 import styles from './styles/Layout.module.css';
 
 interface LeftSidebarProps {
@@ -15,7 +15,9 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
     <div className={styles.leftSidebar}>
       <div>
         <div className={styles.header}>
-          <img src="/img/divine-jewel-logo.png" alt="Divine Jewel Logo" className={styles.logo} />
+          <Link href="/">
+            <img src="/img/divine-jewel-logo.png" alt="Divine Jewel Logo" className={styles.logo} />
+          </Link>
           <img
             src="/img/divine.png"
             alt="Divine"
@@ -50,8 +52,14 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
           </li>
           <li className={styles.navItem} onClick={() => onSelectTitle('Stocks')}>
             <Link href="/stocks">
-              <FontAwesomeIcon icon={faWarehouse} className={styles.icon} />
+              <FontAwesomeIcon icon={faBoxes} className={styles.icon} />
               Stocks
+            </Link>
+          </li>
+          <li className={styles.navItem} onClick={() => onSelectTitle('Supplies')}>
+            <Link href="/supplies">
+              <FontAwesomeIcon icon={faWarehouse} className={styles.icon} />
+              Supplies
             </Link>
           </li>
           <li className={styles.navItem} onClick={() => onSelectTitle('Employees')}>
@@ -62,9 +70,11 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
           </li>
         </ul>
       </div>
-      <button className={`${styles.logoutButton} mt-auto mx-auto`}>
-        Logout
-      </button>
+      <Link href="/">
+        <button className={`${styles.logoutButton} mt-auto mx-auto`}>
+          Logout
+        </button>
+      </Link>
     </div>
   );
 };

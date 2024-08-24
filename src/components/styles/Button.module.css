@@ -1,17 +1,17 @@
 /* src/components/styles/Button.module.css */
 
 .smallButton {
-  padding: 0.25rem 0.75rem;
+  padding: 0.25rem 0.50rem;
   border-radius: 1.5rem;
   color: #575757;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .mediumButton {
-  padding: 0.25rem 0.75rem;
+  padding: 0.25rem 0.50rem;
   border-radius: 1.5rem;
   color: #575757;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 /* Button States */
@@ -28,16 +28,21 @@
 }
 
 .cancelButton {
-  background-color: #D1D5DB;
+  background-color: #DADADA;
 }
 
+.deleteButton {
+  background-color: #FCB6D7;
+  padding: 0.15rem 0.50rem;
+}
 .editButton {
   background-color: #FCE4EC;
-  margin-right: 0.5rem;
+  padding: 0.15rem 0.50rem;
 }
 
 .archiveButton {
   background-color: #D1D5DB;
+  padding: 0.15rem 0.50rem;
 }
 
 .unarchiveButton {
