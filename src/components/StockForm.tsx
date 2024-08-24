@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styles from './styles/Form.module.css';
 import styles2 from './styles/Button.module.css';
-import ManageBranches from './ManageBranches';
 
 interface Stock {
     id: number;

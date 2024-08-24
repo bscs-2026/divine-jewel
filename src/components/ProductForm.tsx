@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from './styles/Form.module.css';
 import styles2 from './styles/Button.module.css';
-import ManageCategories from './ManageCategories';
 
 interface Category {
   id: number;
