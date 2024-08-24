@@ -4,6 +4,7 @@ import Layout from '../../components/Layout';
 import StockTable from '../../components/StockTable';
 import StockForm from '../../components/StockForm';
 import BranchTabs from '../../components/BranchTabs';
+import ManageBranches from '../../components/ManageBranches';
 
 interface Stock {
     id: number;
@@ -62,7 +63,7 @@ export default function StocksPage() {
                 throw new Error('Failed to fetch products');
             }
             const data = await response.json();
-            const activeProducts = data.products.filter((product: Product) => !product.is_archive); 
+            const activeProducts = data.products.filter((product: Product) => !product.is_archive);
             setProducts(activeProducts);
         } catch (error: any) {
             setError(error.message);
@@ -217,7 +218,7 @@ export default function StocksPage() {
     };
 
     const activeProductIds = products.map(product => product.id);
-    const filteredStocks = stocks.filter(stock => 
+    const filteredStocks = stocks.filter(stock =>
         activeProductIds.includes(stock.product_id) &&
         (!filterBranch || stock.branch_code === filterBranch)
     );
@@ -227,19 +228,28 @@ export default function StocksPage() {
         <Layout
             defaultTitle="Stocks"
             rightSidebarContent={
-                <StockForm
-                    products={products}
-                    branches={branches}
-                    addStock={addStock}
-                    transferStock={transferStock}
-                    selectedStock={selectedStock}
-                    isTransfer={isTransfer}
-                    addBranch={addBranch} 
-                    editBranch={editBranch}  
-                    deleteBranch={deleteBranch}
-                    showManageBranches={showManageBranches} 
-                    toggleManageBranches={toggleManageBranches}
-                />
+                <>
+                    <StockForm
+                        products={products}
+                        branches={branches}
+                        addStock={addStock}
+                        transferStock={transferStock}
+                        selectedStock={selectedStock}
+                        isTransfer={isTransfer}
+                        addBranch={addBranch}
+                        editBranch={editBranch}
+                        deleteBranch={deleteBranch}
+                    />
+
+                    {showManageBranches && (
+                        <ManageBranches
+                            branches={branches}
+                            addBranch={addBranch}
+                            editBranch={editBranch}
+                            deleteBranch={deleteBranch}
+                        />
+                    )}
+                </>
             }
         >
             <BranchTabs

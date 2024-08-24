@@ -14,10 +14,10 @@ interface ManageBranchesProps {
     deleteBranch: (id: number) => void;
 }
 
-const ManageBranches: React.FC<ManageBranchesProps> = ({ 
-    branches, 
-    addBranch, 
-    editBranch, 
+const ManageBranches: React.FC<ManageBranchesProps> = ({
+    branches,
+    addBranch,
+    editBranch,
     deleteBranch }) => {
 
     const initialFormData = {
@@ -46,7 +46,7 @@ const ManageBranches: React.FC<ManageBranchesProps> = ({
     };
 
     return (
-        <div>
+        <div className={styles.container}>
             <h2 className={styles.heading}>Manage Store Branches</h2>
             {!action && (
                 <form className={styles.form}>
@@ -72,8 +72,16 @@ const ManageBranches: React.FC<ManageBranchesProps> = ({
             {action === 'edit' && (
                 <form className={styles.form}>
                     <h3>Edit Branch</h3>
-                    <select onChange={(e) => setFormData({ ...formData, id: Number(e.target.value) })}
-                        className={styles.select}>
+                    <select
+                        onChange={(e) => {
+                            const selectedBranch = branches.find(branch => branch.id === Number(e.target.value));
+                            if (selectedBranch) {
+                                setFormData({ id: selectedBranch.id, address_line: selectedBranch.address_line });
+                            }
+                        }}
+                        className={styles.select}
+                        value={formData.id || ''}
+                    >
                         <option value="">Select Branch</option>
                         {branches.map(branch => (
                             <option key={branch.id} value={branch.id}>{branch.address_line}</option>

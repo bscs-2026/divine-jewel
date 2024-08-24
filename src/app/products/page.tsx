@@ -6,6 +6,7 @@ import Layout from '../../components/Layout';
 import ProductTable from '../../components/ProductTable';
 import CategoryTabs from '../../components/CategoryTabs';
 import ProductForm from '../../components/ProductForm';
+import ManageCategories from '../../components/ManageCategories';
 
 interface Product {
   id: number;
@@ -19,6 +20,7 @@ interface Product {
 interface Category {
   id: number;
   name: string;
+  description: string;
 }
 
 export default function ProductsPage() {
@@ -28,6 +30,7 @@ export default function ProductsPage() {
   const [editingProduct, setEditingProduct] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [filterCategory, setFilterCategory] = useState<number | string | null>(null);
+  const [showManageCategories, setShowManageCategories] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -35,6 +38,10 @@ export default function ProductsPage() {
     fetchProducts();
     fetchCategories();
   }, []);
+
+  const toggleManageCategories = () => {
+    setShowManageCategories(!showManageCategories);
+  }
 
   const fetchProducts = async () => {
     setLoading(true); // Set loading to true before starting the fetch
@@ -51,7 +58,7 @@ export default function ProductsPage() {
       setLoading(false); // Set loading to false after the fetch is complete
     }
   };
-  
+
 
   const fetchCategories = async () => {
     try {
@@ -66,6 +73,63 @@ export default function ProductsPage() {
     }
   };
 
+  const addCategory = async (category: Category) => {
+    try {
+      const response = await fetch('/api/products/category', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name: category.name, description: category.description }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add category');
+      }
+
+      await fetchCategories();
+    } catch (error: any) {
+      setError(error.message);
+    }
+  }
+
+  const deleteCategory = async (id: number) => {
+    try {
+      const response = await fetch(`/api/products/category/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete category');
+      }
+
+      await fetchCategories();
+    } catch (error: any) {
+      setError(error.message);
+    }
+  }
+
+
+  const editCategory = async (category: Category) => {
+    try {
+      const response = await fetch(`/api/products/category/${category.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(category),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to edit category');
+      }
+
+      await fetchCategories();
+    } catch (error: any) {
+      setError(error.message);
+    }
+  }
+
   const addProduct = async (product: Product) => {
     try {
       const response = await fetch('/api/products', {
@@ -75,11 +139,11 @@ export default function ProductsPage() {
         },
         body: JSON.stringify(product),
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to add product');
       }
-  
+
       setCurrentProduct(null);
       setSelectedCategory(null);
       await fetchProducts();
@@ -99,14 +163,14 @@ export default function ProductsPage() {
 
   const saveProduct = async (product: Product) => {
     if (!currentProduct) return;
-  
+
     const updatedProduct = {
       ...currentProduct,
       category_id: product.category_id || currentProduct.category_id,
       name: product.name || currentProduct.name,
       price: product.price !== undefined ? product.price : currentProduct.price,
     };
-  
+
     try {
       const response = await fetch(`/api/products/${currentProduct.id}/update`, {
         method: 'PUT',
@@ -115,11 +179,11 @@ export default function ProductsPage() {
         },
         body: JSON.stringify(updatedProduct),
       });
-  
+
       if (!response.ok) {
         throw new Error('Failed to save product');
       }
-  
+
       setEditingProduct(false);
       setCurrentProduct(null);
       setSelectedCategory(null);
@@ -193,40 +257,51 @@ export default function ProductsPage() {
       ? activeProducts.filter(product => product.category_id === filterCategory)
       : activeProducts;
 
-    return (
-        <Layout defaultTitle="Products" rightSidebarContent={
-          <ProductForm
+  return (
+    <Layout defaultTitle="Products" rightSidebarContent={
+      <>
+        <ProductForm
+          categories={categories}
+          currentProduct={currentProduct}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          editingProduct={editingProduct}
+          handleCancelEdit={handleCancelEdit}
+          addProduct={addProduct}
+          saveProduct={saveProduct}
+
+        />
+        {showManageCategories && (
+          <ManageCategories
             categories={categories}
-            currentProduct={currentProduct}
-            selectedCategory={selectedCategory}
-            setSelectedCategory={setSelectedCategory}
-            editingProduct={editingProduct}
-            handleCancelEdit={handleCancelEdit}
-            addProduct={addProduct}
-            saveProduct={saveProduct}
+            addCategory={addCategory}
+            editCategory={editCategory}
+            deleteCategory={deleteCategory}
           />
-        }>
-          {loading ? (
-            <div>Loading...</div>
-          ) : (
-            <>
-            <CategoryTabs
-                categories={categories}
-                filterCategory={filterCategory}
-                setFilterCategory={setFilterCategory}
-            />
-            <ProductTable
-                // products={products}
-                // filteredProducts={filteredProducts}
-                products={filteredProducts}
-                editProduct={editProduct}
-                archiveProduct={archiveProduct}
-                unarchiveProduct={unarchiveProduct}
-                filterCategory={filterCategory}
-            />
-            </>
-          )}
-        </Layout>
-      );
+
+        )}
+      </>
+    }>
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <>
+          <CategoryTabs
+            categories={categories}
+            filterCategory={filterCategory}
+            setFilterCategory={setFilterCategory}
+            toggleManageCategories={toggleManageCategories}
+          />
+          <ProductTable
+            products={filteredProducts}
+            editProduct={editProduct}
+            archiveProduct={archiveProduct}
+            unarchiveProduct={unarchiveProduct}
+            filterCategory={filterCategory}
+          />
+        </>
+      )}
+    </Layout>
+  );
 }
-    
+

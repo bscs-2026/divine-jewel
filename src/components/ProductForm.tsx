@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styles from './styles/Form.module.css';
 import styles2 from './styles/Button.module.css';
+import ManageCategories from './ManageCategories';
 
 interface Category {
   id: number;
   name: string;
+  description: string;
 }
 
 interface Product {
@@ -24,6 +26,7 @@ interface ProductFormProps {
   handleCancelEdit: () => void;
   addProduct: (product: Product) => void;
   saveProduct: (product: Product) => void;
+  
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({
@@ -35,6 +38,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   handleCancelEdit,
   addProduct,
   saveProduct,
+
 }) => {
   const [productName, setProductName] = useState<string>('');
   const [productPrice, setProductPrice] = useState<string>('');
@@ -130,7 +134,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
             Cancel
           </button>
         )}
+
       </form>
+      
     </div>
   );
 };
