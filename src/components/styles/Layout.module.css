@@ -43,21 +43,74 @@
   color: #575757;
 }
 
-.categoryTabsContainer {
+.tabsContainer {
   width: 100%;
   display: flex;
   justify-content: flex-start;
   margin-bottom: 20px;
   padding: 20px;
   font-size: 13px;
-  border: 1px solid #ddd;
-  background-color: #f9f9f9;
-  border-radius: 8px;
+  border: 1px solid #DDDDDD;
+  background-color: #F9F9F9;
+  border-radius: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   color: #575757;
 }
 
+.tabsContainer {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 20px;
+  padding: 20px;
+  font-size: 13px;
+  border: 1px solid #DDDDDD;
+  background-color: #F9F9F9;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #575757;
+}
+
+.tabsContainerItem {
+  padding: 0.25rem 0.75rem;
+  border-radius: 1.5rem;
+  color: #575757;
+  font-size: 13px;
+  transition: background-color 0.3s, color 0.3s;
+  cursor: pointer; /* Ensure the pointer changes on hover */
+}
+
+.tabsContainerItem.active {
+  background-color: #FCB6D7;
+}
+
+.tabsContainerItem.inactive {
+  background-color: #F9F9F9;
+}
+.tabsContainerItem.inactive:hover {
+  background-color: #FFE7EF;
+  color: #575757;
+}
+
+.iconItem {
+  padding: 0.25rem 1.25rem;
+  color: #575757;
+  font-size: 25px;
+}
+
+.iconItem.active {
+  background-color: #FCB6D7;
+}
+
+.iconItem.inactive {
+  background-color: #FFE7EF;
+}
+.iconItem.inactive:hover {
+  background-color: #DDDDDD;
+}
+
 .rightSidebar {
+  margin-left: 75%;
   width: 25%;
   position: fixed;
   top: 0;
@@ -66,7 +119,6 @@
   background-color: #FFE7EF;
   display: flex;
   flex-direction: column;
-  /* justify-content: space-between; */
   padding: 1rem 1rem;
 }
 

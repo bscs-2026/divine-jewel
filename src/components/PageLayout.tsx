@@ -38,5 +38,6 @@ const Layout: React.FC<LayoutProps> = ({ children, rightSidebarContent, defaultT
     </div>
   );
 };
+  
 
 export default Layout;
