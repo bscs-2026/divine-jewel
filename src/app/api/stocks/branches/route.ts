@@ -25,8 +25,3 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
   }
 }
-
-
-//curl -X POST 'http://divine-jewel.local:8000/api/stocks/branches' -H "Content-Type: application/json" -d '{"address_line": "123 Main St"}'
-//curl -X GET 'http://divine-jewel.local:8000/api/stocks/branches' | jq .
-//curl -X DELETE 'http://divine-jewel.local:8000/api/stocks/branches/6' | jq .
