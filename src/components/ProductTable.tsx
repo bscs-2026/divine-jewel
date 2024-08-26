@@ -36,8 +36,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
       <table className={styles.table}>
         <thead>
           <tr>
-            <th className={styles.th}>ID</th>
+            {/* <th className={styles.th}>ID</th> */}
             <th className={styles.th}>Name</th>
+            <th className={styles.th}>Category</th>
             <th className={styles.th}>Stock</th>
             <th className={styles.th}>Price</th>
             <th className={styles.th}>Actions</th>
@@ -47,8 +48,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
           {/* {filteredProducts.map((product) => ( */}
           {products.map((product) => (
             <tr key={product.id} className={styles.borderT}>
-              <td className={styles.td}>{product.id}</td>
+              {/* <td className={styles.td}>{product.id}</td> */}
               <td className={styles.td}>{product.name}</td>
+              <td className={styles.td}>{product.category_name}</td>
               <td className={styles.td}>{product.stock}</td>
               <td className={styles.td}>₱{product.price}</td>
               <td className={styles.td}>
