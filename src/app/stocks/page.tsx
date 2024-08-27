@@ -137,6 +137,9 @@ export default function StocksPage() {
     };
 
     const deleteBranch = async (id: number) => {
+        const confirmDelete = window.confirm('Are you sure you want to delete this branch?');
+        if (!confirmDelete) return;
+
         try {
             const response = await fetch(`/api/stocks/branches/${id}`, {
                 method: 'DELETE',

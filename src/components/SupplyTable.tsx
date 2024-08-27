@@ -89,15 +89,19 @@ const SupplyTable: React.FC<SupplyTableProps> = ({
               <td className={styles.td}>{supply.status}</td>
               <td className={styles.td}>
                 <button
-                  // onClick={() => editSupply(supply.id)}
-                  onClick={() => handleEditClick(supply)} // Use handleEditClick instead
+                  onClick={() => handleEditClick(supply)}
                   className={`${styles2.smallButton} ${styles2.editButton}`}
                 >
                   Edit
                 </button>
                 <button
-                  onClick={() => deleteSupply(supply.id)}
                   className={`${styles2.smallButton} ${styles2.deleteButton}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    if (supply.id) {
+                      deleteSupply(supply.id);
+                    }
+                  }}
                 >
                   Delete
                 </button>
