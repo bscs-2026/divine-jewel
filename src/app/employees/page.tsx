@@ -209,24 +209,23 @@ export default function EmployeesPage() {
     return (
         <Layout defaultTitle='Employees' 
             rightSidebarContent={
-                <div className='input-form'>
-                <form onSubmit={editingEmployee ? saveEmployee : addEmployee}>
-                    <div>
-                        <label htmlFor='first_name'>First Name: </label>
-                        <input type='text' id='first_name' name='first_name' className='text-black' defaultValue={currentEmployee?.first_name || ''}/>
-                        <label htmlFor='last_name'>Last Name: </label>
-                        <input type='text' id='last_name' name='last_name' className='text-black' defaultValue={currentEmployee?.last_name || ''}/>
-                        <label htmlFor='email_address'>E-mail: </label>
-                        <input type='email' id='email_address' name='email_address' className='text-black'defaultValue={currentEmployee?.email_address || ''}/>
-                        <label htmlFor='contact_number'>Contact Number: </label>
-                        <input type='text' id='contact_number' name='contact_number' className='text-black' defaultValue={currentEmployee?.contact_number || ''}/>
-                    </div>
-                    <div className='mt-4'>
-                        <label htmlFor='role_id'>Role: </label>
+                <div className="w-full bg-[#FFE7EF] p-6 pt-15 box-border">
+                    <h2 className="text-[#575757] font-bold text-lg mt-4 mb-4" >{editingEmployee ? 'Edit Employee' : 'Add Employee'} </h2>
+                <form className="flex flex-col gap-3 text-[#575757]" onSubmit={editingEmployee ? saveEmployee : addEmployee}>
+                            <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" type='text' id='first_name' name='first_name'  placeholder='First Name' defaultValue={currentEmployee?.first_name || ''}/>
+                        
+                            <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" type='text' id='last_name' name='last_name'  placeholder='Last Name' defaultValue={currentEmployee?.last_name || ''}/>
+                        
+                        
+                            <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" type='email' id='email_address' name='email_address' placeholder='Email Address' defaultValue={currentEmployee?.email_address || ''}/>
+                        
+                        
+                            <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" type='text' id='contact_number' name='contact_number' placeholder='Contact Number' defaultValue={currentEmployee?.contact_number || ''}/>
+
                         <select
                             id='role_id'
                             name='role_id'
-                            className='text-black'
+                            className="w-full p-2 border border-[#FFE7EF] rounded-lg text-[#575757] text-xs"
                             value={selectedRole}
                             onChange={(e) => setSelectedRole(e.target.value)}
                         >
@@ -235,11 +234,11 @@ export default function EmployeesPage() {
                                 <option key={role.id} value={role.id}>{role.name}</option>
                             ))}
                         </select>
-                        <label htmlFor='employee_type'>Employee Type: </label>
+
                         <select
                             id='employee_type'
                             name='employee_type'
-                            className='text-black'
+                            className="w-full p-2 border border-[#FFE7EF] rounded-lg text-[#575757] text-xs"
                             value={selectedEmployeeType}
                             onChange={(e) => setSelectedEmployeeType(e.target.value)}
                         >
@@ -247,13 +246,10 @@ export default function EmployeesPage() {
                             <option value='Full-Time'>Full-Time</option>
                             <option value='Part-Time'>Part-Time</option>
                         </select>
-                        <label htmlFor='username'>Username: </label>
-                        <input type='text' id='username' name='username' className='text-black' defaultValue={currentEmployee?.username || ''}/>
-                        <label htmlFor='password'>Password: </label>
-                        <input type='password' id='password' name='password' className='text-black' defaultValue={currentEmployee?.password || ''}/>
+                        <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" placeholder='Username' type='text' id='username' name='username'  defaultValue={currentEmployee?.username || ''}/>
+                        <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" placeholder='Password' type='password' id='password' name='password' defaultValue={currentEmployee?.password || ''}/>
         
-                        <button type='submit' className='px-2 mx-2 border border-white'>{editingEmployee ? 'Save Employee' : 'Add Employee'}</button>
-                    </div>
+                        <button type='submit' className="px-2 py-1 rounded-full text-[#575757] text-xs bg-[#FCB6D7]">{editingEmployee ? 'Save Employee' : 'Add Employee'}</button>
                 </form>
             </div>
                 
@@ -264,35 +260,35 @@ export default function EmployeesPage() {
                     <button className='px-2 mx-1 mt-2 border border-white' onClick={() => setListView('active')}>Active</button>
                     <button className='px-2 mx-1 mt-2 border border-white' onClick={() => setListView('inactive')}>Inactive</button>
                 </div>
-                <div className='overflow-x-auto'>
+                <div className="bg-white p-4 rounded-lg shadow-[0_-0.5rem_1rem_rgba(0,0,0,0.1),0_0.5rem_1rem_rgba(0,0,0,0.15)] overflow-y-auto h-[700px] w-full max-w-[1024px]">
                     <table className='min-w-full'>
                         <thead>
                             <tr>
-                                <th className="px-4 py-2 text-center">Name</th>
-                                <th className="px-4 py-2 text-center">E-mail</th>
-                                <th className="px-4 py-2 text-center">Contact Number</th>
-                                <th className="px-4 py-2 text-center">Role</th>
-                                <th className="px-4 py-2 text-center">Employee Type</th>
-                                {/* <th className="px-4 py-2 text-center">Username</th>
-                                <th className="px-4 py-2 text-center">Password</th> */}
-                                <th className="px-4 py-2 text-center">Actions</th>
+                                <th className="p-4 text-[#575757] font-bold text-[13px]">Name</th>
+                                <th className="p-4 text-[#575757] font-bold text-[13px]">E-mail</th>
+                                <th className="p-4 text-[#575757] font-bold text-[13px]">Contact Number</th>
+                                <th className="p-4 text-[#575757] font-bold text-[13px]">Role</th>
+                                <th className="p-4 text-[#575757] font-bold text-[13px]">Employee Type</th>
+                                {/* <th className="p-4 text-[#575757] font-bold text-[13px]">Username</th>
+                                <th className="p-4 text-[#575757] font-bold text-[13px]">Password</th> */}
+                                <th className="p-4 text-[#575757] font-bold text-[13px]">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             {(listView === 'active' ? activeEmployees : inactiveEmployees).map((employee) => (
                                 <tr key={employee.id} >
-                                    <td className='px-4'>{employee.last_name + ', ' + employee.first_name}</td>
-                                    <td className='px-4'>{employee.email_address}</td>
-                                    <td className='px-4'>{employee.contact_number}</td>
-                                    <td className='px-4'>{employee.role_name}</td>
-                                    <td className='px-4'>{employee.employee_type}</td>
-                                    {/* <td className='px-4'>{employee.username}</td>
-                                    <td className='px-4'>{employee.password}</td> */}
+                                    <td className="p-4 text-[#575757] text-xs">{employee.last_name + ', ' + employee.first_name}</td>
+                                    <td className="p-4 text-[#575757] text-xs">{employee.email_address}</td>
+                                    <td className="p-4 text-[#575757] text-xs">{employee.contact_number}</td>
+                                    <td className="p-4 text-[#575757] text-xs">{employee.role_name}</td>
+                                    <td className="p-4 text-[#575757] text-xs">{employee.employee_type}</td>
+                                    {/* <td className="p-4 text-[#575757] text-xs">{employee.username}</td>
+                                    <td className="p-4 text-[#575757] text-xs">{employee.password}</td> */}
                                     <td>
                                         {listView === 'active' ? (
                                             <>
-                                                <button onClick={() => editEmployee(employee.id)} className='px-2'>Edit</button>
-                                                <button onClick={() => archiveEmployee(employee.id)} className='px-2'>Archive</button>
+                                                <button onClick={() => editEmployee(employee.id)} className="px-2 py-1 rounded-full text-[#575757] text-xs bg-[#FCE4EC]">Edit</button>
+                                                <button onClick={() => archiveEmployee(employee.id)} className="px-2 py-[0.15rem] bg-[#D1D5DB] rounded-full text-[#575757] text-xs">Archive</button>
                                             </>
                                         ) : (
                                             <button onClick={() => unarchiveEmployee(employee.id)}>Unarchive</button>
