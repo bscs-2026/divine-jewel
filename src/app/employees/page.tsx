@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState, FormEvent } from 'react';
-import Layout from '@/components/Layout';
+import Layout from '../../components/PageLayout';
 
 interface Employee {
     id: number;
@@ -209,57 +209,57 @@ export default function EmployeesPage() {
     return (
         <Layout defaultTitle='Employees' 
             rightSidebarContent={
-                <h1 className='m-auto'>In working...</h1>
+                <div className='input-form'>
+                <form onSubmit={editingEmployee ? saveEmployee : addEmployee}>
+                    <div>
+                        <label htmlFor='first_name'>First Name: </label>
+                        <input type='text' id='first_name' name='first_name' className='text-black' defaultValue={currentEmployee?.first_name || ''}/>
+                        <label htmlFor='last_name'>Last Name: </label>
+                        <input type='text' id='last_name' name='last_name' className='text-black' defaultValue={currentEmployee?.last_name || ''}/>
+                        <label htmlFor='email_address'>E-mail: </label>
+                        <input type='email' id='email_address' name='email_address' className='text-black'defaultValue={currentEmployee?.email_address || ''}/>
+                        <label htmlFor='contact_number'>Contact Number: </label>
+                        <input type='text' id='contact_number' name='contact_number' className='text-black' defaultValue={currentEmployee?.contact_number || ''}/>
+                    </div>
+                    <div className='mt-4'>
+                        <label htmlFor='role_id'>Role: </label>
+                        <select
+                            id='role_id'
+                            name='role_id'
+                            className='text-black'
+                            value={selectedRole}
+                            onChange={(e) => setSelectedRole(e.target.value)}
+                        >
+                            <option value='' disabled>Select Role</option>
+                            {roles.map((role) => (
+                                <option key={role.id} value={role.id}>{role.name}</option>
+                            ))}
+                        </select>
+                        <label htmlFor='employee_type'>Employee Type: </label>
+                        <select
+                            id='employee_type'
+                            name='employee_type'
+                            className='text-black'
+                            value={selectedEmployeeType}
+                            onChange={(e) => setSelectedEmployeeType(e.target.value)}
+                        >
+                            <option value='' disabled>Select Type</option>
+                            <option value='Full-Time'>Full-Time</option>
+                            <option value='Part-Time'>Part-Time</option>
+                        </select>
+                        <label htmlFor='username'>Username: </label>
+                        <input type='text' id='username' name='username' className='text-black' defaultValue={currentEmployee?.username || ''}/>
+                        <label htmlFor='password'>Password: </label>
+                        <input type='password' id='password' name='password' className='text-black' defaultValue={currentEmployee?.password || ''}/>
+        
+                        <button type='submit' className='px-2 mx-2 border border-white'>{editingEmployee ? 'Save Employee' : 'Add Employee'}</button>
+                    </div>
+                </form>
+            </div>
+                
             }
             >
             <div className='container m-4'>
-                <div className='input-form'>
-                    <form onSubmit={editingEmployee ? saveEmployee : addEmployee}>
-                        <div>
-                            <label htmlFor='first_name'>First Name: </label>
-                            <input type='text' id='first_name' name='first_name' className='text-black' defaultValue={currentEmployee?.first_name || ''}/>
-                            <label htmlFor='last_name'>Last Name: </label>
-                            <input type='text' id='last_name' name='last_name' className='text-black' defaultValue={currentEmployee?.last_name || ''}/>
-                            <label htmlFor='email_address'>E-mail: </label>
-                            <input type='email' id='email_address' name='email_address' className='text-black'defaultValue={currentEmployee?.email_address || ''}/>
-                            <label htmlFor='contact_number'>Contact Number: </label>
-                            <input type='text' id='contact_number' name='contact_number' className='text-black' defaultValue={currentEmployee?.contact_number || ''}/>
-                        </div>
-                        <div className='mt-4'>
-                            <label htmlFor='role_id'>Role: </label>
-                            <select
-                                id='role_id'
-                                name='role_id'
-                                className='text-black'
-                                value={selectedRole}
-                                onChange={(e) => setSelectedRole(e.target.value)}
-                            >
-                                <option value='' disabled>Select Role</option>
-                                {roles.map((role) => (
-                                    <option key={role.id} value={role.id}>{role.name}</option>
-                                ))}
-                            </select>
-                            <label htmlFor='employee_type'>Employee Type: </label>
-                            <select
-                                id='employee_type'
-                                name='employee_type'
-                                className='text-black'
-                                value={selectedEmployeeType}
-                                onChange={(e) => setSelectedEmployeeType(e.target.value)}
-                            >
-                                <option value='' disabled>Select Type</option>
-                                <option value='Full-Time'>Full-Time</option>
-                                <option value='Part-Time'>Part-Time</option>
-                            </select>
-                            <label htmlFor='username'>Username: </label>
-                            <input type='text' id='username' name='username' className='text-black' defaultValue={currentEmployee?.username || ''}/>
-                            <label htmlFor='password'>Password: </label>
-                            <input type='password' id='password' name='password' className='text-black' defaultValue={currentEmployee?.password || ''}/>
-            
-                            <button type='submit' className='px-2 mx-2 border border-white'>{editingEmployee ? 'Save Employee' : 'Add Employee'}</button>
-                        </div>
-                    </form>
-                </div>
                 <div className='employee-toggle-view'>
                     <button className='px-2 mx-1 mt-2 border border-white' onClick={() => setListView('active')}>Active</button>
                     <button className='px-2 mx-1 mt-2 border border-white' onClick={() => setListView('inactive')}>Inactive</button>
@@ -273,8 +273,8 @@ export default function EmployeesPage() {
                                 <th className="px-4 py-2 text-center">Contact Number</th>
                                 <th className="px-4 py-2 text-center">Role</th>
                                 <th className="px-4 py-2 text-center">Employee Type</th>
-                                <th className="px-4 py-2 text-center">Username</th>
-                                <th className="px-4 py-2 text-center">Password</th>
+                                {/* <th className="px-4 py-2 text-center">Username</th>
+                                <th className="px-4 py-2 text-center">Password</th> */}
                                 <th className="px-4 py-2 text-center">Actions</th>
                             </tr>
                         </thead>
@@ -286,8 +286,8 @@ export default function EmployeesPage() {
                                     <td className='px-4'>{employee.contact_number}</td>
                                     <td className='px-4'>{employee.role_name}</td>
                                     <td className='px-4'>{employee.employee_type}</td>
-                                    <td className='px-4'>{employee.username}</td>
-                                    <td className='px-4'>{employee.password}</td>
+                                    {/* <td className='px-4'>{employee.username}</td>
+                                    <td className='px-4'>{employee.password}</td> */}
                                     <td>
                                         {listView === 'active' ? (
                                             <>
