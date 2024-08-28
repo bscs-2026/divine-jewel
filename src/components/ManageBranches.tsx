@@ -103,13 +103,27 @@ const ManageBranches: React.FC<ManageBranchesProps> = ({
             {action === 'delete' && (
                 <form className={styles.form}>
                     <h3>Delete Branch</h3>
-                    <select onChange={(e) => handleDeleteBranch(Number(e.target.value))}
+                    <select 
+                        // onChange={(e) => handleDeleteBranch(Number(e.target.value))}
+                        onChange={(e) => setFormData({ ...formData, id: Number(e.target.value) })}
+                        value={formData.id || ''}
                         className={styles.select}>
+
                         <option value="">Select Branch</option>
                         {branches.map(branch => (
                             <option key={branch.id} value={branch.id}>{branch.address_line}</option>
                         ))}
                     </select>
+                    <button
+                    className={`${styles2.smallButton} ${styles2.deleteButton}`}
+                        onClick={(e) => {
+                            e.preventDefault(); // Prevent form submission
+                            if (formData.id) {
+                                handleDeleteBranch(formData.id);
+                            }
+                        }}>
+                        Delete
+                    </button>
                     <button className={`${styles2.smallButton} ${styles2.cancelButton}`} onClick={() => setAction(null)}>Cancel</button>
                 </form>
             )}

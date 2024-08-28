@@ -62,7 +62,7 @@ export default function EmployeesPage() {
     };
 
     const fetchRoles = async () => {
-        try {   
+        try {
             const response = await fetch('/api/employees/roles');
             if (!response.ok) {
                 throw new Error('Failed to fetch roles');
@@ -71,7 +71,7 @@ export default function EmployeesPage() {
             setRoles(data.roles);
         } catch (error: any) {
             setError(error.message);
-        } 
+        }
     };
 
     const addEmployee = async (event: FormEvent) => {
@@ -111,7 +111,7 @@ export default function EmployeesPage() {
             setEditingEmployee(true);
             console.log(employee);
         }
-        
+
     };
 
     const getRoleIdFromName = (roleName: string) => {
@@ -140,8 +140,8 @@ export default function EmployeesPage() {
 
             fetchEmployees();
         } catch (error: any) {
-            setError(error.message);  
-            console.error('An error occurred while updating employee:', error);  
+            setError(error.message);
+            console.error('An error occurred while updating employee:', error);
         } finally {
             setEditingEmployee(false);
             setCurrentEmployee(null);
@@ -150,7 +150,7 @@ export default function EmployeesPage() {
             setSelectedEmployeeType('');
         }
     };
-    
+
     const archiveEmployee = async (id: number) => {
         const confirmArchive = confirm('Are you sure you want to archive this employee?');
 
@@ -166,7 +166,7 @@ export default function EmployeesPage() {
                 },
                 body: JSON.stringify({ is_archive: true }),
             });
-            
+
             if (!response.ok) {
                 throw new Error('Failed to archive employee');
             }
@@ -207,40 +207,42 @@ export default function EmployeesPage() {
     const inactiveEmployees = employees.filter(employee => employee.is_archive === 1 || employee.is_archive === true);
 
     return (
-        <Layout defaultTitle='Employees' 
+        <Layout defaultTitle='Employees'
             rightSidebarContent={
                 <div className="w-full bg-[#FFE7EF] p-6 pt-15 box-border">
-                    <h2 className="text-[#575757] font-bold text-lg mt-4 mb-4" >{editingEmployee ? 'Edit Employee' : 'Add Employee'} </h2>
-                <form className="flex flex-col gap-3 text-[#575757]" onSubmit={editingEmployee ? saveEmployee : addEmployee}>
-                            <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" 
-                            type='text' 
-                            id='first_name' 
-                            name='first_name'  
-                            placeholder='First Name' 
-                            defaultValue={currentEmployee?.first_name || ''}/>
-                        
-                            <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" 
-                            type='text' 
-                            id='last_name' 
-                            name='last_name'  
-                            placeholder='Last Name' 
-                            defaultValue={currentEmployee?.last_name || ''}/>
-                        
-                        
-                            <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" 
-                            type='email' 
-                            id='email_address' 
-                            name='email_address' 
-                            placeholder='Email Address' 
-                            defaultValue={currentEmployee?.email_address || ''}/>
-                        
-                        
-                            <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" 
-                            type='text' 
-                            id='contact_number' 
-                            name='contact_number' 
-                            placeholder='Contact Number' 
-                            defaultValue={currentEmployee?.contact_number || ''}/>
+
+                    <h2 className="text-[#575757] font-bold mt-14 mb-4 text-[14px]" >{editingEmployee ? 'Edit Employee' : 'Add Employee'} </h2>
+
+                    <form className="flex flex-col gap-3 text-[#575757]" onSubmit={editingEmployee ? saveEmployee : addEmployee}>
+                        <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
+                            type='text'
+                            id='first_name'
+                            name='first_name'
+                            placeholder='First Name'
+                            defaultValue={currentEmployee?.first_name || ''} />
+
+                        <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
+                            type='text'
+                            id='last_name'
+                            name='last_name'
+                            placeholder='Last Name'
+                            defaultValue={currentEmployee?.last_name || ''} />
+
+
+                        <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
+                            type='email'
+                            id='email_address'
+                            name='email_address'
+                            placeholder='Email Address'
+                            defaultValue={currentEmployee?.email_address || ''} />
+
+
+                        <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
+                            type='text'
+                            id='contact_number'
+                            name='contact_number'
+                            placeholder='Contact Number'
+                            defaultValue={currentEmployee?.contact_number || ''} />
 
                         <select
                             id='role_id'
@@ -266,24 +268,48 @@ export default function EmployeesPage() {
                             <option value='Full-Time'>Full-Time</option>
                             <option value='Part-Time'>Part-Time</option>
                         </select>
-                        <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" placeholder='Username' type='text' id='username' name='username'  defaultValue={currentEmployee?.username || ''}/>
-                        <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" placeholder='Password' type='password' id='password' name='password' defaultValue={currentEmployee?.password || ''}/>
-        
-                        <button type='submit' className="px-2 py-1 rounded-full text-[#575757] text-xs bg-[#FCB6D7]">{editingEmployee ? 'Save Employee' : 'Add Employee'}</button>
-                </form>
-            </div>
-                
+
+                        <input
+                            className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
+                            placeholder='Username'
+                            type='text'
+                            id='username'
+                            name='username'
+                            defaultValue={currentEmployee?.username || ''} />
+
+                        <input
+                            className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
+                            placeholder='Password'
+                            type='password'
+                            id='password'
+                            name='password'
+                            defaultValue={currentEmployee?.password || ''} />
+
+                        <button
+                            type='submit'
+                            className="px-2 py-1 rounded-full text-[#575757] text-xs bg-[#FCB6D7]">{editingEmployee ? 'Save Employee' : 'Add Employee'}
+                        </button>
+                    </form>
+                </div>
+
             }
-            >
-            <div className='container m-4'>
+        >
+            <div>
 
                 <div className="w-full flex justify-start mb-5 p-5 text-[13px] border border-[#DDDDDD] bg-[#F9F9F9] rounded-lg shadow-md text-[#575757]">
-                    <button onClick={() => setListView('active')}>Active</button>
-                    <button onClick={() => setListView('inactive')}>Inactive</button>
+                    <button
+                        className={`px-2 py-1.5 rounded-full text-[#575757] text-[13px] bg-[${listView === 'active' ? '#FCB6D7' : '#F9F9F9'}]`}
+                        onClick={() => setListView('active')}>Active
+                    </button>
+                    <button
+                        className={`px-2 py-1.5 rounded-full text-[#575757] text-[13px] bg-[${listView === 'inactive' ? '#FCB6D7' : '#F9F9F9'}]`}
+                        onClick={() => setListView('inactive')}>
+                        Inactive
+                    </button>
                 </div>
 
                 <div className="bg-white p-4 rounded-lg shadow-[0_-0.5rem_1rem_rgba(0,0,0,0.1),0_0.5rem_1rem_rgba(0,0,0,0.15)] overflow-y-auto h-[700px] w-full max-w-[1024px]">
-                    <table className='min-w-full'>
+                    <table className="w-full text-left text-black">
                         <thead>
                             <tr>
                                 <th className="p-4 text-[#575757] font-bold text-[13px]">Name</th>
@@ -298,7 +324,7 @@ export default function EmployeesPage() {
                         </thead>
                         <tbody>
                             {(listView === 'active' ? activeEmployees : inactiveEmployees).map((employee) => (
-                                <tr key={employee.id} >
+                                <tr key={employee.id} className="w-full text-left text-black border-t border-gray-300">
                                     <td className="p-4 text-[#575757] text-xs">{employee.last_name + ', ' + employee.first_name}</td>
                                     <td className="p-4 text-[#575757] text-xs">{employee.email_address}</td>
                                     <td className="p-4 text-[#575757] text-xs">{employee.contact_number}</td>
@@ -306,14 +332,14 @@ export default function EmployeesPage() {
                                     <td className="p-4 text-[#575757] text-xs">{employee.employee_type}</td>
                                     {/* <td className="p-4 text-[#575757] text-xs">{employee.username}</td>
                                     <td className="p-4 text-[#575757] text-xs">{employee.password}</td> */}
-                                    <td>
+                                    <td className="p-4 text-[#575757] text-xs">
                                         {listView === 'active' ? (
                                             <>
                                                 <button onClick={() => editEmployee(employee.id)} className="px-2 py-1 rounded-full text-[#575757] text-xs bg-[#FCE4EC]">Edit</button>
                                                 <button onClick={() => archiveEmployee(employee.id)} className="px-2 py-[0.15rem] bg-[#D1D5DB] rounded-full text-[#575757] text-xs">Archive</button>
                                             </>
                                         ) : (
-                                            <button onClick={() => unarchiveEmployee(employee.id)}>Unarchive</button>
+                                            <button onClick={() => unarchiveEmployee(employee.id)} className="px-2 py-[0.15rem] bg-[#FCB6D7] rounded-full text-[#575757] text-xs">Unarchive</button>
                                         )}
                                     </td>
                                 </tr>

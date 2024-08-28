@@ -121,6 +121,9 @@ const suppliesPage: React.FC = () => {
   };
 
   const deleteSupplier = async (id: number) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this supplier?');
+    if (!confirmDelete) return;
+
     try {
       const response = await fetch(`/api/supply/suppliers/${id}`, {
         method: 'DELETE',
@@ -176,6 +179,9 @@ const suppliesPage: React.FC = () => {
   };
 
   const deleteSupply = async (id: number) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this supply?');
+    if (!confirmDelete) return;
+    
     try {
       const response = await fetch(`/api/supply/${id}`, {
         method: 'DELETE',
@@ -228,9 +234,6 @@ const suppliesPage: React.FC = () => {
         )
       }
     >
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
         <>
           <SupplierTabs
             suppliers={suppliers}
@@ -249,7 +252,7 @@ const suppliesPage: React.FC = () => {
             setActiveTab={setActiveTab}
           />
         </>
-      )}
+
     </Layout>
   );
 };

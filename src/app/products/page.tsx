@@ -94,6 +94,9 @@ export default function ProductsPage() {
   }
 
   const deleteCategory = async (id: number) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this category?');
+    if (!confirmDelete) return;
+    
     try {
       const response = await fetch(`/api/products/category/${id}`, {
         method: 'DELETE',
@@ -282,9 +285,6 @@ export default function ProductsPage() {
         )}
       </>
     }>
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
         <>
           <CategoryTabs
             categories={categories}
@@ -300,7 +300,6 @@ export default function ProductsPage() {
             filterCategory={filterCategory}
           />
         </>
-      )}
     </Layout>
   );
 }

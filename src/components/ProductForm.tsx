@@ -122,7 +122,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           className={styles.input}
         />
         <button type="submit" className={`${styles2.smallButton} ${styles2.addButton}`}>
-          {editingProduct ? 'Save' : 'Add'}
+          {editingProduct ? 'Save Product' : 'Add Product'}
         </button>
         {editingProduct && (
           <button

@@ -82,19 +82,20 @@ const ManageCategories: React.FC<CategoryFormProps> = ({
             {action === 'edit' && (
                 <form className={styles.form}>
                     <h3>Edit Category</h3>
-                    <select 
+                    <select
                         onChange={(e) => {
                             const selectedCategory = categories.find(category => category.id === Number(e.target.value));
                             if (selectedCategory) {
-                                setFormData({ 
-                                id: selectedCategory.id, 
-                                name: selectedCategory.name, 
-                                description: selectedCategory.description });
+                                setFormData({
+                                    id: selectedCategory.id,
+                                    name: selectedCategory.name,
+                                    description: selectedCategory.description
+                                });
                             }
                         }}
                         className={styles.select}
                         value={formData.id || ''}
-                    >   
+                    >
                         <option value="">Select a Category</option>
                         {categories.map(category => (
                             <option key={category.id} value={category.id}>
@@ -108,7 +109,7 @@ const ManageCategories: React.FC<CategoryFormProps> = ({
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className={styles.input}
-                    />  
+                    />
                     <input
                         type="text"
                         placeholder="Category Description"
@@ -116,20 +117,21 @@ const ManageCategories: React.FC<CategoryFormProps> = ({
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                         className={styles.input}
                     />
-                    <button 
-                        className={`${styles2.smallButton} ${styles2.addButton}`} 
+                    <button
+                        className={`${styles2.smallButton} ${styles2.addButton}`}
                         onClick={handleEditCategory}>
                         save
                     </button>
                     <button className={`${styles2.smallButton} ${styles2.cancelButton}`} onClick={() => setAction(null)}>Cancel</button>
 
                 </form>
-            )}  
+            )}
             {action === 'delete' && (
                 <form className={styles.form}>
                     <h3>Delete Category</h3>
-                    <select 
-                        onChange={(e) => handleDeleteCategory(Number(e.target.value))}
+                    <select
+                        onChange={(e) => setFormData({ ...formData, id: Number(e.target.value) })}
+                        value={formData.id || ''}
                         className={styles.select}
                     >
                         <option value="">Select a Category</option>
@@ -139,6 +141,16 @@ const ManageCategories: React.FC<CategoryFormProps> = ({
                             </option>
                         ))}
                     </select>
+                    <button
+                        className={`${styles2.smallButton} ${styles2.deleteButton}`}
+                        onClick={(e) => {
+                            e.preventDefault(); // Prevent form submission
+                            if (formData.id) {
+                                handleDeleteCategory(formData.id);
+                            }
+                        }}>
+                        Delete
+                    </button>
                     <button className={`${styles2.smallButton} ${styles2.cancelButton}`} onClick={() => setAction(null)}>Cancel</button>
                 </form>
             )}
