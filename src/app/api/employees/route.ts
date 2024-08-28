@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     console.log('Adding employee to database...');
     const result = await query(
       'INSERT INTO `employees` (first_name, last_name, email_address, contact_number, employee_type, role_id, username, password, is_archive ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-      [first_name, last_name, email_address, contact_number, employee_type, role_id, username, password, is_archive]
+      [first_name, last_name, email_address, contact_number, employee_type, role_id, username, password, 0]
       // 'INSERT INTO `employees` (first_name, last_name, email_address, contact_number, employee_type, role_id, username, password, status, is_archive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       // [first_name, last_name, email_address, contact_number, employee_type, role_id, username, password, status, is_archive]
     );
