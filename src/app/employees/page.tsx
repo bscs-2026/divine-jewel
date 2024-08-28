@@ -212,15 +212,35 @@ export default function EmployeesPage() {
                 <div className="w-full bg-[#FFE7EF] p-6 pt-15 box-border">
                     <h2 className="text-[#575757] font-bold text-lg mt-4 mb-4" >{editingEmployee ? 'Edit Employee' : 'Add Employee'} </h2>
                 <form className="flex flex-col gap-3 text-[#575757]" onSubmit={editingEmployee ? saveEmployee : addEmployee}>
-                            <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" type='text' id='first_name' name='first_name'  placeholder='First Name' defaultValue={currentEmployee?.first_name || ''}/>
+                            <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" 
+                            type='text' 
+                            id='first_name' 
+                            name='first_name'  
+                            placeholder='First Name' 
+                            defaultValue={currentEmployee?.first_name || ''}/>
                         
-                            <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" type='text' id='last_name' name='last_name'  placeholder='Last Name' defaultValue={currentEmployee?.last_name || ''}/>
+                            <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" 
+                            type='text' 
+                            id='last_name' 
+                            name='last_name'  
+                            placeholder='Last Name' 
+                            defaultValue={currentEmployee?.last_name || ''}/>
                         
                         
-                            <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" type='email' id='email_address' name='email_address' placeholder='Email Address' defaultValue={currentEmployee?.email_address || ''}/>
+                            <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" 
+                            type='email' 
+                            id='email_address' 
+                            name='email_address' 
+                            placeholder='Email Address' 
+                            defaultValue={currentEmployee?.email_address || ''}/>
                         
                         
-                            <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" type='text' id='contact_number' name='contact_number' placeholder='Contact Number' defaultValue={currentEmployee?.contact_number || ''}/>
+                            <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs" 
+                            type='text' 
+                            id='contact_number' 
+                            name='contact_number' 
+                            placeholder='Contact Number' 
+                            defaultValue={currentEmployee?.contact_number || ''}/>
 
                         <select
                             id='role_id'
@@ -256,10 +276,12 @@ export default function EmployeesPage() {
             }
             >
             <div className='container m-4'>
-                <div className='employee-toggle-view'>
-                    <button className='px-2 mx-1 mt-2 border border-white' onClick={() => setListView('active')}>Active</button>
-                    <button className='px-2 mx-1 mt-2 border border-white' onClick={() => setListView('inactive')}>Inactive</button>
+
+                <div className="w-full flex justify-start mb-5 p-5 text-[13px] border border-[#DDDDDD] bg-[#F9F9F9] rounded-lg shadow-md text-[#575757]">
+                    <button onClick={() => setListView('active')}>Active</button>
+                    <button onClick={() => setListView('inactive')}>Inactive</button>
                 </div>
+
                 <div className="bg-white p-4 rounded-lg shadow-[0_-0.5rem_1rem_rgba(0,0,0,0.1),0_0.5rem_1rem_rgba(0,0,0,0.15)] overflow-y-auto h-[700px] w-full max-w-[1024px]">
                     <table className='min-w-full'>
                         <thead>
