@@ -285,9 +285,6 @@ export default function ProductsPage() {
         )}
       </>
     }>
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
         <>
           <CategoryTabs
             categories={categories}
@@ -303,7 +300,6 @@ export default function ProductsPage() {
             filterCategory={filterCategory}
           />
         </>
-      )}
     </Layout>
   );
 }

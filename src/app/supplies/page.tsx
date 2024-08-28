@@ -234,9 +234,6 @@ const suppliesPage: React.FC = () => {
         )
       }
     >
-      {loading ? (
-        <div>Loading...</div>
-      ) : (
         <>
           <SupplierTabs
             suppliers={suppliers}
@@ -255,7 +252,7 @@ const suppliesPage: React.FC = () => {
             setActiveTab={setActiveTab}
           />
         </>
-      )}
+
     </Layout>
   );
 };
