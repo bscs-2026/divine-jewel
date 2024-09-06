@@ -3,9 +3,9 @@
 
 import { Suspense, useEffect, useState, FormEvent } from 'react';
 import MainLayout from '@/components/MainLayout';
-import EmployeeModal from './_components/EmployeeModal';
-import InformationModal from './_components/InformationModal';
-import EmployeeTable from './_components/EmployeeTable';
+import EmployeeModal from '@/components/modals/EmployeeModal';
+import InformationModal from '@/components/modals/InformationModal';
+import EmployeeTable from '@/components/tables/EmployeeTable';
 
 
 export interface Employee {

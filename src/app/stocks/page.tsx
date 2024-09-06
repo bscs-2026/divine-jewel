@@ -1,10 +1,10 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Layout from '../../components/PageLayout';
-import StockTable from '../../components/StockTable';
-import StockForm from '../../components/StockForm';
-import BranchTabs from '../../components/BranchTabs';
-import ManageBranches from '../../components/ManageBranches';
+import StockTable from '../../components/tables/StockTable';
+import StockForm from '../../components/forms/StockForm';
+import BranchTabs from '../../components/tabs/BranchTabs';
+import ManageBranches from '../../components/forms/ManageBranches';
 
 interface Stock {
     id: number;

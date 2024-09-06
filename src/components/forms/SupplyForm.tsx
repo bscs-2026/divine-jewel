@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import styles from './styles/Layout.module.css';
-import formStyles from './styles/Form.module.css';
-import buttonStyles from './styles/Button.module.css';
+import styles from '../styles/Layout.module.css';
+import formStyles from '../styles/Form.module.css';
+import buttonStyles from '../styles/Button.module.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWarehouse, faTruck, faFilePen, faSquareMinus } from '@fortawesome/free-solid-svg-icons';
 

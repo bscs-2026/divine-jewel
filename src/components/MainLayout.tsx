@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import LeftSidebar from './LeftSidebar';
+import LeftSidebar from './layout/LeftSidebar';
 
 interface MainLayoutProps {
     children: React.ReactNode;
