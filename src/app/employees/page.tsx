@@ -1,14 +1,20 @@
 // src/app/employees/page.tsx
 'use client';
 
-import { useEffect, useState, FormEvent } from 'react';
-import Layout from '../../components/PageLayout';
+import { Suspense, useEffect, useState, FormEvent } from 'react';
+import MainLayout from '@/components/MainLayout';
+import EmployeeModal from './_components/EmployeeModal';
+import InformationModal from './_components/InformationModal';
+import EmployeeTable from './_components/EmployeeTable';
 
-interface Employee {
+
+export interface Employee {
     id: number;
     first_name: string;
     last_name: string;
+    address: string;
     email_address: string;
+    birth_date: Date;
     contact_number: string;
     employee_type: string;
     role_name: string;
@@ -17,7 +23,7 @@ interface Employee {
     is_archive: number | boolean;
 }
 
-interface Role {
+export interface Role {
     id: number;
     name: string;
     description: string;
@@ -33,6 +39,8 @@ export default function EmployeesPage() {
     const [selectedRole, setSelectedRole] = useState<string>('');
     const [selectedEmployeeType, setSelectedEmployeeType] = useState<string>('');
     const [listView, setListView] = useState<'active' | 'inactive'>('active');
+    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [isInformationModalOpen, setIsInformationModalOpen] = useState<boolean>(false);
 
     useEffect(() => {
         fetchEmployees();
@@ -80,6 +88,8 @@ export default function EmployeesPage() {
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
 
+        console.log('Form Data:', data);
+
         try {
             const response = await fetch('/api/employees', {
                 method: 'POST',
@@ -96,7 +106,7 @@ export default function EmployeesPage() {
             form.reset();
             setSelectedRole('');
             setSelectedEmployeeType('');
-
+            setIsModalOpen(false);
             fetchEmployees();
         } catch (error: any) {
             setError(error.message);
@@ -109,6 +119,7 @@ export default function EmployeesPage() {
         if (employee) {
             setCurrentEmployee(employee);
             setEditingEmployee(true);
+            setIsModalOpen(true);
             console.log(employee);
         }
 
@@ -148,6 +159,7 @@ export default function EmployeesPage() {
             form.reset();
             setSelectedRole('');
             setSelectedEmployeeType('');
+            setIsModalOpen(false);
         }
     };
 
@@ -203,100 +215,58 @@ export default function EmployeesPage() {
         }
     };
 
+    const deleteEmployee = async (id: number) => {
+        const confirmDelete = confirm('Are you sure you want to delete this employee?');
+
+        if (!confirmDelete) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/employees/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete employee');
+            }
+            await fetchEmployees();
+        } catch (error: any) {
+            setError(error.message);
+            console.error('An error occurred while deleting employee:', error);
+        }
+    };
+
+    const handleAddEmployee = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setEditingEmployee(false);
+        setCurrentEmployee(null);
+        setSelectedRole('');
+        setSelectedEmployeeType('');
+        setIsModalOpen(false);
+    };
+
+    const handleInformationModalOpen = (employee: Employee) => {
+        setCurrentEmployee(employee);
+        setIsInformationModalOpen(true);
+    }
+
+    const handleInformationModalClose = () => {
+        setIsInformationModalOpen(false);
+    }
+
     const activeEmployees = employees.filter(employee => employee.is_archive === 0 || employee.is_archive === false);
     const inactiveEmployees = employees.filter(employee => employee.is_archive === 1 || employee.is_archive === true);
 
     return (
-        <Layout defaultTitle='Employees'
-            rightSidebarContent={
-                <div className="w-full bg-[#FFE7EF] p-6 pt-15 box-border">
+        <MainLayout defaultTitle='Employees'>
+            <div className='m-4'>
 
-                    <h2 className="text-[#575757] font-bold mt-14 mb-4 text-[14px]" >{editingEmployee ? 'Edit Employee' : 'Add Employee'} </h2>
-
-                    <form className="flex flex-col gap-3 text-[#575757]" onSubmit={editingEmployee ? saveEmployee : addEmployee}>
-                        <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
-                            type='text'
-                            id='first_name'
-                            name='first_name'
-                            placeholder='First Name'
-                            defaultValue={currentEmployee?.first_name || ''} />
-
-                        <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
-                            type='text'
-                            id='last_name'
-                            name='last_name'
-                            placeholder='Last Name'
-                            defaultValue={currentEmployee?.last_name || ''} />
-
-
-                        <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
-                            type='email'
-                            id='email_address'
-                            name='email_address'
-                            placeholder='Email Address'
-                            defaultValue={currentEmployee?.email_address || ''} />
-
-
-                        <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
-                            type='text'
-                            id='contact_number'
-                            name='contact_number'
-                            placeholder='Contact Number'
-                            defaultValue={currentEmployee?.contact_number || ''} />
-
-                        <select
-                            id='role_id'
-                            name='role_id'
-                            className="w-full p-2 border border-[#FFE7EF] rounded-lg text-[#575757] text-xs"
-                            value={selectedRole}
-                            onChange={(e) => setSelectedRole(e.target.value)}
-                        >
-                            <option value='' disabled>Select Role</option>
-                            {roles.map((role) => (
-                                <option key={role.id} value={role.id}>{role.name}</option>
-                            ))}
-                        </select>
-
-                        <select
-                            id='employee_type'
-                            name='employee_type'
-                            className="w-full p-2 border border-[#FFE7EF] rounded-lg text-[#575757] text-xs"
-                            value={selectedEmployeeType}
-                            onChange={(e) => setSelectedEmployeeType(e.target.value)}
-                        >
-                            <option value='' disabled>Select Type</option>
-                            <option value='Full-Time'>Full-Time</option>
-                            <option value='Part-Time'>Part-Time</option>
-                        </select>
-
-                        <input
-                            className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
-                            placeholder='Username'
-                            type='text'
-                            id='username'
-                            name='username'
-                            defaultValue={currentEmployee?.username || ''} />
-
-                        <input
-                            className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
-                            placeholder='Password'
-                            type='password'
-                            id='password'
-                            name='password'
-                            defaultValue={currentEmployee?.password || ''} />
-
-                        <button
-                            type='submit'
-                            className="px-2 py-1 rounded-full text-[#575757] text-xs bg-[#FCB6D7]">{editingEmployee ? 'Save Employee' : 'Add Employee'}
-                        </button>
-                    </form>
-                </div>
-
-            }
-        >
-            <div>
-
-                <div className="w-full flex justify-start mb-5 p-5 text-[13px] border border-[#DDDDDD] bg-[#F9F9F9] rounded-lg shadow-md text-[#575757]">
+                <div className="flex justify-start mb-5 p-5 text-[13px] border border-[#DDDDDD] bg-[#F9F9F9] rounded-lg shadow-md text-[#575757]">
                     <button
                         className={`px-2 py-1.5 rounded-full text-[#575757] text-[13px] bg-[${listView === 'active' ? '#FCB6D7' : '#F9F9F9'}]`}
                         onClick={() => setListView('active')}>Active
@@ -306,48 +276,47 @@ export default function EmployeesPage() {
                         onClick={() => setListView('inactive')}>
                         Inactive
                     </button>
+                    <button
+                        className="ml-auto px-4 py-2 rounded-full text-[#575757] bg-[#FCB6D7] hover:bg-[#FFE7EF]"
+                        onClick={handleAddEmployee}
+                    >
+                        Add Employee
+                    </button>
                 </div>
 
-                <div className="bg-white p-4 rounded-lg shadow-[0_-0.5rem_1rem_rgba(0,0,0,0.1),0_0.5rem_1rem_rgba(0,0,0,0.15)] overflow-y-auto h-[700px] w-full max-w-[1024px]">
-                    <table className="w-full text-left text-black">
-                        <thead>
-                            <tr>
-                                <th className="p-4 text-[#575757] font-bold text-[13px]">Name</th>
-                                <th className="p-4 text-[#575757] font-bold text-[13px]">E-mail</th>
-                                <th className="p-4 text-[#575757] font-bold text-[13px]">Contact Number</th>
-                                <th className="p-4 text-[#575757] font-bold text-[13px]">Role</th>
-                                <th className="p-4 text-[#575757] font-bold text-[13px]">Employee Type</th>
-                                {/* <th className="p-4 text-[#575757] font-bold text-[13px]">Username</th>
-                                <th className="p-4 text-[#575757] font-bold text-[13px]">Password</th> */}
-                                <th className="p-4 text-[#575757] font-bold text-[13px]">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {(listView === 'active' ? activeEmployees : inactiveEmployees).map((employee) => (
-                                <tr key={employee.id} className="w-full text-left text-black border-t border-gray-300">
-                                    <td className="p-4 text-[#575757] text-xs">{employee.last_name + ', ' + employee.first_name}</td>
-                                    <td className="p-4 text-[#575757] text-xs">{employee.email_address}</td>
-                                    <td className="p-4 text-[#575757] text-xs">{employee.contact_number}</td>
-                                    <td className="p-4 text-[#575757] text-xs">{employee.role_name}</td>
-                                    <td className="p-4 text-[#575757] text-xs">{employee.employee_type}</td>
-                                    {/* <td className="p-4 text-[#575757] text-xs">{employee.username}</td>
-                                    <td className="p-4 text-[#575757] text-xs">{employee.password}</td> */}
-                                    <td className="p-4 text-[#575757] text-xs">
-                                        {listView === 'active' ? (
-                                            <>
-                                                <button onClick={() => editEmployee(employee.id)} className="px-2 py-1 rounded-full text-[#575757] text-xs bg-[#FCE4EC]">Edit</button>
-                                                <button onClick={() => archiveEmployee(employee.id)} className="px-2 py-[0.15rem] bg-[#D1D5DB] rounded-full text-[#575757] text-xs">Archive</button>
-                                            </>
-                                        ) : (
-                                            <button onClick={() => unarchiveEmployee(employee.id)} className="px-2 py-[0.15rem] bg-[#FCB6D7] rounded-full text-[#575757] text-xs">Unarchive</button>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                <EmployeeModal 
+                    isOpen={isModalOpen} 
+                    onClose={handleCloseModal} 
+                    onSubmit={editingEmployee ? saveEmployee : addEmployee}
+                    currentEmployee={currentEmployee}
+                    editingEmployee={editingEmployee}
+                    roles={roles}
+                    selectedRole={selectedRole}
+                    setSelectedRole={setSelectedRole}
+                    selectedEmployeeType={selectedEmployeeType}
+                    setSelectedEmployeeType={setSelectedEmployeeType}
+                />
+
+                <div className="bg-white p-4 rounded-lg shadow-[0_-0.5rem_1rem_rgba(0,0,0,0.1),0_0.5rem_1rem_rgba(0,0,0,0.15)] ">
+                    
+                    <EmployeeTable
+                        employees={listView === 'active' ? activeEmployees : inactiveEmployees}
+                        listView={listView}
+                        handleInformationModalOpen={handleInformationModalOpen}
+                        editEmployee={editEmployee}
+                        archiveEmployee={archiveEmployee}
+                        unarchiveEmployee={unarchiveEmployee}
+                        deleteEmployee={deleteEmployee}
+                    />
+
+                    <InformationModal
+                        isInfoModalOpen={isInformationModalOpen}
+                        onInfoModalClose={handleInformationModalClose}
+                        employee={currentEmployee}
+                    />
+
                 </div>
             </div>
-        </Layout>
+        </MainLayout>
     );
 };
