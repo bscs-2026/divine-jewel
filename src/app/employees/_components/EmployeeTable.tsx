@@ -50,7 +50,7 @@ const EmployeeTable = ({
                                 </>
                             ) : (
                                 <>
-                                    <button onClick={() => handleInformationModalOpen(employee)} className="mr-2 px-2 py-1 rounded-full text-[#575757] text-xs bg-[#FCE4EC]">Get Info</button>
+                                    <button onClick={() => handleInformationModalOpen(employee)} className="mr-2 px-2 py-1 rounded-full text-[#575757] text-xs bg-[#FCE4EC]">More Info</button>
                                     <button onClick={() => unarchiveEmployee(employee.id)} className="px-2 py-[0.15rem] bg-[#FCE4EC] rounded-full text-[#575757] text-xs">Unarchive</button>
                                     <button onClick={() => deleteEmployee(employee.id)} className=" mx-2 px-2 py-[0.15rem] bg-[#D1D5DB] rounded-full text-[#661a1a] text-xs">Delete</button>
                                 </>

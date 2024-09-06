@@ -182,6 +182,7 @@
   padding: 0.5rem 1rem;
   border-radius: 9999px;
   color: #575757;
+  margin-left: 2.5rem;
 }
 
 @media (max-width: 768px) {
