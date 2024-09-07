@@ -1,7 +1,7 @@
 // src/components/BranchTabs.tsx
 import React from 'react';
-import styles from './styles/Layout.module.css';
-import styles2 from './styles/Button.module.css';
+import styles from '../styles/Layout.module.css';
+import styles2 from '../styles/Button.module.css';
 
 interface Branch {
   id: number;

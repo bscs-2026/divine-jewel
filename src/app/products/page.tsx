@@ -3,10 +3,10 @@
 
 import { useEffect, useState } from 'react';
 import Layout from '../../components/PageLayout';
-import ProductTable from '../../components/ProductTable';
-import CategoryTabs from '../../components/CategoryTabs';
-import ProductForm from '../../components/ProductForm';
-import ManageCategories from '../../components/ManageCategories';
+import ProductTable from '../../components/tables/ProductTable';
+import CategoryTabs from '../../components/tabs/CategoryTabs';
+import ProductForm from '../../components/forms/ProductForm';
+import ManageCategories from '../../components/forms/ManageCategories';
 
 interface Product {
   id: number;

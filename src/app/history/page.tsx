@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import LeftSidebar from '../../components/LeftSidebar';
+import LeftSidebar from '../../components/layout/LeftSidebar';
 
 export default function Home() {
   return (

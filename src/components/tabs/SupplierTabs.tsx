@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './styles/Layout.module.css';
+import styles from '../styles/Layout.module.css';
 
 interface Supplier {
   id: number;

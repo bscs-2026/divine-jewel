@@ -4,9 +4,9 @@
 
 import React, { useState, useEffect } from 'react';
 import Layout from '../../components/PageLayout';
-import SupplyTable from '../../components/SupplyTable';
-import SupplierTabs from '../../components/SupplierTabs';
-import SupplyForm from '../../components/SupplyForm';
+import SupplyTable from '../../components/tables/SupplyTable';
+import SupplierTabs from '../../components/tabs/SupplierTabs';
+import SupplyForm from '../../components/forms/SupplyForm';
 
 interface Supplier {
   id?: number;

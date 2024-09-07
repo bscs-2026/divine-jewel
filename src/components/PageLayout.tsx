@@ -1,7 +1,7 @@
 // src/components/Layout.tsx
 
 import React, { useState, useEffect } from 'react';
-import LeftSidebar from './LeftSidebar';
+import LeftSidebar from './layout/LeftSidebar';
 import styles from './styles/Layout.module.css';
 
 interface LayoutProps {
