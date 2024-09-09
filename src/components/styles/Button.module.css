@@ -50,3 +50,8 @@
 .unarchiveButton {
   background-color: #FCB6D7;
 }
+
+.alignRightButton {
+  display: block;
+  margin-left: auto;
+}
