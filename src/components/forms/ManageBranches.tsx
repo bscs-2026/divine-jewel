@@ -1,134 +1,197 @@
-// src/components/ManageBranches.tsx
-
 import React, { useState } from 'react';
-import styles from '../styles/Form.module.css';
-import styles2 from '../styles/Button.module.css';
+import { Edit, Delete } from '@mui/icons-material';
+import modalStyles from '../styles/Modal.module.css';
 
 interface Branch {
-    id: number;
-    address_line: string;
+  id: number;
+  name: string;
+  address_line: string;
 }
 
 interface ManageBranchesProps {
-    branches: Branch[];
-    addBranch: (branch: Branch) => void;
-    editBranch: (branch: Branch) => void;
-    deleteBranch: (id: number) => void;
+  branches: Branch[];
+  addBranch: (branch: Branch) => void;
+  editBranch: (branch: Branch) => void;
+  deleteBranch: (id: number) => void;
 }
 
 const ManageBranches: React.FC<ManageBranchesProps> = ({
-    branches,
-    addBranch,
-    editBranch,
-    deleteBranch }) => {
+  branches,
+  addBranch,
+  editBranch,
+  deleteBranch,
+}) => {
+  const initialFormData = {
+    id: 0,
+    name: '',
+    address_line: '',
+  };
 
-    const initialFormData = {
-        id: 0,
-        address_line: '',
-    };
+  const [formData, setFormData] = useState(initialFormData);
+  const [editingBranchId, setEditingBranchId] = useState<number | null>(null);
+  const [action, setAction] = useState<'add' | 'edit' | 'delete' | null>(null);
 
-    const [formData, setFormData] = useState(initialFormData);
-    const [action, setAction] = useState<'add' | 'edit' | 'delete' | null>(null);
+  const handleAddBranch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData.name.trim() === '' || formData.address_line.trim() === '') return;
+    addBranch(formData);
+    setFormData(initialFormData);
+  };
 
-    const handleAddBranch = () => {
-        addBranch(formData);
-        setFormData(initialFormData);
-        setAction(null);
-    };
+  const handleEditBranch = (branch: Branch) => {
+    setFormData({ id: branch.id, name: branch.name, address_line: branch.address_line });
+    setEditingBranchId(branch.id);
+    setAction('edit');
+  };
 
-    const handleEditBranch = () => {
-        editBranch(formData);
-        setFormData(initialFormData);
-        setAction(null);
-    };
+  const handleSaveEditBranch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (formData.name.trim() === '' || formData.address_line.trim() === '') return;
+    editBranch(formData);
+    setFormData(initialFormData);
+    setEditingBranchId(null);
+    setAction(null);
+  };
 
-    const handleDeleteBranch = (id: number) => {
-        deleteBranch(id);
-        setAction(null);
-    };
+  const handleDeleteBranch = (id: number) => {
+    deleteBranch(id);
+  };
 
-    return (
-        <div className={styles.container}>
-            <h2 className={styles.heading}>Manage Store Branches</h2>
-            {!action && (
-                <form className={styles.form}>
-                    <button className={`${styles2.smallButton} ${styles2.addButton}`} onClick={() => setAction('add')}>Add Branch</button>
-                    <button className={`${styles2.smallButton} ${styles2.addButton}`} onClick={() => setAction('edit')}>Edit Branch</button>
-                    <button className={`${styles2.smallButton} ${styles2.addButton}`} onClick={() => setAction('delete')}>Delete Branch</button>
-                </form>
-            )}
-            {action === 'add' && (
-                <form className={styles.form}>
-                    <h3>Add Branch</h3>
+  const handleCancelEdit = () => {
+    setFormData(initialFormData);
+    setEditingBranchId(null);
+    setAction(null);
+  };
+
+  return (
+    <div className={modalStyles.modalContent}>
+      <div className={modalStyles.modalContentScrollable}>
+        <h2 className={modalStyles.modalHeading}>Manage Store Branches</h2>
+
+        {/* Add Branch Form */}
+        {action === 'add' && (
+          <form className={modalStyles.modalForm} onSubmit={handleAddBranch}>
+            <input
+              type="text"
+              placeholder="Branch Name"
+              value={formData.name}
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
+              className={modalStyles.modalInput}
+            />
+            <input
+              type="text"
+              placeholder="Branch Address"
+              value={formData.address_line}
+              onChange={(e) =>
+                setFormData({ ...formData, address_line: e.target.value })
+              }
+              className={modalStyles.modalInput}
+            />
+            <div className={modalStyles.modalButtonContainer}>
+              <button type="submit" className={modalStyles.modalButton}>
+                Add
+              </button>
+              <button
+                type="button"
+                className={modalStyles.modalButton}
+                onClick={() => setAction(null)}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* List of Branches */}
+        <table className={modalStyles.modalTable}>
+          <thead>
+            <tr>
+              <th>Branch Name</th>
+              <th>Branch Address</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {branches.map((branch) => (
+              <tr key={branch.id}>
+                <td>
+                  {editingBranchId === branch.id ? (
                     <input
-                        type="text"
-                        placeholder="Address Line"
-                        value={formData.address_line}
-                        onChange={(e) => setFormData({ ...formData, address_line: e.target.value })}
-                        className={styles.input}
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
+                      className={modalStyles.modalInput}
                     />
-                    <button className={`${styles2.smallButton} ${styles2.addButton}`} onClick={handleAddBranch}>Add</button>
-                    <button className={`${styles2.smallButton} ${styles2.cancelButton}`} onClick={() => setAction(null)}>Cancel</button>
-                </form>
-            )}
-            {action === 'edit' && (
-                <form className={styles.form}>
-                    <h3>Edit Branch</h3>
-                    <select
-                        onChange={(e) => {
-                            const selectedBranch = branches.find(branch => branch.id === Number(e.target.value));
-                            if (selectedBranch) {
-                                setFormData({ id: selectedBranch.id, address_line: selectedBranch.address_line });
-                            }
-                        }}
-                        className={styles.select}
-                        value={formData.id || ''}
-                    >
-                        <option value="">Select Branch</option>
-                        {branches.map(branch => (
-                            <option key={branch.id} value={branch.id}>{branch.address_line}</option>
-                        ))}
-                    </select>
+                  ) : (
+                    branch.name
+                  )}
+                </td>
+                <td>
+                  {editingBranchId === branch.id ? (
                     <input
-                        type="text"
-                        placeholder="New Address Line"
-                        value={formData.address_line}
-                        onChange={(e) => setFormData({ ...formData, address_line: e.target.value })}
-                        className={styles.input}
+                      type="text"
+                      value={formData.address_line}
+                      onChange={(e) =>
+                        setFormData({ ...formData, address_line: e.target.value })
+                      }
+                      className={modalStyles.modalInput}
                     />
-                    <button className={`${styles2.smallButton} ${styles2.addButton}`} onClick={handleEditBranch}>Submit</button>
-                    <button className={`${styles2.smallButton} ${styles2.cancelButton}`} onClick={() => setAction(null)}>Cancel</button>
-                </form>
-            )}
-            {action === 'delete' && (
-                <form className={styles.form}>
-                    <h3>Delete Branch</h3>
-                    <select 
-                        // onChange={(e) => handleDeleteBranch(Number(e.target.value))}
-                        onChange={(e) => setFormData({ ...formData, id: Number(e.target.value) })}
-                        value={formData.id || ''}
-                        className={styles.select}>
+                  ) : (
+                    branch.address_line
+                  )}
+                </td>
+                <td>
+                  {editingBranchId === branch.id ? (
+                    <>
+                      <button
+                        className={modalStyles.modalButton}
+                        onClick={handleSaveEditBranch}
+                      >
+                        Save
+                      </button>
+                      <button
+                        className={modalStyles.modalButton}
+                        onClick={handleCancelEdit}
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Edit
+                        onClick={() => handleEditBranch(branch)}
+                        className={modalStyles.iconButton}
+                        style={{ cursor: 'pointer', color: '#575757' }}
+                      />
+                      <Delete
+                        onClick={() => handleDeleteBranch(branch.id)}
+                        className={modalStyles.iconButton}
+                        style={{ cursor: 'pointer', color: '#ff4d4f', marginLeft: '10px' }}
+                      />
+                    </>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-                        <option value="">Select Branch</option>
-                        {branches.map(branch => (
-                            <option key={branch.id} value={branch.id}>{branch.address_line}</option>
-                        ))}
-                    </select>
-                    <button
-                    className={`${styles2.smallButton} ${styles2.deleteButton}`}
-                        onClick={(e) => {
-                            e.preventDefault(); // Prevent form submission
-                            if (formData.id) {
-                                handleDeleteBranch(formData.id);
-                            }
-                        }}>
-                        Delete
-                    </button>
-                    <button className={`${styles2.smallButton} ${styles2.cancelButton}`} onClick={() => setAction(null)}>Cancel</button>
-                </form>
-            )}
+        {/* Add New Branch Button */}
+        <div className={modalStyles.modalButtonContainer}>
+          <button
+            className={modalStyles.modalButton}
+            onClick={() => setAction('add')}
+          >
+            Add Branch
+          </button>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default ManageBranches;

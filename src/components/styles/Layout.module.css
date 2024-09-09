@@ -57,20 +57,6 @@
   color: #575757;
 }
 
-.tabsContainer {
-  width: 100%;
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 20px;
-  padding: 20px;
-  font-size: 13px;
-  border: 1px solid #DDDDDD;
-  background-color: #F9F9F9;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  color: #575757;
-}
-
 .tabsContainerItem {
   padding: 0.25rem 0.75rem;
   border-radius: 1.5rem;

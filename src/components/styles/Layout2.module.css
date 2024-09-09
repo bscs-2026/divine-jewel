@@ -1,0 +1,108 @@
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.leftSidebar {
+    width: 15%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    background-color: #FFE7EF;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1rem 1rem;
+    color: #575757;
+}
+
+.mainContent {
+    margin-left: 15%;
+    padding: 20px;
+    width: 85%;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: flex-start;
+    font-size: 12px;
+    padding-left: 20px;
+}
+
+.mainContent h1 {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #575757;
+}
+
+.tabsContainer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    font-size: 13px;
+    border: 1px solid #DDDDDD;
+    background-color: #F9F9F9;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #575757;
+}
+
+.leftTabs {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.tabsContainerItem {
+    padding: 0.25rem 0.75rem;
+    border-radius: 1.5rem;
+    color: #575757;
+    font-size: 13px;
+    transition: background-color 0.3s, color 0.3s;
+    cursor: pointer;
+}
+
+.tabsContainerItem.active {
+    background-color: #FCB6D7;
+}
+
+.tabsContainerItem.inactive {
+    background-color: #F9F9F9;
+}
+
+.tabsContainerItem.inactive:hover {
+    background-color: #FFE7EF;
+    color: #575757;
+}
+
+/* Vertical line before the Manage Branches button */
+.verticalLine {
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.verticalLine::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: #ccc;
+}
+
+.rightButtonGroup {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.tabsContainerItem:disabled {
+    cursor: not-allowed;
+    color: #b0b0b0;
+}
