@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import styles from '../styles/Form.module.css';
-import styles2 from '../styles/Button.module.css';
+import styles from '../styles/Modal.module.css';
+import { ArrowBack } from '@mui/icons-material';
 
 interface Stock {
     id: number;
@@ -26,194 +26,259 @@ interface Product {
 
 interface Branch {
     id: number;
+    name: string;
     address_line: string;
 }
 
 interface StockFormProps {
     products: Product[];
     branches: Branch[];
-    selectedStock: Stock | null;
+    selectedStocks: Stock[];
     isTransfer: boolean;
-    addStock: (stock: Stock) => void;
-    transferStock: (stockDetails: StockDetails) => void;
+    addStock: (stock: Stock) => Promise<{ ok: boolean, message?: string }>;
+    transferStock: (stockDetails: StockDetails) => Promise<{ ok: boolean, message?: string }>;
+    onClose: () => void;
 }
 
 const StockForm: React.FC<StockFormProps> = ({
     products,
     branches,
-    selectedStock,
+    selectedStocks,
     isTransfer,
     addStock,
     transferStock,
+    onClose
 }) => {
-    const initialFormData = {
-        product_id: "",
-        branch_code: "",
-        destination_branch: "",
-        note: "",
-        quantity: ""
-    };
+    const [formDataList, setFormDataList] = useState(
+        selectedStocks.map((stock) => ({
+            product_id: stock.product_id.toString(),
+            branch_code: stock.branch_code.toString(),
+            quantity: "",
+            note: "",
+        }))
+    );
 
-    const [formData, setFormData] = useState(initialFormData);
+    const [destinationBranch, setDestinationBranch] = useState("");
+    const [transferNote, setTransferNote] = useState("");
+    const [lastAction, setLastAction] = useState<boolean | null>(null);
+    const [errors, setErrors] = useState<string[]>([]);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
 
     useEffect(() => {
-        if (selectedStock) {
-            setFormData({
-                product_id: selectedStock.product_id.toString(),
-                branch_code: selectedStock.branch_code.toString(),
-                destination_branch: "",
+        setFormDataList(
+            selectedStocks.map((stock) => ({
+                product_id: stock.product_id ? stock.product_id.toString() : "",
+                branch_code: stock.branch_code ? stock.branch_code.toString() : "",
+                quantity: "",
                 note: "",
-                quantity: ""
-            });
-        }
-    }, [selectedStock]);
+            }))
+        );
+    }, [selectedStocks]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => {
+    useEffect(() => {
+        if (lastAction !== null && lastAction !== isTransfer) {
+            setFormDataList(
+                selectedStocks.map((stock) => ({
+                    product_id: stock.product_id ? stock.product_id.toString() : "",
+                    branch_code: stock.branch_code ? stock.branch_code.toString() : "",
+                    quantity: "",
+                    note: "",
+                }))
+            );
+            setDestinationBranch("");
+            setTransferNote("");
+        }
+        setLastAction(isTransfer);
+    }, [isTransfer, selectedStocks, lastAction]);
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
+        const inputValue = parseInt(value);
+        const availableStock = selectedStocks[index].quantity;
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (isTransfer) {
-            const stockDetails = {
-                product_id: parseInt(formData.product_id),
-                source_branch: parseInt(formData.branch_code),
-                destination_branch: parseInt(formData.destination_branch),
-                quantity: parseInt(formData.quantity),
-                note: formData.note || '',
-            };
-            transferStock(stockDetails);
-        } else {
-            const stock = {
-                ...selectedStock,
-                product_id: parseInt(formData.product_id),
-                branch_code: parseInt(formData.branch_code),
-                quantity: parseInt(formData.quantity),
-            };
-            addStock(stock as Stock);
+        if (isTransfer && name === "quantity" && inputValue > availableStock) {
+            setErrors((prev) => {
+                const updatedErrors = [...prev];
+                updatedErrors[index] = `Available stock is ${availableStock}.`;
+                return updatedErrors;
+            });
+            return;
         }
-        resetForm();
+
+        setErrors((prev) => {
+            const updatedErrors = [...prev];
+            updatedErrors[index] = "";
+            return updatedErrors;
+        });
+
+        setFormDataList((prev) => {
+            const updatedFormData = [...prev];
+            updatedFormData[index] = {
+                ...updatedFormData[index],
+                [name]: value,
+            };
+            return updatedFormData;
+        });
     };
 
-    const resetForm = () => {
-        setFormData(initialFormData);
+    const handleDestinationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setDestinationBranch(e.target.value);
+    };
+
+    const handleNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setTransferNote(e.target.value);
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+    
+        let formIsValid = true;
+        let apiSuccess = false;
+    
+        await Promise.all(formDataList.map(async (formData, index) => {
+            if (!formData.product_id || !formData.branch_code || isNaN(parseInt(formData.quantity))) {
+                alert("Please fill all required fields correctly.");
+                formIsValid = false;
+                return;
+            }
+    
+            try {
+                let response;
+                if (isTransfer) {
+                    if (!destinationBranch) {
+                        alert("Please select a destination branch for the transfer.");
+                        formIsValid = false;
+                        return;
+                    }
+                    const stockDetails = {
+                        product_id: parseInt(formData.product_id),
+                        source_branch: parseInt(formData.branch_code),
+                        destination_branch: parseInt(destinationBranch),
+                        quantity: parseInt(formData.quantity),
+                        note: transferNote || '',
+                    };
+                    response = await transferStock(stockDetails);
+                    if (response.ok) {
+                        setSuccessMessage("Stock successfully transferred!");
+                        apiSuccess = true;
+                    }
+                } else {
+                    const stock = {
+                        ...selectedStocks[index],
+                        product_id: parseInt(formData.product_id),
+                        branch_code: parseInt(formData.branch_code),
+                        quantity: parseInt(formData.quantity),
+                    };
+                    response = await addStock(stock);
+                    if (response.ok) {
+                        setSuccessMessage("Stock successfully added!");
+                        apiSuccess = true;
+                    }
+                }
+            } catch (error) {
+                console.error("An error occurred during the API request", error);
+                formIsValid = false;
+            }
+        }));
+    
+        if (formIsValid && apiSuccess) {
+            setShowSuccessModal(true);
+            setTimeout(() => {
+                setShowSuccessModal(false);
+                onClose();
+            }, 2000);
+        }
     };
 
     return (
-        <div className={styles.container}>
-            <h2 className={styles.heading}>
-                {isTransfer ? 'Transfer Stock Qty.' : 'Add Stock Qty.'}
-            </h2>
-            <form onSubmit={handleSubmit} className={styles.form}>
-                <select
-                    name="product_id"
-                    id="product_id"
-                    className={styles.select}
-                    value={formData.product_id}
-                    onChange={handleInputChange}
-                    required
-                >
-                    <option value="">Select a product</option>
-                    {products.map((product) => (
-                        <option key={product.id} value={product.id}>
-                            {product.name}
-                        </option>
+        <div className={`${styles.modalContent} ${styles.modalContentMedium}`}>
+            <div className={styles.modalContentScrollable}>
+                <h2 className={styles.modalHeading}>
+                    {isTransfer ? 'Transfer Stocks' : 'Add Stocks'}
+                </h2>
+                <form onSubmit={handleSubmit}>
+                    {isTransfer && (
+                        <div>
+                            <select
+                                name="destination_branch"
+                                value={destinationBranch}
+                                onChange={handleDestinationChange}
+                                required
+                                className={`${styles.modalSelect} ${destinationBranch === "" ? styles.placeholder : ""}`}
+                            >
+                                <option value="" disabled>
+                                    Select destination branch
+                                </option>
+                                {branches.map((branch) => (
+                                    <option key={branch.id} value={branch.id}>
+                                        {branch.name}
+                                    </option>
+                                ))}
+                            </select>
+
+                            <input
+                                type="text"
+                                name="transfer_note"
+                                placeholder="Note (Optional)"
+                                value={transferNote}
+                                onChange={handleNoteChange}
+                                className={styles.modalInput}
+                            />
+                        </div>
+                    )}
+
+                    <div className={styles.modalInputHeaderContainer}>
+                        <span className={styles.modalInputLabel}>Qty.</span>
+                    </div>
+
+                    {formDataList.map((formData, index) => (
+                        <div key={index} className={styles.modalItem}>
+                            <div>
+                                <p className={styles.modalPrimary}>{selectedStocks[index]?.product_name}</p>
+                                <p className={styles.modalSecondary}>{selectedStocks[index]?.branch_name}</p>
+                            </div>
+                            <div>
+                                <input
+                                    type="number"
+                                    name="quantity"
+                                    value={formData.quantity}
+                                    onChange={(e) => handleInputChange(e, index)}
+                                    required
+                                    className={styles.modalInputFixed}
+                                    min="1"
+                                    {...(isTransfer ? { max: selectedStocks[index].quantity } : {})}
+                                    placeholder={`Current qty. ${selectedStocks[index].quantity}`}
+                                />
+                                {errors[index] && <p className={styles.modalErrorText}>{errors[index]}</p>}
+                            </div>
+                        </div>
                     ))}
-                </select>
 
-                {isTransfer ? (
-                    <>
-                        <select
-                            name="branch_code"
-                            id="source_branch"
-                            className={styles.select}
-                            value={formData.branch_code}
-                            onChange={handleInputChange}
-                            required
+                    <div className={styles.modalMediumButtonContainer}>
+                        <button
+                            type="button"
+                            className={`${styles.modalMediumButton} ${styles.modalBackButton}`}
+                            onClick={() => onClose(false)}
                         >
-                            <option value="">
-                                Select source branch
-                            </option>
-                            {branches.map((branch) => (
-                                <option key={branch.id} value={branch.id}>
-                                    {branch.address_line}
-                                </option>
-                            ))}
-                        </select>
-                        <select
-                            name="destination_branch"
-                            id="destination_branch"
-                            value={formData.destination_branch}
-                            onChange={handleInputChange}
-                            className={styles.select}
-                            required
+                            <ArrowBack className={styles.modalBackButtonIcon} /> Back
+                            <span className={styles.modalTooltipText}>Back to select more</span>
+                        </button>
+                        <button
+                            type="submit"
+                            className={`${styles.modalMediumButton}`}
                         >
-                            <option value="">Select destination branch</option>
-                            {branches.map((branch) => (
-                                <option key={branch.id} value={branch.id}>
-                                    {branch.address_line}
-                                </option>
-                            ))}
-                        </select>
-                        <input
-                            type="text"
-                            name="note"
-                            id="note"
-                            placeholder="Transfer Note (Optional)"
-                            value={formData.note}
-                            onChange={handleInputChange}
-                            className={styles.input}
-                        />
-                    </>
-                ) : (
-                    <select
-                        name="branch_code"
-                        id="branch_code"
-                        className={styles.select}
-                        value={formData.branch_code}
-                        onChange={handleInputChange}
-                        required
-                    >
-                        <option value="">
-                            Select a branch
-                        </option>
-                        {branches.map((branch) => (
-                            <option key={branch.id} value={branch.id}>
-                                {branch.address_line}
-                            </option>
-                        ))}
-                    </select>
-                )}
+                            {isTransfer ? 'Transfer Stock' : 'Add Stock'}
+                        </button>
+                    </div>
+                </form>
+            </div>
 
-                <input
-                    type='number'
-                    id='quantity'
-                    name='quantity'
-                    placeholder='Quantity'
-                    className={styles.input}
-                    value={formData.quantity}
-                    onChange={handleInputChange}
-                    required
-                />
-
-                <button
-                    type='submit'
-                    className={`${styles2.smallButton} ${styles2.addButton}`}
-                >
-                    {isTransfer ? 'Transfer Stock' : 'Add Stock'}
-                </button>
-                <button
-                    type='button'
-                    className={`${styles2.smallButton} ${styles2.cancelButton}`}
-                    onClick={resetForm}
-                >   Cancel
-                </button> 
-            </form>
+            {showSuccessModal && (
+                <div className={`${styles.successModal} show`}>
+                    <p>{successMessage}</p>
+                </div>
+            )}
         </div>
     );
 };
