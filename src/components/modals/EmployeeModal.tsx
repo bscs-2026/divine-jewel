@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
-import { Employee } from '../page';
+import { Employee } from '@/app/employees/page';
 
 interface EmployeeModalProps {
     isOpen: boolean;
