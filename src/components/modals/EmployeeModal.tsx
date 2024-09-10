@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { Employee } from '@/app/employees/page';
@@ -29,9 +29,102 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
     setSelectedEmployeeType
 }) => {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+    const [errors, setErrors] = useState<any>({});
+    const [formData, setFormData] = useState({
+        first_name: '',
+        last_name: '',
+        address: '',
+        birth_date: '',
+        email_address: '',
+        contact_number: '',
+        username: '',
+        password: ''
+    });
 
-    const togglePasswordVisibility = () => {
-        setIsPasswordVisible(!isPasswordVisible);
+    useEffect(() => {
+        if (editingEmployee && currentEmployee) {
+            setFormData({
+                first_name: currentEmployee.first_name || '',
+                last_name: currentEmployee.last_name || '',
+                address: currentEmployee.address || '',
+                birth_date: currentEmployee.birth_date?.toString().split('T')[0] || '',
+                email_address: currentEmployee.email_address || '',
+                contact_number: currentEmployee.contact_number || '',
+                username: currentEmployee.username || '',
+                password: currentEmployee.password || ''
+            });
+            setSelectedRole(currentEmployee.role_name || '');
+            setSelectedEmployeeType(currentEmployee.employee_type || '');
+        }
+    }, [currentEmployee, editingEmployee, setSelectedRole, setSelectedEmployeeType]);
+
+    const validate = () => {
+        let isValid = true;
+        let errors: any = {};
+
+        // Validate address
+        if (!formData.address) {
+            errors.address = 'Address is required';
+            isValid = false;
+        }
+
+        // Validate birth_date
+        if (!formData.birth_date) {
+            errors.birth_date = 'Birth Date is required';
+            isValid = false;
+        }
+
+        // Validate contact_number
+        if (!/^(\d{11})$/.test(formData.contact_number)) {
+            errors.contact_number = 'Contact Number must be 11 digits';
+            isValid = false;
+        }
+
+        // Validate email_address
+        if (formData.email_address && !/\S+@\S+\.\S+/.test(formData.email_address)) {
+            errors.email_address = 'Invalid email address';
+            isValid = false;
+        }
+
+        // Validate role and employee_type
+        if (!selectedRole) {
+            errors.role_id = 'Role is required';
+            isValid = false;
+        }
+
+        if (!selectedEmployeeType) {
+            errors.employee_type = 'Employee Type is required';
+            isValid = false;
+        }
+
+        // Validate username and password
+        if (formData.username.length < 8) {
+            errors.username = 'Username must be at least 8 characters';
+            isValid = false;
+        }
+
+        if (formData.password.length < 8) {
+            errors.password = 'Password must be at least 8 characters';
+            isValid = false;
+        }
+
+        setErrors(errors);
+        return isValid;
+    };
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (validate()) {
+            onSubmit(e);
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { id, value } = e.target;
+        setFormData(prevData => ({
+            ...prevData,
+            [id]: value
+        }));
     };
 
     if (!isOpen) return null;
@@ -43,54 +136,72 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
                     {editingEmployee ? 'Edit Employee' : 'Add Employee'}
                 </h2>
 
-                <form className="flex flex-col gap-3 text-[#575757]" onSubmit={onSubmit}>
-                    <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
+                <form className="flex flex-col gap-3 text-[#575757]" onSubmit={handleSubmit}>
+                    <input 
+                        className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
                         type='text'
                         id='first_name'
                         name='first_name'
                         placeholder='First Name'
-                        defaultValue={currentEmployee?.first_name || ''} 
+                        value={formData.first_name} 
+                        onChange={handleChange}
                     />
+                    {errors.first_name && <p className="text-red-500 text-xs">{errors.first_name}</p>}
 
-                    <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
+                    <input 
+                        className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
                         type='text'
                         id='last_name'
                         name='last_name'
                         placeholder='Last Name'
-                        defaultValue={currentEmployee?.last_name || ''} 
+                        value={formData.last_name} 
+                        onChange={handleChange}
                     />
+                    {errors.last_name && <p className="text-red-500 text-xs">{errors.last_name}</p>}
 
-                    <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
+                    <input 
+                        className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
                         type='text'
                         id='address'
                         name='address'
                         placeholder='Address'
-                        defaultValue={currentEmployee?.address || ''} 
+                        value={formData.address} 
+                        onChange={handleChange}
                     />
+                    {errors.address && <p className="text-red-500 text-xs">{errors.address}</p>}
 
-                    <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
+                    <input 
+                        className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
                         type='date'
                         id='birth_date'
                         name='birth_date'
                         placeholder='Birth Date'
-                        defaultValue={editingEmployee ? (currentEmployee?.birth_date?.toString().split('T')[0] || '') : ''}
+                        value={formData.birth_date}
+                        onChange={handleChange}
                     />
+                    {errors.birth_date && <p className="text-red-500 text-xs">{errors.birth_date}</p>}
 
-                    <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
+                    <input 
+                        className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
                         type='email'
                         id='email_address'
                         name='email_address'
-                        placeholder='Email Address'
-                        defaultValue={currentEmployee?.email_address || ''} 
+                        placeholder='Email Address (N/A if none)'
+                        value={formData.email_address} 
+                        onChange={handleChange}
                     />
+                    {errors.email_address && <p className="text-red-500 text-xs">{errors.email_address}</p>}
 
-                    <input className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
+                    <input 
+                        className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
                         type='text'
                         id='contact_number'
                         name='contact_number'
                         placeholder='Contact Number'
-                        defaultValue={currentEmployee?.contact_number || ''} 
+                        value={formData.contact_number} 
+                        onChange={handleChange}
                     />
+                    {errors.contact_number && <p className="text-red-500 text-xs">{errors.contact_number}</p>}
 
                     <select
                         id='role_id'
@@ -104,6 +215,7 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
                             <option key={role.id} value={role.id}>{role.name}</option>
                         ))}
                     </select>
+                    {errors.role_id && <p className="text-red-500 text-xs">{errors.role_id}</p>}
 
                     <select
                         id='employee_type'
@@ -116,6 +228,7 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
                         <option value='Full-Time'>Full-Time</option>
                         <option value='Part-Time'>Part-Time</option>
                     </select>
+                    {errors.employee_type && <p className="text-red-500 text-xs">{errors.employee_type}</p>}
 
                     <input
                         className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
@@ -123,8 +236,10 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
                         type='text'
                         id='username'
                         name='username'
-                        defaultValue={currentEmployee?.username || ''} 
+                        value={formData.username} 
+                        onChange={handleChange}
                     />
+                    {errors.username && <p className="text-red-500 text-xs">{errors.username}</p>}
 
                     <div className="relative w-full overflow-hidden">
                         <input
@@ -133,16 +248,18 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
                             type={isPasswordVisible ? 'text' : 'password'}
                             id='password'
                             name='password'
-                            defaultValue={currentEmployee?.password || ''} 
+                            value={formData.password} 
+                            onChange={handleChange}
                         />
                         <button
                             type="button"
-                            onClick={togglePasswordVisibility}
+                            onClick={() => setIsPasswordVisible(!isPasswordVisible)}
                             className="absolute inset-y-0 right-0 px-2 py-1 text-sm text-[#575757] bg-white rounded-r-md flex items-center justify-center"
                         >
                             <FontAwesomeIcon icon={isPasswordVisible ? faEyeSlash : faEye} className="text-sm" />
                         </button>
                     </div>
+                    {errors.password && <p className="text-red-500 text-xs">{errors.password}</p>}
 
                     <button
                         type='submit'
@@ -151,6 +268,7 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
                         {editingEmployee ? 'Save Employee' : 'Add Employee'}
                     </button>
                     <button
+                        type='button'
                         className="px-2 py-1 rounded-full text-[#575757] text-xs bg-[#FCB6D7]"
                         onClick={onClose}
                     >
