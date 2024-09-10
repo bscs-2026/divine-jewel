@@ -6,6 +6,7 @@ import MainLayout from '@/components/MainLayout';
 import EmployeeModal from '@/components/modals/EmployeeModal';
 import InformationModal from '@/components/modals/InformationModal';
 import EmployeeTable from '@/components/tables/EmployeeTable';
+import { SuccessfulPrompt } from '@/components/prompts/Prompt';
 
 
 export interface Employee {
@@ -41,6 +42,10 @@ export default function EmployeesPage() {
     const [listView, setListView] = useState<'active' | 'inactive'>('active');
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
     const [isInformationModalOpen, setIsInformationModalOpen] = useState<boolean>(false);
+    const [isPromptVisible, setIsPromptVisible] = useState<boolean>(false);
+    const [isArchivePromptVisible, setIsArchivePromptVisible] = useState<boolean>(false);
+    const [isUnarchivePromptVisible, setIsUnarchivePromptVisible] = useState<boolean>(false);
+    const [isEditPromptVisible, setIsEditPromptVisible] = useState<boolean>(false);
 
     useEffect(() => {
         fetchEmployees();
@@ -108,6 +113,7 @@ export default function EmployeesPage() {
             setSelectedEmployeeType('');
             setIsModalOpen(false);
             fetchEmployees();
+            setIsPromptVisible(true);
         } catch (error: any) {
             setError(error.message);
             console.error('An error occurred while adding employee:', error);
@@ -150,6 +156,7 @@ export default function EmployeesPage() {
             }
 
             fetchEmployees();
+            setIsEditPromptVisible(true);
         } catch (error: any) {
             setError(error.message);
             console.error('An error occurred while updating employee:', error);
@@ -183,6 +190,7 @@ export default function EmployeesPage() {
                 throw new Error('Failed to archive employee');
             }
             await fetchEmployees();
+            setIsArchivePromptVisible(true);
         } catch (error: any) {
             setError(error.message);
             console.error('An error occurred while archiving employee:', error);
@@ -209,6 +217,7 @@ export default function EmployeesPage() {
                 throw new Error('Failed to unarchive employee');
             }
             await fetchEmployees();
+            setIsUnarchivePromptVisible(true);
         } catch (error: any) {
             setError(error.message);
             console.error('An error occurred while unarchiving employee:', error);
@@ -296,6 +305,31 @@ export default function EmployeesPage() {
                     selectedEmployeeType={selectedEmployeeType}
                     setSelectedEmployeeType={setSelectedEmployeeType}
                 />
+
+                <SuccessfulPrompt 
+                    message="Employee added successfully." 
+                    isVisible={isPromptVisible} 
+                    onClose={() => setIsPromptVisible(false)} 
+                />
+
+                <SuccessfulPrompt 
+                    message="Employee archived." 
+                    isVisible={isArchivePromptVisible} 
+                    onClose={() => setIsArchivePromptVisible(false)} 
+                />
+
+                <SuccessfulPrompt 
+                    message="Employee unarchived." 
+                    isVisible={isUnarchivePromptVisible} 
+                    onClose={() => setIsUnarchivePromptVisible(false)} 
+                />
+
+                <SuccessfulPrompt 
+                    message="Employee information changed." 
+                    isVisible={isEditPromptVisible} 
+                    onClose={() => setIsEditPromptVisible(false)} 
+                />
+
 
                 <div className="bg-white p-4 rounded-lg shadow-[0_-0.5rem_1rem_rgba(0,0,0,0.1),0_0.5rem_1rem_rgba(0,0,0,0.15)] ">
                     

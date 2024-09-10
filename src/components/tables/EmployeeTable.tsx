@@ -1,6 +1,7 @@
 // components/EmployeeTable.tsx
 import React from 'react';
-import { Employee } from '../page';
+import { format } from 'date-fns';
+import { Employee } from '@/app/employees/page';
 
 type EmployeeTableProps = {
     employees: Employee[];
@@ -21,12 +22,18 @@ const EmployeeTable = ({
     unarchiveEmployee,
     deleteEmployee
 }: EmployeeTableProps) => {
+
+    const formatDate = (dateString: string): string => {
+        const date = new Date(dateString);
+        return format(date, 'MMMM d, yyyy');
+    };
+
     return (
         <table className="w-full text-left text-black">
             <thead>
                 <tr>
                     <th className="p-4 text-[#575757] font-bold text-[13px]">Name</th>
-                    <th className="p-4 text-[#575757] font-bold text-[13px]">E-mail</th>
+                    <th className="p-4 text-[#575757] font-bold text-[13px]">Birth Date</th>
                     <th className="p-4 text-[#575757] font-bold text-[13px]">Contact Number</th>
                     <th className="p-4 text-[#575757] font-bold text-[13px]">Role</th>
                     <th className="p-4 text-[#575757] font-bold text-[13px]">Employee Type</th>
@@ -37,7 +44,7 @@ const EmployeeTable = ({
                 {employees.map((employee) => (
                     <tr key={employee.id} className="w-full text-left text-black border-t border-gray-300">
                         <td className="p-4 text-[#575757] text-xs">{employee.last_name + ', ' + employee.first_name}</td>
-                        <td className="p-4 text-[#575757] text-xs">{employee.email_address}</td>
+                        <td className="p-4 text-[#575757] text-xs">{employee?.birth_date ? formatDate(employee.birth_date.toString()) : 'N/A'}</td>
                         <td className="p-4 text-[#575757] text-xs">{employee.contact_number}</td>
                         <td className="p-4 text-[#575757] text-xs">{employee.role_name}</td>
                         <td className="p-4 text-[#575757] text-xs">{employee.employee_type}</td>
