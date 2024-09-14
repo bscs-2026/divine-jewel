@@ -6,7 +6,7 @@ import MainLayout from '@/components/MainLayout';
 import EmployeeModal from '@/components/modals/EmployeeModal';
 import InformationModal from '@/components/modals/InformationModal';
 import EmployeeTable from '@/components/tables/EmployeeTable';
-import { SuccessfulPrompt } from '@/components/prompts/Prompt';
+import { DeletePrompt, SuccessfulPrompt } from '@/components/prompts/Prompt';
 
 
 export interface Employee {
@@ -46,6 +46,7 @@ export default function EmployeesPage() {
     const [isArchivePromptVisible, setIsArchivePromptVisible] = useState<boolean>(false);
     const [isUnarchivePromptVisible, setIsUnarchivePromptVisible] = useState<boolean>(false);
     const [isEditPromptVisible, setIsEditPromptVisible] = useState<boolean>(false);
+    const [isDeletePromptVisible, setIsDeletePromptVisible] = useState<boolean>(false);
 
     useEffect(() => {
         fetchEmployees();
@@ -92,9 +93,7 @@ export default function EmployeesPage() {
         const form = event.target as HTMLFormElement;
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
-
-        console.log('Form Data:', data);
-
+    
         try {
             const response = await fetch('/api/employees', {
                 method: 'POST',
@@ -103,14 +102,14 @@ export default function EmployeesPage() {
                 },
                 body: JSON.stringify(data),
             });
-
+    
             if (!response.ok) {
                 throw new Error('Failed to add employee');
             }
-
-            form.reset();
-            setSelectedRole('');
-            setSelectedEmployeeType('');
+    
+            form.reset();  // Reset form fields
+            setSelectedRole('');  // Reset selected role
+            setSelectedEmployeeType('');  // Reset selected employee type
             setIsModalOpen(false);
             fetchEmployees();
             setIsPromptVisible(true);
@@ -119,6 +118,7 @@ export default function EmployeesPage() {
             console.error('An error occurred while adding employee:', error);
         }
     };
+    
 
     const editEmployee = (id: number) => {
         const employee = employees.find((employee) => employee.id === id);
@@ -141,7 +141,7 @@ export default function EmployeesPage() {
         const form = event.target as HTMLFormElement;
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
-
+    
         try {
             const response = await fetch(`/api/employees/${currentEmployee?.id}`, {
                 method: 'PUT',
@@ -150,25 +150,25 @@ export default function EmployeesPage() {
                 },
                 body: JSON.stringify(data),
             });
-
+    
             if (!response.ok) {
                 throw new Error('Failed to update employee');
             }
-
+    
             fetchEmployees();
+            setEditingEmployee(false);
+            setCurrentEmployee(null);
+            form.reset();  
+            setSelectedRole(''); 
+            setSelectedEmployeeType('');  
+            setIsModalOpen(false);
             setIsEditPromptVisible(true);
         } catch (error: any) {
             setError(error.message);
             console.error('An error occurred while updating employee:', error);
-        } finally {
-            setEditingEmployee(false);
-            setCurrentEmployee(null);
-            form.reset();
-            setSelectedRole('');
-            setSelectedEmployeeType('');
-            setIsModalOpen(false);
         }
     };
+    
 
     const archiveEmployee = async (id: number) => {
         const confirmArchive = confirm('Are you sure you want to archive this employee?');
@@ -240,6 +240,8 @@ export default function EmployeesPage() {
                 throw new Error('Failed to delete employee');
             }
             await fetchEmployees();
+
+            setIsDeletePromptVisible(true);
         } catch (error: any) {
             setError(error.message);
             console.error('An error occurred while deleting employee:', error);
@@ -255,8 +257,7 @@ export default function EmployeesPage() {
         setEditingEmployee(false);
         setCurrentEmployee(null);
         setSelectedRole('');
-        setSelectedEmployeeType('');
-        setIsModalOpen(false);
+        setSelectedEmployeeType(''); 
     };
 
     const handleInformationModalOpen = (employee: Employee) => {
@@ -328,6 +329,11 @@ export default function EmployeesPage() {
                     message="Employee information changed." 
                     isVisible={isEditPromptVisible} 
                     onClose={() => setIsEditPromptVisible(false)} 
+                />
+
+                <DeletePrompt 
+                    isVisible={isDeletePromptVisible}
+                    onClose={() => setIsDeletePromptVisible(false)}    
                 />
 
 

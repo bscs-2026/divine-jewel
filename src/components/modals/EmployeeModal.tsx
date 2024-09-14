@@ -42,6 +42,22 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
     });
 
     useEffect(() => {
+        if (!isOpen) {
+            // Clear the form data when the modal closes
+            setFormData({
+                first_name: '',
+                last_name: '',
+                address: '',
+                birth_date: '',
+                email_address: '',
+                contact_number: '',
+                username: '',
+                password: ''
+            });
+        }
+    }, [isOpen]);
+
+    useEffect(() => {
         if (editingEmployee && currentEmployee) {
             setFormData({
                 first_name: currentEmployee.first_name || '',
@@ -81,8 +97,8 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
         }
 
         // Validate email_address
-        if (formData.email_address && !/\S+@\S+\.\S+/.test(formData.email_address)) {
-            errors.email_address = 'Invalid email address';
+        if (formData.email_address && formData.email_address !== 'N/A' && !/\S+@\S+\.\S+/.test(formData.email_address)) {
+            errors.email_address = 'Invalid Email Address';
             isValid = false;
         }
 
@@ -100,6 +116,11 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
         // Validate username and password
         if (formData.username.length < 8) {
             errors.username = 'Username must be at least 8 characters';
+            isValid = false;
+        }
+
+        if (!/^[a-zA-Z]+$/.test(formData.username)) {
+            errors.username = 'Username must contain only alphabetic characters';
             isValid = false;
         }
 
@@ -183,7 +204,7 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
 
                     <input 
                         className="w-full p-2 border border-[#FFE7EF] rounded-md text-[#575757] text-xs"
-                        type='email'
+                        type='text'
                         id='email_address'
                         name='email_address'
                         placeholder='Email Address (N/A if none)'
