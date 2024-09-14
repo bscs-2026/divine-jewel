@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-// import { Edit, Delete } from '@mui/icons-material';
+import { Edit, Delete } from '@mui/icons-material';
 import modalStyles from '../styles/Modal.module.css';
 
 interface Branch {

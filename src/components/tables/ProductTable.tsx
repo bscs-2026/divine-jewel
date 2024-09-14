@@ -1,6 +1,8 @@
 import React from 'react';
 import styles from '../styles/Table.module.css';
 import styles2 from '../styles/Button.module.css';
+import Modal from '../modals/Modal';
+import ProductForm from '../forms/ProductForm';
 
 interface Product {
   id: number;
@@ -27,7 +29,8 @@ const ProductTable: React.FC<ProductTableProps> = ({
   editProduct,
   archiveProduct,
   unarchiveProduct,
-  filterCategory
+  filterCategory,
+
 }) => {
   console.log('filterCategory:', filterCategory); // Debugging line
 

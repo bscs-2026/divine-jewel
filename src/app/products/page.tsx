@@ -2,11 +2,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Layout from '../../components/PageLayout';
+import Layout from '../../components/layout/Layout';
 import ProductTable from '../../components/tables/ProductTable';
 import CategoryTabs from '../../components/tabs/CategoryTabs';
 import ProductForm from '../../components/forms/ProductForm';
 import ManageCategories from '../../components/forms/ManageCategories';
+import Modal from '../../components/modals/Modal';
 
 interface Product {
   id: number;
@@ -33,6 +34,8 @@ export default function ProductsPage() {
   const [showManageCategories, setShowManageCategories] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isManageCategoriesModalOpen, setIsManageCategoriesModalOpen] = useState(false);
 
   useEffect(() => {
     fetchProducts();
@@ -40,8 +43,15 @@ export default function ProductsPage() {
   }, []);
 
   const toggleManageCategories = () => {
-    setShowManageCategories(!showManageCategories);
+    setIsManageCategoriesModalOpen(true);
   }
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setCurrentProduct(null); // Reset current product when closing modal
+    setEditingProduct(false); // Reset editing mode
+  };
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -58,7 +68,6 @@ export default function ProductsPage() {
       setLoading(false);
     }
   };
-
 
   const fetchCategories = async () => {
     try {
@@ -153,6 +162,7 @@ export default function ProductsPage() {
     } catch (error: any) {
       setError(error.message);
     }
+    // closeModal();
   };
 
   const editProduct = (productId: number) => {
@@ -161,6 +171,7 @@ export default function ProductsPage() {
       setCurrentProduct(productToEdit);
       setSelectedCategory(productToEdit.category_id);
       setEditingProduct(true);
+      openModal();
     }
   };
 
@@ -194,12 +205,14 @@ export default function ProductsPage() {
     } catch (error: any) {
       setError(error.message);
     }
+    closeModal();
   };
 
   const handleCancelEdit = () => {
     setEditingProduct(false);
     setCurrentProduct(null);
     setSelectedCategory(null);
+    closeModal();
   };
 
   const archiveProduct = async (productId: number) => {
@@ -251,6 +264,16 @@ export default function ProductsPage() {
     }
   };
 
+  // const handleEditProduct = (productId: number) => {
+  //   const productToEdit = products.find((product) => product.id === productId);
+  //   if (productToEdit) {
+  //     setCurrentProduct(productToEdit);
+  //     setSelectedCategory(productToEdit.category_id);
+  //     setEditingProduct(true);
+  //     openModal(); // Open modal after selecting the product
+  //   }
+  // };
+
   const activeProducts = products.filter(product => !product.is_archive);
   const archivedProducts = products.filter(product => product.is_archive);
 
@@ -261,36 +284,13 @@ export default function ProductsPage() {
       : activeProducts;
 
   return (
-    <Layout defaultTitle="Products" rightSidebarContent={
-      <>
-        <ProductForm
-          categories={categories}
-          currentProduct={currentProduct}
-          selectedCategory={selectedCategory}
-          setSelectedCategory={setSelectedCategory}
-          editingProduct={editingProduct}
-          handleCancelEdit={handleCancelEdit}
-          addProduct={addProduct}
-          saveProduct={saveProduct}
-
-        />
-        {showManageCategories && (
-          <ManageCategories
-            categories={categories}
-            addCategory={addCategory}
-            editCategory={editCategory}
-            deleteCategory={deleteCategory}
-          />
-
-        )}
-      </>
-    }>
-        <>
+    <Layout defaultTitle="Products">
           <CategoryTabs
             categories={categories}
             filterCategory={filterCategory}
             setFilterCategory={setFilterCategory}
             toggleManageCategories={toggleManageCategories}
+            handleAddProduct={openModal}
           />
           <ProductTable
             products={filteredProducts}
@@ -299,8 +299,46 @@ export default function ProductsPage() {
             unarchiveProduct={unarchiveProduct}
             filterCategory={filterCategory}
           />
-        </>
+
+          <Modal show={isModalOpen} onClose={closeModal}>
+            <ProductForm
+              categories={categories}
+              currentProduct={currentProduct}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              editingProduct={editingProduct}
+              handleCancelEdit={handleCancelEdit}
+              addProduct={addProduct}
+              saveProduct={saveProduct}
+              onClose={closeModal}
+            />
+          </Modal>
+
     </Layout>
   );
 }
 
+// rightSidebarContent={
+//       <>
+//         <ProductForm
+//           categories={categories}
+//           currentProduct={currentProduct}
+//           selectedCategory={selectedCategory}
+//           setSelectedCategory={setSelectedCategory}
+//           editingProduct={editingProduct}
+//           handleCancelEdit={handleCancelEdit}
+//           addProduct={addProduct}
+//           saveProduct={saveProduct}
+
+//         />
+//         {showManageCategories && (
+//           <ManageCategories
+//             categories={categories}
+//             addCategory={addCategory}
+//             editCategory={editCategory}
+//             deleteCategory={deleteCategory}
+//           />
+
+//         )}
+//       </>
+//     }

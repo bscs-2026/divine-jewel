@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import styles from '../styles/Form.module.css';
+// import styles from '../styles/Form.module.css';
 import styles2 from '../styles/Button.module.css';
+import styles from '../styles/Modal.module.css';
 
 interface Category {
   id: number;
@@ -25,7 +26,8 @@ interface ProductFormProps {
   handleCancelEdit: () => void;
   addProduct: (product: Product) => void;
   saveProduct: (product: Product) => void;
-  
+  onClose: () => void;
+
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({
@@ -37,6 +39,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   handleCancelEdit,
   addProduct,
   saveProduct,
+  onClose
 
 }) => {
   const [productName, setProductName] = useState<string>('');
@@ -87,55 +90,60 @@ const ProductForm: React.FC<ProductFormProps> = ({
   };
 
   return (
-    <div className={styles.container}>
-      <h2 className={styles.heading}>
-        {editingProduct ? 'Edit Product' : 'Add Product'}
-      </h2>
-      <form onSubmit={handleFormSubmit} className={styles.form}>
-        <select
-          name="category_id"
-          value={selectedCategory ?? ''}
-          onChange={(e) => setSelectedCategory(Number(e.target.value))}
-          className={styles.select}
-        >
-          <option value="">Product Category</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.name}
-            </option>
-          ))}
-        </select>
-        <input
-          type="text"
-          name="name"
-          placeholder="Product Name"
-          value={productName}
-          onChange={(e) => setProductName(e.target.value)}
-          className={styles.input}
-        />
-        <input
-          type="text"
-          name="price"
-          placeholder="Price"
-          value={productPrice}
-          onChange={handlePriceChange}
-          className={styles.input}
-        />
-        <button type="submit" className={`${styles2.smallButton} ${styles2.addButton}`}>
-          {editingProduct ? 'Save Product' : 'Add Product'}
-        </button>
-        {editingProduct && (
-          <button
-            type="button"
-            onClick={handleCancelEdit}
-            className={`${styles2.smallButton} ${styles2.cancelButton}`}
-          >
-            Cancel
-          </button>
-        )}
+    <div className={styles.modalContent}>
+      <div className={styles.modalContentScrollable}>
+        <h2 className={styles.modalHeading}>
+          {editingProduct ? 'Edit Product' : 'Add Product'}
+        </h2>
 
-      </form>
-      
+        <form onSubmit={handleFormSubmit}>
+          <select
+            name="category_id"
+            value={selectedCategory ?? ''}
+            onChange={(e) => setSelectedCategory(Number(e.target.value))}
+            className={styles.modalSelect}
+          >
+            <option value="">Product Category</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
+          <input
+            type="text"
+            name="name"
+            placeholder="Product Name"
+            value={productName}
+            onChange={(e) => setProductName(e.target.value)}
+            className={styles.modalInput}
+          />
+          <input
+            type="text"
+            name="price"
+            placeholder="Price"
+            value={productPrice}
+            onChange={handlePriceChange}
+            className={styles.modalInput}
+          />
+
+          <div className={styles.modalButtonContainer}>
+            <button type="submit" className={`${styles.modalButton}`}>
+              {editingProduct ? 'Save Product' : 'Add Product'}
+            </button>
+            {editingProduct && (
+              <button
+                type="button"
+                onClick={onClose}
+                className={`${styles.modalButton}`}
+              >
+                Cancel
+              </button>
+            )}
+          </div>
+
+        </form>
+      </div>
     </div>
   );
 };
