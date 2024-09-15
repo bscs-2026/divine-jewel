@@ -1,6 +1,7 @@
 // src/components/CategoryTabs.tsx
 import React from 'react';
 import styles from '../styles/Layout2.module.css';
+import { AddBox } from '@mui/icons-material';
 
 
 interface Category {
@@ -56,12 +57,18 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
         </button>
       </div>
       <div className={styles.rightButtonGroup}>
-        <button
+        <AddBox
+          onClick={handleAddProduct}
+          style={{ cursor: 'pointer', color: '#575757', marginRight: '5px', fontSize: '2.5rem' }}
+        />
+
+
+        {/* <button
           className={`${styles.tabsContainerItem}`}
           onClick={handleAddProduct}
         >
           Add
-        </button>
+        </button> */}
 
       </div>
     </div>

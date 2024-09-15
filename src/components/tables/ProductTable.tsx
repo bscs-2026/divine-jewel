@@ -1,12 +1,15 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import styles from '../styles/Table.module.css';
 import styles2 from '../styles/Button.module.css';
-import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward, Edit, Archive, Unarchive} from '@mui/icons-material';
 
 interface Product {
   id: number;
+  SKU: string;
   category_id: number;
   name: string;
+  size: string;
+  color: string;
   price: number;
   quantity: number;
   is_archive: number | boolean;
@@ -40,8 +43,11 @@ const ProductTable: React.FC<ProductTableProps> = ({
   // Define columns for the table
   const columns = useMemo(
     () => [
+      { Header: 'SKU', accessor: 'SKU' as keyof Product, align: 'left' },
       { Header: 'Name', accessor: 'name' as keyof Product, align: 'left' },
       { Header: 'Category', accessor: 'category_name' as keyof Product, align: 'left' },
+      { Header: 'Size', accessor: 'size' as keyof Product, align: 'left' },
+      { Header: 'Color', accessor: 'color' as keyof Product, align: 'left' },
       { Header: 'Stock', accessor: 'stock' as keyof Product, align: 'right' },
       { Header: 'Price', accessor: 'price' as keyof Product, align: 'right' },
     ],
@@ -105,38 +111,34 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 </div>
               </th>
             ))}
-            <th className={styles.th}>Actions</th>
+            <th className={`${styles.td} ${styles.rightAlign}`}>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {/* {filteredProducts.map((product) => ( */}
           {sortedProducts.map((product) => (
             <tr key={product.id} className={styles.tableRow}>
+              <td className={styles.td}>{product.SKU}</td>
               <td className={styles.td}>{product.name}</td>
               <td className={styles.td}>{product.category_name}</td>
+              <td className={styles.td}>{product.size}</td>
+              <td className={styles.td}>{product.color}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>{product.stock}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>₱{product.price}</td>
-              <td className={styles.td}>
-                <button
-                  onClick={() => editProduct(product.id)}
-                  className={`${styles2.smallButton} ${styles2.editButton}`}
-                >
-                  Edit
-                </button>
+              <td className={`${styles.td} ${styles.rightAlign}`}>    
+                <Edit
+                  onClick={() => editProduct(product.id)} 
+                  style={{ cursor: 'pointer', color: '#575757', marginRight: '5px', fontSize: '2rem' }}
+                />
                 {filterCategory === 'Archive' ? (
-                  <button
-                    onClick={() => unarchiveProduct(product.id)}
-                    className={`${styles2.smallButton} ${styles2.unarchiveButton}`}
-                  >
-                    Unarchive
-                  </button>
+                  <Unarchive
+                  onClick={() => unarchiveProduct(product.id)}
+                  style={{ cursor: 'pointer', color: '#28a745', fontSize: '2rem' }}
+                />
                 ) : (
-                  <button
+                  <Archive
                     onClick={() => archiveProduct(product.id)}
-                    className={`${styles2.smallButton} ${styles2.archiveButton}`}
-                  >
-                    Archive
-                  </button>
+                    style={{ cursor: 'pointer', color: '#ff4d4f', fontSize: '2rem' }}
+                  />
                 )}
               </td>
             </tr>

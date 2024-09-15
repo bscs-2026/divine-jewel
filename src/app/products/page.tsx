@@ -11,8 +11,11 @@ import Modal from '../../components/modals/Modal';
 
 interface Product {
   id: number;
+  SKU: string;
   category_id: number;
   name: string;
+  size: string;
+  color: string;
   price: number;
   quantity: number;
   is_archive: number | boolean;
@@ -180,9 +183,13 @@ export default function ProductsPage() {
 
     const updatedProduct = {
       ...currentProduct,
+      SKU: product.SKU || currentProduct.SKU,
       category_id: product.category_id || currentProduct.category_id,
       name: product.name || currentProduct.name,
       price: product.price !== undefined ? product.price : currentProduct.price,
+      size: product.size || currentProduct.size,
+      color: product.color || currentProduct.color,
+      quantity: product.quantity !== undefined ? product.quantity : currentProduct.quantity,
     };
 
     try {

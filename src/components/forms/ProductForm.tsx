@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-// import styles from '../styles/Form.module.css';
 import styles2 from '../styles/Button.module.css';
 import styles from '../styles/Modal.module.css';
 
@@ -11,8 +10,11 @@ interface Category {
 
 interface Product {
   id: number;
+  SKU: string;
   category_id: number;
   name: string;
+  size: string;
+  color: string;
   price: number;
   quantity: number;
 }
@@ -27,7 +29,6 @@ interface ProductFormProps {
   addProduct: (product: Product) => void;
   saveProduct: (product: Product) => void;
   onClose: () => void;
-
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({
@@ -40,41 +41,48 @@ const ProductForm: React.FC<ProductFormProps> = ({
   addProduct,
   saveProduct,
   onClose
-
 }) => {
+  const [productSKU, setProductSKU] = useState<string>('');
   const [productName, setProductName] = useState<string>('');
+  const [productSize, setProductSize] = useState<string>('');
+  const [productColor, setProductColor] = useState<string>('');
   const [productPrice, setProductPrice] = useState<string>('');
 
   useEffect(() => {
     if (editingProduct && currentProduct) {
+      setProductSKU(currentProduct.SKU);
       setProductName(currentProduct.name);
+      setProductSize(currentProduct.size);
+      setProductColor(currentProduct.color);
       setProductPrice(currentProduct.price.toString());
       setSelectedCategory(currentProduct.category_id);
     } else {
+      setProductSKU('');
       setProductName('');
+      setProductSize('');
+      setProductColor('');
       setProductPrice('');
       setSelectedCategory(null);
     }
   }, [currentProduct, editingProduct, setSelectedCategory]);
 
-  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setProductPrice(e.target.value);
-  };
-
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!productName || !productPrice || selectedCategory === null) {
+    if (!productName || !productPrice || !productSKU || !productSize || !productColor || selectedCategory === null) {
       alert('Please fill out all fields');
       return;
     }
 
     const updatedProduct: Product = {
       id: currentProduct ? currentProduct.id : Date.now(),
+      SKU: productSKU,
       category_id: selectedCategory,
       name: productName,
       price: parseFloat(productPrice),
       quantity: currentProduct ? currentProduct.quantity : 1,
+      size: productSize,
+      color: productColor,
     };
 
     if (editingProduct) {
@@ -84,9 +92,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
     }
 
     // Clear form after saving
+    setProductSKU('');
     setProductName('');
+    setProductSize('');
+    setProductColor('');
     setProductPrice('');
     setSelectedCategory(null);
+
+    onClose();  // Close the modal after saving
   };
 
   return (
@@ -97,6 +110,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
         </h2>
 
         <form onSubmit={handleFormSubmit}>
+          <input
+            type="text"
+            name="SKU"
+            placeholder="SKU"
+            value={productSKU}
+            onChange={(e) => setProductSKU(e.target.value)}
+            className={styles.modalInput}
+          />
           <select
             name="category_id"
             value={selectedCategory ?? ''}
@@ -120,10 +141,26 @@ const ProductForm: React.FC<ProductFormProps> = ({
           />
           <input
             type="text"
+            name="size"
+            placeholder="Size"
+            value={productSize}
+            onChange={(e) => setProductSize(e.target.value)}
+            className={styles.modalInput}
+          />
+          <input
+            type="text"
+            name="color"
+            placeholder="Color"
+            value={productColor}
+            onChange={(e) => setProductColor(e.target.value)}
+            className={styles.modalInput}
+          />
+          <input
+            type="text"
             name="price"
             placeholder="Price"
             value={productPrice}
-            onChange={handlePriceChange}
+            onChange={(e) => setProductPrice(e.target.value)}
             className={styles.modalInput}
           />
 
@@ -141,7 +178,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
               </button>
             )}
           </div>
-
         </form>
       </div>
     </div>
