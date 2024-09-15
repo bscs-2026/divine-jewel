@@ -4,7 +4,7 @@ import { query } from '../../../../../lib/db';
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     try {
         const { id } = params;
-        const { address_line } = await request.json();
+        const { name, address_line } = await request.json();
 
         if (!id) {
             return NextResponse.json({ error: 'Branch ID is required' }, { status: 400 });
@@ -12,10 +12,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         console.log('Updating branch in database...');
 
         const result = await query(
-            'UPDATE `branches` SET address_line = ? WHERE id = ?',
-            [address_line, id]
+            'UPDATE `branches` SET name = ?, address_line = ? WHERE id = ?',
+            [name, address_line, id]
         );
-        
+
         console.log('Updated Branch:', result);
 
         return NextResponse.json({ message: 'Branch updated successfully' }, { status: 200 });

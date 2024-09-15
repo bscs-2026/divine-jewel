@@ -1,47 +1,77 @@
-// src/components/BranchTabs.tsx
 import React from 'react';
-import styles from '../styles/Layout.module.css';
-import styles2 from '../styles/Button.module.css';
+import styles from '../styles/Layout2.module.css';
 
 interface Branch {
   id: number;
+  name: string;
   address_line: string;
 }
 
-interface BranchTabs {
+interface BranchTabsProps {
   branches: Branch[];
   filterBranch: number | string | null;
   setFilterBranch: (id: number | string | null) => void;
   toggleManageBranches: () => void;
-  
+  handleAddStocks: () => void;
+  handleTransferStocks: () => void;
+  selectedStocks: { id: number; [key: string]: any }[];
 }
 
-const StockFilterTabs: React.FC<BranchTabs> = ({ branches, filterBranch, setFilterBranch, toggleManageBranches }) => {
+const BranchTabs: React.FC<BranchTabsProps> = ({
+  branches = [],
+  filterBranch,
+  setFilterBranch,
+  toggleManageBranches,
+  handleAddStocks,
+  handleTransferStocks,
+  selectedStocks,
+}) => {
+  const isStocksSelected = selectedStocks.length > 0;
+
   return (
     <div className={styles.tabsContainer}>
-      <button
-        className={`${styles2.mediumButton} ${filterBranch === null ? styles2.activeButton : styles2.inactiveButton}`}
-        onClick={() => setFilterBranch(null)}
-      >
-        All
-      </button>
-      {branches.map(branch => (
+      <div className={styles.leftTabs}>
         <button
-          key={branch.id}
-          className={`${styles2.mediumButton} ${filterBranch === branch.id ? styles2.activeButton : styles2.inactiveButton}`}
-          onClick={() => setFilterBranch(branch.id)}
+          className={`${styles.tabsContainerItem} ${filterBranch === null ? styles.active : styles.inactive}`}
+          onClick={() => setFilterBranch(null)}
         >
-          {branch.address_line}
+          All
         </button>
-      ))}
-      <button
-        className={`${styles2.mediumButton}`}
-        onClick={toggleManageBranches}
-      >
-        Manage Branches
-      </button>
+        {branches.map((branch) => (
+          <button
+            key={branch.id}
+            className={`${styles.tabsContainerItem} ${filterBranch === branch.id ? styles.active : styles.inactive}`}
+            onClick={() => setFilterBranch(branch.id)}
+          >
+            {branch.name}
+          </button>
+        ))}
+        <button
+          className={`${styles.tabsContainerItem} ${styles.verticalLine}`}
+          onClick={toggleManageBranches}
+        >
+          Manage Branches
+        </button>
+      </div>
+
+      <div className={styles.rightButtonGroup}>
+        <button
+          className={`${styles.tabsContainerItem} ${styles.boldButton}`}
+          onClick={handleAddStocks}
+          disabled={!isStocksSelected}
+        >
+          Add
+        </button>
+        <button
+          className={`${styles.tabsContainerItem} ${styles.boldButton}`}
+          onClick={handleTransferStocks}
+          disabled={!isStocksSelected}
+        >
+          Transfer
+        </button>
+      </div>
     </div>
   );
 };
 
-export default StockFilterTabs;
+export default BranchTabs;

@@ -1,38 +1,82 @@
-/* src/components/styles/Table.module.css */
+/* styles/Table.module.css */
 
 .container {
   background-color: white;
   padding: 1rem;
   border-radius: 0.5rem;
-  box-shadow: 0 -0.5rem 1rem rgba(0, 0, 0, 0.1),
-    /* Top shadow */
-    0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  /* Bottom and side shadows */
+  box-shadow: 0 -0.5rem 1rem rgba(0, 0, 0, 0.1), 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   overflow-y: auto;
   height: 700px;
   width: 100%;
-  max-width: 1024px;
 }
 
 .table {
   width: 100%;
   text-align: left;
-  color: black;
+  color: #575757;
+  table-layout: auto;
+  border-collapse: collapse;
 }
 
 .th {
   padding: 1rem;
   color: #575757;
   font-weight: bold;
-  font-size: 13px;
+  font-size: 16px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .td {
-  padding: 1rem;
-  color: #575757;
-  font-size: 12px;
+  padding: 8px;
+  font-size: 14px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
-.borderT {
-  border-top: 1px solid #e2e8f0;
+.thRightAlign {
+  text-align: right;
+}
+
+.thLeftAlign {
+  text-align: left;
+}
+
+.sortableHeaderContent {
+  /* display: flex; */
+  align-items: center;
+  gap: 4px;
+}
+
+.rightAlign {
+  text-align: right;
+}
+
+.sortIconsLeft {
+  margin-left: 4px;
+}
+
+.sortIconsRight {
+  margin-left: auto;
+}
+
+.sortIcon {
+  color: #fcb6d7;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.sortIcon.active {
+  color: #f96daf;
+  font-weight: bold;
+}
+
+.tableRow:hover {
+  background-color: #f9f9f9;
+}
+
+.tableRow:hover .tableData {
+  background-color: #f0f0f0;
+}
+
+.tableRow:nth-child(even) {
+  background-color: #f9f9f9;
 }

@@ -1,10 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Layout from '../../components/PageLayout';
+import Layout from '../../components/layout/Layout';
 import StockTable from '../../components/tables/StockTable';
 import StockForm from '../../components/forms/StockForm';
 import BranchTabs from '../../components/tabs/BranchTabs';
 import ManageBranches from '../../components/forms/ManageBranches';
+import Modal from '../../components/modals/Modal';
+import DeleteConfirmationModal from '../../components/modals/DeleteConfirmationModal';
 
 interface Stock {
     id: number;
@@ -23,6 +25,7 @@ interface Product {
 
 interface Branch {
     id: number;
+    name: string;
     address_line: string;
 }
 
@@ -38,134 +41,79 @@ export default function StocksPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [stocks, setStocks] = useState<Stock[]>([]);
     const [branches, setBranches] = useState<Branch[]>([]);
-    const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
-    const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
+    const [selectedStocks, setSelectedStocks] = useState<Stock[]>([]);
     const [isTransfer, setIsTransfer] = useState(false);
     const [filterBranch, setFilterBranch] = useState<number | string | null>(null);
-    const [showManageBranches, setShowManageBranches] = useState(false);
-    const [loading, setLoading] = useState<boolean>(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isManageBranchesModalOpen, setIsManageBranchesModalOpen] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [branchToDelete, setBranchToDelete] = useState<number | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        fetchStocks();
-        fetchBranches();
-        fetchProducts();
+        fetchData();
     }, []);
 
-    const toggleManageBranches = () => {
-        setShowManageBranches(!showManageBranches);
-    }
-
-    const fetchProducts = async () => {
+    const fetchData = async () => {
         try {
-            const response = await fetch('/api/products');
-            if (!response.ok) {
-                throw new Error('Failed to fetch products');
+            const [branchesRes, productsRes, stocksRes] = await Promise.all([
+                fetch('/api/stocks/branches'),
+                fetch('/api/products'),
+                fetch('/api/stocks')
+            ]);
+
+            if (!branchesRes.ok || !productsRes.ok || !stocksRes.ok) {
+                throw new Error('Failed to fetch data');
             }
-            const data = await response.json();
-            const activeProducts = data.products.filter((product: Product) => !product.is_archive);
-            setProducts(activeProducts);
-        } catch (error: any) {
-            setError(error.message);
-        }
-    };
 
-    const fetchStocks = async () => {
-        try {
-            const response = await fetch('/api/stocks');
-            if (!response.ok) {
-                throw new Error('Failed to fetch stocks');
-            }
-            const data = await response.json();
-            setStocks(data.stocks);
-        } catch (error: any) {
-            setError(error.message);
-        }
-    };
+            const branchesData = await branchesRes.json();
+            const productsData = await productsRes.json();
+            const stocksData = await stocksRes.json();
 
-    const fetchBranches = async () => {
-        try {
-            const response = await fetch('/api/stocks/branches');
-            if (!response.ok) {
-                throw new Error('Failed to fetch branches');
-            }
-            const data = await response.json();
-            setBranches(data.branches);
-        } catch (error: any) {
-            setError(error.message);
-        }
-    };
+            setBranches(branchesData.branches);
+            setProducts(productsData.products.filter((product: Product) => !product.is_archive));
 
-    const addBranch = async (branch: Branch) => {
-        try {
-            const response = await fetch('/api/stocks/branches', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ address_line: branch.address_line }),
+            const updatedStocks = stocksData.stocks.map((stock: Stock) => {
+                const branch = branchesData.branches.find((branch: Branch) => branch.id === stock.branch_code);
+                return { ...stock, branch_name: branch ? branch.name : 'Unknown' };
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to add branch');
-            }
-
-            await fetchBranches();
+            setStocks(updatedStocks);
         } catch (error: any) {
             setError(error.message);
         }
     };
 
-    const editBranch = async (branch: Branch) => {
-        try {
-            const response = await fetch(`/api/stocks/branches/${branch.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ address_line: branch.address_line }),
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to edit branch');
-            }
-
-            await fetchBranches();
-        } catch (error: any) {
-            setError(error.message);
+    const closeModal = (resetSelected: boolean = true) => {
+        setIsModalOpen(false);
+        if (resetSelected) {
+            setSelectedStocks([]);
         }
     };
 
-    const deleteBranch = async (id: number) => {
-        const confirmDelete = window.confirm('Are you sure you want to delete this branch?');
-        if (!confirmDelete) return;
-
-        try {
-            const response = await fetch(`/api/stocks/branches/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            if (!response.ok) {
-                throw new Error('Failed to delete branch');
-            }
-
-            await fetchBranches();
-        } catch (error: any) {
-            setError(error.message);
-        }
+    const handleAddStocks = () => {
+        setIsTransfer(false);
+        setIsModalOpen(true);
     };
 
+    const handleTransferStocks = () => {
+        setIsTransfer(true);
+        setIsModalOpen(true);
+    };
 
     const addStock = async (stock: Stock) => {
         if (!stock.product_id || !stock.branch_code || isNaN(stock.quantity)) {
-            setError('Please select a product, branch, and enter a valid quantity.');
-            return;
+            console.error('Invalid stock data');
+            return { ok: false, message: 'Invalid stock data' };
         }
-
+    
         try {
+            setStocks((prevStocks) =>
+                prevStocks.map((s) =>
+                    s.id === stock.id ? { ...s, quantity: s.quantity + stock.quantity } : s
+                )
+            );
+    
             const response = await fetch(`/api/stocks/${stock.product_id}`, {
                 method: 'PUT',
                 headers: {
@@ -173,27 +121,39 @@ export default function StocksPage() {
                 },
                 body: JSON.stringify({ branch_code: stock.branch_code, quantity: stock.quantity }),
             });
-
+    
             if (!response.ok) {
                 throw new Error('Failed to update stock');
             }
-
-            setError(null);
-            setSelectedStock(null);
-            await fetchStocks();
+    
+            await fetchData(); 
+    
+            return { ok: true };
         } catch (error: any) {
             setError(error.message);
+            return { ok: false, message: error.message };
         }
     };
 
     const transferStock = async (stockDetails: StockDetails) => {
-
         if (!stockDetails.product_id || !stockDetails.source_branch || !stockDetails.destination_branch || isNaN(stockDetails.quantity)) {
-            setError('Please select a product, source branch, destination branch, and enter a valid quantity.');
-            return;
+            console.error('Invalid stock transfer data');
+            return { ok: false, message: 'Invalid stock transfer data' };
         }
-
+    
         try {
+            setStocks((prevStocks) =>
+                prevStocks.map((s) => {
+                    if (s.product_id === stockDetails.product_id && s.branch_code === stockDetails.source_branch) {
+                        return { ...s, quantity: s.quantity - stockDetails.quantity };
+                    }
+                    if (s.product_id === stockDetails.product_id && s.branch_code === stockDetails.destination_branch) {
+                        return { ...s, quantity: s.quantity + stockDetails.quantity };
+                    }
+                    return s;
+                })
+            );
+    
             const response = await fetch(`/api/stocks/stock_details`, {
                 method: 'POST',
                 headers: {
@@ -207,65 +167,150 @@ export default function StocksPage() {
                     note: stockDetails.note,
                 }),
             });
-
+    
             if (!response.ok) {
                 throw new Error('Failed to transfer stock');
             }
+    
+            await fetchData();
+    
+            return { ok: true };
+        } catch (error: any) {
+            setError(error.message);
+            return { ok: false, message: error.message };
+        }
+    };
+    
+    const closeManageBranchesModal = () => {
+        setIsManageBranchesModalOpen(false);
+    };
 
-            setSelectedStock(null);
-            setIsTransfer(false);
-            await fetchStocks();
+    const addBranch = async (branch: Branch) => {
+        try {
+            const response = await fetch('/api/stocks/branches', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: branch.name,
+                    address_line: branch.address_line,
+                }),
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to add branch');
+            }
+    
+            await fetchData();
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
+    
+
+    const editBranch = async (branch: Branch) => {
+        try {
+            const response = await fetch(`/api/stocks/branches/${branch.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: branch.name,
+                    address_line: branch.address_line,
+                }),
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to edit branch');
+            }
+    
+            await fetchData(); 
         } catch (error: any) {
             setError(error.message);
         }
     };
 
-    const activeProductIds = products.map(product => product.id);
-    const filteredStocks = stocks.filter(stock =>
-        activeProductIds.includes(stock.product_id) &&
-        (!filterBranch || stock.branch_code === filterBranch)
+    const deleteBranch = async (id: number) => {
+        setBranchToDelete(id);  
+        setShowDeleteModal(true);  
+    };
+    
+    const confirmDeleteBranch = async () => {
+        if (branchToDelete === null) return;
+        try {
+            const response = await fetch(`/api/stocks/branches/${branchToDelete}`, {
+                method: 'DELETE',
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to delete branch');
+            }
+    
+            await fetchData();
+            setBranchToDelete(null);  
+            setShowDeleteModal(false);  
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
+    
+    const activeProductIds = products.map((product) => product.id);
+    const filteredStocks = stocks.filter(
+        (stock) =>
+            activeProductIds.includes(stock.product_id) &&
+            (!filterBranch || stock.branch_code === filterBranch)
     );
 
-
     return (
-        <Layout
-            defaultTitle="Stocks"
-            rightSidebarContent={
-                <>
+        <Layout defaultTitle="Stocks">
+            <BranchTabs
+                branches={branches}
+                filterBranch={filterBranch}
+                setFilterBranch={setFilterBranch}
+                toggleManageBranches={() => setIsManageBranchesModalOpen(!isManageBranchesModalOpen)}
+                handleAddStocks={handleAddStocks}
+                handleTransferStocks={handleTransferStocks}
+                selectedStocks={selectedStocks}
+            />
+
+            <StockTable
+                stocks={filteredStocks}
+                selectedStocks={selectedStocks}
+                setSelectedStocks={setSelectedStocks}
+            />
+
+            <Modal show={isModalOpen} onClose={() => closeModal(true)}>
+                {selectedStocks.length > 0 && (
                     <StockForm
                         products={products}
                         branches={branches}
                         addStock={addStock}
                         transferStock={transferStock}
-                        selectedStock={selectedStock}
+                        selectedStocks={selectedStocks}
                         isTransfer={isTransfer}
-                        addBranch={addBranch}
-                        editBranch={editBranch}
-                        deleteBranch={deleteBranch}
+                        onClose={(reset) => closeModal(reset)}
                     />
+                )}
+            </Modal>
 
-                    {showManageBranches && (
-                        <ManageBranches
-                            branches={branches}
-                            addBranch={addBranch}
-                            editBranch={editBranch}
-                            deleteBranch={deleteBranch}
-                        />
-                    )}
-                </>
-            }
-        >
-            <BranchTabs
-                branches={branches}
-                filterBranch={filterBranch}
-                setFilterBranch={setFilterBranch}
-                toggleManageBranches={toggleManageBranches}
-            />
+            <Modal show={isManageBranchesModalOpen} onClose={closeManageBranchesModal}>
+                <ManageBranches
+                    branches={branches}
+                    addBranch={addBranch}
+                    editBranch={editBranch}
+                    deleteBranch={deleteBranch}
+                />
+            </Modal>
 
-            <StockTable
-                stocks={filteredStocks}
-                setSelectedStock={setSelectedStock}
-                setIsTransfer={setIsTransfer}
+            <DeleteConfirmationModal
+                show={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={confirmDeleteBranch}
             />
         </Layout>
     );
