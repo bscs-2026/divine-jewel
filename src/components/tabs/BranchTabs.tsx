@@ -3,6 +3,7 @@ import styles from '../styles/Layout2.module.css';
 
 interface Branch {
   id: number;
+  name: string;
   address_line: string;
 }
 
@@ -13,23 +14,22 @@ interface BranchTabsProps {
   toggleManageBranches: () => void;
   handleAddStocks: () => void;
   handleTransferStocks: () => void;
-  selectedStocks: any[]; // Accept selected stocks as prop to determine button state
+  selectedStocks: { id: number; [key: string]: any }[];
 }
 
 const BranchTabs: React.FC<BranchTabsProps> = ({
-  branches,
+  branches = [],
   filterBranch,
   setFilterBranch,
   toggleManageBranches,
   handleAddStocks,
   handleTransferStocks,
-  selectedStocks, // Use selectedStocks to disable buttons when empty
+  selectedStocks,
 }) => {
-  const isStocksSelected = selectedStocks.length > 0; // Check if stocks are selected
+  const isStocksSelected = selectedStocks.length > 0;
 
   return (
     <div className={styles.tabsContainer}>
-      {/* Left-aligned branch buttons */}
       <div className={styles.leftTabs}>
         <button
           className={`${styles.tabsContainerItem} ${filterBranch === null ? styles.active : styles.inactive}`}
@@ -43,10 +43,9 @@ const BranchTabs: React.FC<BranchTabsProps> = ({
             className={`${styles.tabsContainerItem} ${filterBranch === branch.id ? styles.active : styles.inactive}`}
             onClick={() => setFilterBranch(branch.id)}
           >
-            {branch.address_line}
+            {branch.name}
           </button>
         ))}
-        {/* Add vertical line before Manage Branches */}
         <button
           className={`${styles.tabsContainerItem} ${styles.verticalLine}`}
           onClick={toggleManageBranches}
@@ -55,17 +54,16 @@ const BranchTabs: React.FC<BranchTabsProps> = ({
         </button>
       </div>
 
-      {/* Right-aligned button group for Add and Transfer */}
       <div className={styles.rightButtonGroup}>
         <button
-          className={`${styles.tabsContainerItem}`}
+          className={`${styles.tabsContainerItem} ${styles.boldButton}`}
           onClick={handleAddStocks}
           disabled={!isStocksSelected}
         >
           Add
         </button>
         <button
-          className={`${styles.tabsContainerItem}`}
+          className={`${styles.tabsContainerItem} ${styles.boldButton}`}
           onClick={handleTransferStocks}
           disabled={!isStocksSelected}
         >

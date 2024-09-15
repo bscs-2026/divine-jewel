@@ -1,5 +1,3 @@
-// src/components/stocks/page.tsx
-
 'use client';
 import { useEffect, useState } from 'react';
 import Layout from '../../components/layout/Layout';
@@ -8,6 +6,7 @@ import StockForm from '../../components/forms/StockForm';
 import BranchTabs from '../../components/tabs/BranchTabs';
 import ManageBranches from '../../components/forms/ManageBranches';
 import Modal from '../../components/modals/Modal';
+import DeleteConfirmationModal from '../../components/modals/DeleteConfirmationModal';
 
 interface Stock {
     id: number;
@@ -26,6 +25,7 @@ interface Product {
 
 interface Branch {
     id: number;
+    name: string;
     address_line: string;
 }
 
@@ -46,54 +46,48 @@ export default function StocksPage() {
     const [filterBranch, setFilterBranch] = useState<number | string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isManageBranchesModalOpen, setIsManageBranchesModalOpen] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [branchToDelete, setBranchToDelete] = useState<number | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        fetchStocks();
-        fetchBranches();
-        fetchProducts();
+        fetchData();
     }, []);
 
-    const toggleManageBranches = () => {
-        setIsManageBranchesModalOpen(true);
-    };
-
-    const fetchProducts = async () => {
+    const fetchData = async () => {
         try {
-            const response = await fetch('/api/products');
-            if (!response.ok) {
-                throw new Error('Failed to fetch products');
+            const [branchesRes, productsRes, stocksRes] = await Promise.all([
+                fetch('/api/stocks/branches'),
+                fetch('/api/products'),
+                fetch('/api/stocks')
+            ]);
+
+            if (!branchesRes.ok || !productsRes.ok || !stocksRes.ok) {
+                throw new Error('Failed to fetch data');
             }
-            const data = await response.json();
-            const activeProducts = data.products.filter((product: Product) => !product.is_archive);
-            setProducts(activeProducts);
+
+            const branchesData = await branchesRes.json();
+            const productsData = await productsRes.json();
+            const stocksData = await stocksRes.json();
+
+            setBranches(branchesData.branches);
+            setProducts(productsData.products.filter((product: Product) => !product.is_archive));
+
+            const updatedStocks = stocksData.stocks.map((stock: Stock) => {
+                const branch = branchesData.branches.find((branch: Branch) => branch.id === stock.branch_code);
+                return { ...stock, branch_name: branch ? branch.name : 'Unknown' };
+            });
+
+            setStocks(updatedStocks);
         } catch (error: any) {
-            console.error(error);
+            setError(error.message);
         }
     };
 
-    const fetchStocks = async () => {
-        try {
-            const response = await fetch('/api/stocks');
-            if (!response.ok) {
-                throw new Error('Failed to fetch stocks');
-            }
-            const data = await response.json();
-            setStocks(data.stocks);
-        } catch (error: any) {
-            console.error(error);
-        }
-    };
-
-    const fetchBranches = async () => {
-        try {
-            const response = await fetch('/api/stocks/branches');
-            if (!response.ok) {
-                throw new Error('Failed to fetch branches');
-            }
-            const data = await response.json();
-            setBranches(data.branches);
-        } catch (error: any) {
-            console.error(error);
+    const closeModal = (resetSelected: boolean = true) => {
+        setIsModalOpen(false);
+        if (resetSelected) {
+            setSelectedStocks([]);
         }
     };
 
@@ -110,16 +104,16 @@ export default function StocksPage() {
     const addStock = async (stock: Stock) => {
         if (!stock.product_id || !stock.branch_code || isNaN(stock.quantity)) {
             console.error('Invalid stock data');
-            return;
+            return { ok: false, message: 'Invalid stock data' };
         }
-
+    
         try {
             setStocks((prevStocks) =>
                 prevStocks.map((s) =>
                     s.id === stock.id ? { ...s, quantity: s.quantity + stock.quantity } : s
                 )
             );
-
+    
             const response = await fetch(`/api/stocks/${stock.product_id}`, {
                 method: 'PUT',
                 headers: {
@@ -127,23 +121,26 @@ export default function StocksPage() {
                 },
                 body: JSON.stringify({ branch_code: stock.branch_code, quantity: stock.quantity }),
             });
-
+    
             if (!response.ok) {
                 throw new Error('Failed to update stock');
             }
-
-            await fetchStocks();
+    
+            await fetchData(); 
+    
+            return { ok: true };
         } catch (error: any) {
-            console.error(error);
+            setError(error.message);
+            return { ok: false, message: error.message };
         }
     };
 
     const transferStock = async (stockDetails: StockDetails) => {
         if (!stockDetails.product_id || !stockDetails.source_branch || !stockDetails.destination_branch || isNaN(stockDetails.quantity)) {
             console.error('Invalid stock transfer data');
-            return;
+            return { ok: false, message: 'Invalid stock transfer data' };
         }
-
+    
         try {
             setStocks((prevStocks) =>
                 prevStocks.map((s) => {
@@ -156,7 +153,7 @@ export default function StocksPage() {
                     return s;
                 })
             );
-
+    
             const response = await fetch(`/api/stocks/stock_details`, {
                 method: 'POST',
                 headers: {
@@ -170,30 +167,98 @@ export default function StocksPage() {
                     note: stockDetails.note,
                 }),
             });
-
+    
             if (!response.ok) {
                 throw new Error('Failed to transfer stock');
             }
-
-            await fetchStocks();
+    
+            await fetchData();
+    
+            return { ok: true };
         } catch (error: any) {
-            console.error(error);
+            setError(error.message);
+            return { ok: false, message: error.message };
         }
     };
-
-    const closeModal = () => {
-        setIsModalOpen(false);
-        setSelectedStocks([]);
-    };
-
+    
     const closeManageBranchesModal = () => {
         setIsManageBranchesModalOpen(false);
     };
 
-    const backToTable = () => {
-        setIsModalOpen(false);
+    const addBranch = async (branch: Branch) => {
+        try {
+            const response = await fetch('/api/stocks/branches', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: branch.name,
+                    address_line: branch.address_line,
+                }),
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to add branch');
+            }
+    
+            await fetchData();
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
+    
+
+    const editBranch = async (branch: Branch) => {
+        try {
+            const response = await fetch(`/api/stocks/branches/${branch.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    name: branch.name,
+                    address_line: branch.address_line,
+                }),
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to edit branch');
+            }
+    
+            await fetchData(); 
+        } catch (error: any) {
+            setError(error.message);
+        }
     };
 
+    const deleteBranch = async (id: number) => {
+        setBranchToDelete(id);  
+        setShowDeleteModal(true);  
+    };
+    
+    const confirmDeleteBranch = async () => {
+        if (branchToDelete === null) return;
+        try {
+            const response = await fetch(`/api/stocks/branches/${branchToDelete}`, {
+                method: 'DELETE',
+            });
+    
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to delete branch');
+            }
+    
+            await fetchData();
+            setBranchToDelete(null);  
+            setShowDeleteModal(false);  
+        } catch (error: any) {
+            setError(error.message);
+        }
+    };
+    
     const activeProductIds = products.map((product) => product.id);
     const filteredStocks = stocks.filter(
         (stock) =>
@@ -207,7 +272,7 @@ export default function StocksPage() {
                 branches={branches}
                 filterBranch={filterBranch}
                 setFilterBranch={setFilterBranch}
-                toggleManageBranches={toggleManageBranches}
+                toggleManageBranches={() => setIsManageBranchesModalOpen(!isManageBranchesModalOpen)}
                 handleAddStocks={handleAddStocks}
                 handleTransferStocks={handleTransferStocks}
                 selectedStocks={selectedStocks}
@@ -219,7 +284,7 @@ export default function StocksPage() {
                 setSelectedStocks={setSelectedStocks}
             />
 
-            <Modal show={isModalOpen} onClose={closeModal}>
+            <Modal show={isModalOpen} onClose={() => closeModal(true)}>
                 {selectedStocks.length > 0 && (
                     <StockForm
                         products={products}
@@ -228,7 +293,7 @@ export default function StocksPage() {
                         transferStock={transferStock}
                         selectedStocks={selectedStocks}
                         isTransfer={isTransfer}
-                        onClose={backToTable}
+                        onClose={(reset) => closeModal(reset)}
                     />
                 )}
             </Modal>
@@ -236,11 +301,17 @@ export default function StocksPage() {
             <Modal show={isManageBranchesModalOpen} onClose={closeManageBranchesModal}>
                 <ManageBranches
                     branches={branches}
-                    addBranch={() => {}}
-                    editBranch={() => {}}
-                    deleteBranch={() => {}}
+                    addBranch={addBranch}
+                    editBranch={editBranch}
+                    deleteBranch={deleteBranch}
                 />
             </Modal>
+
+            <DeleteConfirmationModal
+                show={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={confirmDeleteBranch}
+            />
         </Layout>
     );
 }

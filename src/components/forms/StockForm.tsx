@@ -1,7 +1,6 @@
-// src/components/forms/StockForm.tsx
-
 import React, { useEffect, useState } from 'react';
 import styles from '../styles/Modal.module.css';
+import { ArrowBack } from '@mui/icons-material';
 
 interface Stock {
     id: number;
@@ -27,6 +26,7 @@ interface Product {
 
 interface Branch {
     id: number;
+    name: string;
     address_line: string;
 }
 
@@ -35,8 +35,8 @@ interface StockFormProps {
     branches: Branch[];
     selectedStocks: Stock[];
     isTransfer: boolean;
-    addStock: (stock: Stock) => void;
-    transferStock: (stockDetails: StockDetails) => void;
+    addStock: (stock: Stock) => Promise<{ ok: boolean, message?: string }>;
+    transferStock: (stockDetails: StockDetails) => Promise<{ ok: boolean, message?: string }>;
     onClose: () => void;
 }
 
@@ -61,6 +61,9 @@ const StockForm: React.FC<StockFormProps> = ({
     const [destinationBranch, setDestinationBranch] = useState("");
     const [transferNote, setTransferNote] = useState("");
     const [lastAction, setLastAction] = useState<boolean | null>(null);
+    const [errors, setErrors] = useState<string[]>([]);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
 
     useEffect(() => {
         setFormDataList(
@@ -89,19 +92,31 @@ const StockForm: React.FC<StockFormProps> = ({
         setLastAction(isTransfer);
     }, [isTransfer, selectedStocks, lastAction]);
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, index: number) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const { name, value } = e.target;
+        const inputValue = parseInt(value);
+        const availableStock = selectedStocks[index].quantity;
 
-        if (name === "quantity" && parseInt(value) < 0) {
+        if (isTransfer && name === "quantity" && inputValue > availableStock) {
+            setErrors((prev) => {
+                const updatedErrors = [...prev];
+                updatedErrors[index] = `Available stock is ${availableStock}.`;
+                return updatedErrors;
+            });
             return;
         }
 
+        setErrors((prev) => {
+            const updatedErrors = [...prev];
+            updatedErrors[index] = "";
+            return updatedErrors;
+        });
+
         setFormDataList((prev) => {
             const updatedFormData = [...prev];
-            // Cast name as keyof the object to ensure TypeScript knows it's a valid key
             updatedFormData[index] = {
-              ...updatedFormData[index],
-              [name]: value,
+                ...updatedFormData[index],
+                [name]: value,
             };
             return updatedFormData;
         });
@@ -115,41 +130,69 @@ const StockForm: React.FC<StockFormProps> = ({
         setTransferNote(e.target.value);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        formDataList.forEach((formData, index) => {
+    
+        let formIsValid = true;
+        let apiSuccess = false;
+    
+        await Promise.all(formDataList.map(async (formData, index) => {
             if (!formData.product_id || !formData.branch_code || isNaN(parseInt(formData.quantity))) {
                 alert("Please fill all required fields correctly.");
+                formIsValid = false;
                 return;
             }
-
-            if (isTransfer) {
-                if (!destinationBranch) {
-                    alert("Please select a destination branch for the transfer.");
-                    return;
+    
+            try {
+                let response;
+                if (isTransfer) {
+                    if (!destinationBranch) {
+                        alert("Please select a destination branch for the transfer.");
+                        formIsValid = false;
+                        return;
+                    }
+                    const stockDetails = {
+                        product_id: parseInt(formData.product_id),
+                        source_branch: parseInt(formData.branch_code),
+                        destination_branch: parseInt(destinationBranch),
+                        quantity: parseInt(formData.quantity),
+                        note: transferNote || '',
+                    };
+                    response = await transferStock(stockDetails);
+                    if (response.ok) {
+                        setSuccessMessage("Stock successfully transferred!");
+                        apiSuccess = true;
+                    }
+                } else {
+                    const stock = {
+                        ...selectedStocks[index],
+                        product_id: parseInt(formData.product_id),
+                        branch_code: parseInt(formData.branch_code),
+                        quantity: parseInt(formData.quantity),
+                    };
+                    response = await addStock(stock);
+                    if (response.ok) {
+                        setSuccessMessage("Stock successfully added!");
+                        apiSuccess = true;
+                    }
                 }
-                const stockDetails = {
-                    product_id: parseInt(formData.product_id),
-                    source_branch: parseInt(formData.branch_code),
-                    destination_branch: parseInt(destinationBranch),
-                    quantity: parseInt(formData.quantity),
-                    note: transferNote || '',
-                };
-                transferStock(stockDetails);
-            } else {
-                const stock = {
-                    ...selectedStocks[index],
-                    product_id: parseInt(formData.product_id),
-                    branch_code: parseInt(formData.branch_code),
-                    quantity: parseInt(formData.quantity),
-                };
-                addStock(stock);
+            } catch (error) {
+                console.error("An error occurred during the API request", error);
+                formIsValid = false;
             }
-        });
+        }));
+    
+        if (formIsValid && apiSuccess) {
+            setShowSuccessModal(true);
+            setTimeout(() => {
+                setShowSuccessModal(false);
+                onClose();
+            }, 2000);
+        }
     };
 
     return (
-        <div className={styles.modalContent}>
+        <div className={`${styles.modalContent} ${styles.modalContentMedium}`}>
             <div className={styles.modalContentScrollable}>
                 <h2 className={styles.modalHeading}>
                     {isTransfer ? 'Transfer Stocks' : 'Add Stocks'}
@@ -162,12 +205,14 @@ const StockForm: React.FC<StockFormProps> = ({
                                 value={destinationBranch}
                                 onChange={handleDestinationChange}
                                 required
-                                className={styles.modalSelect}
+                                className={`${styles.modalSelect} ${destinationBranch === "" ? styles.placeholder : ""}`}
                             >
-                                <option value="">Select destination branch</option>
+                                <option value="" disabled>
+                                    Select destination branch
+                                </option>
                                 {branches.map((branch) => (
                                     <option key={branch.id} value={branch.id}>
-                                        {branch.address_line}
+                                        {branch.name}
                                     </option>
                                 ))}
                             </select>
@@ -175,7 +220,7 @@ const StockForm: React.FC<StockFormProps> = ({
                             <input
                                 type="text"
                                 name="transfer_note"
-                                placeholder="Transfer Note (Optional)"
+                                placeholder="Note (Optional)"
                                 value={transferNote}
                                 onChange={handleNoteChange}
                                 className={styles.modalInput}
@@ -200,29 +245,40 @@ const StockForm: React.FC<StockFormProps> = ({
                                     value={formData.quantity}
                                     onChange={(e) => handleInputChange(e, index)}
                                     required
-                                    className={styles.modalInput}
+                                    className={styles.modalInputFixed}
                                     min="1"
+                                    {...(isTransfer ? { max: selectedStocks[index].quantity } : {})}
+                                    placeholder={`Current qty. ${selectedStocks[index].quantity}`}
                                 />
+                                {errors[index] && <p className={styles.modalErrorText}>{errors[index]}</p>}
                             </div>
                         </div>
                     ))}
-                    <div className={styles.modalButtonContainer}>
+
+                    <div className={styles.modalMediumButtonContainer}>
                         <button
                             type="button"
-                            className={`${styles.modalButton}`}
-                            onClick={onClose}
+                            className={`${styles.modalMediumButton} ${styles.modalBackButton}`}
+                            onClick={() => onClose(false)}
                         >
-                            Select more
+                            <ArrowBack className={styles.modalBackButtonIcon} /> Back
+                            <span className={styles.modalTooltipText}>Back to select more</span>
                         </button>
                         <button
                             type="submit"
-                            className={`${styles.modalButton}`}
+                            className={`${styles.modalMediumButton}`}
                         >
                             {isTransfer ? 'Transfer Stock' : 'Add Stock'}
                         </button>
                     </div>
                 </form>
             </div>
+
+            {showSuccessModal && (
+                <div className={`${styles.successModal} show`}>
+                    <p>{successMessage}</p>
+                </div>
+            )}
         </div>
     );
 };

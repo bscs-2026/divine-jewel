@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from '../styles/Modal.module.css';
 
 interface ModalProps {
@@ -8,20 +8,34 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ show, onClose, children }) => {
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 600);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsLargeScreen(window.innerWidth >= 600);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   if (!show) {
-    return null; // Don't render the modal if show is false
+    return null;
   }
 
   // Handle clicking outside the modal content to close it
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
-      onClose(); // Close the modal when clicking outside the modal content
+      onClose();
     }
   };
 
   return (
     <div className={styles.modalBackdrop} onClick={handleBackdropClick}>
-      <div className={styles.modalContent}>
+      <div className={`${styles.modalContent} ${isLargeScreen ? styles.modalContentBig : styles.modalContentMedium}`}>
         {children}
       </div>
     </div>

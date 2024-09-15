@@ -4,14 +4,14 @@
   padding: 0.25rem 0.5rem;
   border-radius: 1.5rem;
   color: #575757;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .mediumButton {
   padding: 0.25rem 1rem;
   border-radius: 0.75rem;
   color: #575757;
-  font-size: 13px;
+  font-size: 14px;
   /* font-weight: bold; */
   cursor: pointer;
   transition: background-color 0.3s ease;

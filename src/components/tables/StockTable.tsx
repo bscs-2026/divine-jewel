@@ -8,7 +8,8 @@ interface Stock {
   branch_code: number;
   quantity: number;
   product_name: string;
-  branch_name: string;
+  branch_name: string | undefined;
+  // branch_address: string | undefined;
 }
 
 interface StockTableProps {
@@ -29,6 +30,7 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
     () => [
       { Header: 'Product', accessor: 'product_name' as keyof Stock, align: 'left' },
       { Header: 'Branch', accessor: 'branch_name' as keyof Stock, align: 'left' },
+      // { Header: 'Address', accessor: 'branch_address' as keyof Stock, align: 'left' },
       { Header: 'Quantity', accessor: 'quantity' as keyof Stock, align: 'right' },
     ],
     []
@@ -121,7 +123,7 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
                 onClick={() => handleSort(column.accessor)}
                 className={`${styles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign}`}
               >
-                <div className={`${styles.sorthContent}`}>
+                <div className={`${styles.sortContent}`}>
                   {column.Header}
                   {renderSortIcon(column.accessor)}
                 </div>
@@ -141,11 +143,13 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
                 />
               </td>
               <td className={styles.td}>{stock.product_name}</td>
-              <td className={styles.td}>{stock.branch_name}</td>
+              <td className={styles.td}>{stock.branch_name || 'Unknown'}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>{stock.quantity}</td>
             </tr>
           ))}
         </tbody>
+
+
       </table>
     </div>
   );

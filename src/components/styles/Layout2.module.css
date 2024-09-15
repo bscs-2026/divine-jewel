@@ -26,7 +26,7 @@
     flex-direction: column;
     align-items: left;
     justify-content: flex-start;
-    font-size: 12px;
+    font-size: 13px;
     padding-left: 20px;
 }
 
@@ -80,7 +80,6 @@
     color: #575757;
 }
 
-/* Vertical line before the Manage Branches button */
 .verticalLine {
     position: relative;
     padding-left: 1.5rem;
@@ -106,3 +105,7 @@
     cursor: not-allowed;
     color: #b0b0b0;
 }
+
+.boldButton {
+    font-weight: bold;
+  }
