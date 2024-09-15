@@ -14,10 +14,10 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const { address_line } = await request.json();
+  const { name, address_line } = await request.json();
   try {
     console.log('Adding branch to database...');
-    const result = await query('INSERT INTO branches (address_line) VALUES (?)', [address_line]);
+    const result = await query('INSERT INTO branches (name, address_line) VALUES (?, ?)', [name, address_line]);
     console.log('Added Branch:', result);
     return NextResponse.json({ message: 'Branch added successfully' }, { status: 201 });
   } catch (error: any) {
