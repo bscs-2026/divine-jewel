@@ -93,6 +93,30 @@
   font-size: 13px;
 }
 
+.custom-input::placeholder {
+  color: #575757;
+  font-size: 10px;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* .custom-quantity-input[type="number"]::-webkit-outer-spin-button,
+.custom-quantity-input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+.custom-quantity-input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.custom-quantity-input[type="number"] {
+  appearance: auto; 
+} */
+
+.primary {
+  text-align: left;
+  color: #575757;
+  font-size: 13px;
+}
+
 .secondary {
   text-align: left;
   color: #575757;

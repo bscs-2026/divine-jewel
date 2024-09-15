@@ -1,7 +1,8 @@
 // src/components/CategoryTabs.tsx
 import React from 'react';
-import styles from '../styles/Layout.module.css';
-import styles2 from '../styles/Button.module.css';
+import styles from '../styles/Layout2.module.css';
+import { AddBox } from '@mui/icons-material';
+
 
 interface Category {
   id: number;
@@ -13,39 +14,63 @@ interface CategoryTabsProps {
   filterCategory: number | string | null;
   setFilterCategory: (id: number | string | null) => void;
   toggleManageCategories: () => void;
+  handleAddProduct: () => void;
 }
 
-const CategoryTabs: React.FC<CategoryTabsProps> = ({ categories, filterCategory, setFilterCategory, toggleManageCategories }) => {
+const CategoryTabs: React.FC<CategoryTabsProps> = ({
+  categories,
+  filterCategory,
+  setFilterCategory,
+  toggleManageCategories,
+  handleAddProduct
+}) => {
   return (
     <div className={styles.tabsContainer}>
-      <button
-        className={`${styles2.mediumButton} ${filterCategory === null ? styles2.activeButton : styles2.inactiveButton}`}
-        onClick={() => setFilterCategory(null)}
-      >
-        All
-      </button>
-      {categories.map(category => (
+      <div className={styles.leftTabs}>
         <button
-          key={category.id}
-          className={`${styles2.mediumButton} ${filterCategory === category.id ? styles2.activeButton : styles2.inactiveButton}`}
-          onClick={() => setFilterCategory(category.id)}
+          className={`${styles.tabsContainerItem}  ${filterCategory === null ? styles.active : styles.inactive}`}
+          onClick={() => setFilterCategory(null)}
         >
-          {category.name}
+          All
         </button>
-      ))}
-      <button
-        className={`${styles2.mediumButton} ${filterCategory === 'Archive' ? styles2.activeButton : styles2.inactiveButton}`}
-        onClick={() => setFilterCategory('Archive')}
-      >
-        Archived
-      </button>
+        {categories.map(category => (
+          <button
+            key={category.id}
+            className={`${styles.tabsContainerItem} ${filterCategory === category.id ? styles.active : styles.inactive}`}
+            onClick={() => setFilterCategory(category.id)}
+          >
+            {category.name}
+          </button>
+        ))}
+        <button
+          className={`${styles.tabsContainerItem} ${filterCategory === 'Archive' ? styles.active : styles.inactive}`}
+          onClick={() => setFilterCategory('Archive')}
+        >
+          Archived
+        </button>
 
-      <button
-         className={`${styles2.mediumButton}`}
-         onClick={toggleManageCategories}
-         >
-        Manage Categories
-      </button>
+        <button
+          className={`${styles.tabsContainerItem} ${styles.verticalLine}`}
+          onClick={toggleManageCategories}
+        >
+          Manage Categories
+        </button>
+      </div>
+      <div className={styles.rightButtonGroup}>
+        <AddBox
+          onClick={handleAddProduct}
+          style={{ cursor: 'pointer', color: '#575757', marginRight: '5px', fontSize: '2.5rem' }}
+        />
+
+
+        {/* <button
+          className={`${styles.tabsContainerItem}`}
+          onClick={handleAddProduct}
+        >
+          Add
+        </button> */}
+
+      </div>
     </div>
   );
 };
