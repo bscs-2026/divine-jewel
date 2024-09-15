@@ -259,7 +259,7 @@ const StockForm: React.FC<StockFormProps> = ({
                         <button
                             type="button"
                             className={`${styles.modalMediumButton} ${styles.modalBackButton}`}
-                            onClick={() => onClose(false)}
+                            onClick={() => onClose()}
                         >
                             <ArrowBack className={styles.modalBackButtonIcon} /> Back
                             <span className={styles.modalTooltipText}>Back to select more</span>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import styles from '../styles/Form.module.css';
-import styles2 from '../styles/Button.module.css';
+import { Edit, Delete } from '@mui/icons-material';
+import DeleteConfirmationModal from '../modals/DeleteConfirmationModal';
+import styles from '../styles/Modal.module.css';
 
 interface Category {
     id: number;
@@ -8,19 +9,19 @@ interface Category {
     description: string;
 }
 
-interface CategoryFormProps {
+interface ManageCategoriesProps {
     categories: Category[];
     addCategory: (category: Category) => void;
     editCategory: (category: Category) => void;
     deleteCategory: (id: number) => void;
 }
 
-const ManageCategories: React.FC<CategoryFormProps> = ({
-    categories,
+const ManageCategories: React.FC<ManageCategoriesProps> = ({
+    categories = [],
     addCategory,
     editCategory,
-    deleteCategory }) => {
-
+    deleteCategory,
+}) => {
     const initialFormData = {
         id: 0,
         name: '',
@@ -28,135 +29,143 @@ const ManageCategories: React.FC<CategoryFormProps> = ({
     };
 
     const [formData, setFormData] = useState(initialFormData);
-    const [action, setAction] = useState<'add' | 'edit' | 'delete' | null>(null);
+    const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null);
+    const [action, setAction] = useState<'add' | 'edit' | null>(null);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [categoryToDelete, setCategoryToDelete] = useState<number | null>(null);
 
-    const handleAddCategory = () => {
+    const handleAddCategory = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (formData.name.trim() === '' || formData.description.trim() === '') return;
         addCategory(formData);
         setFormData(initialFormData);
         setAction(null);
     };
 
-    const handleEditCategory = () => {
+    const handleEditCategory = (category: Category) => {
+        setFormData({ id: category.id, name: category.name, description: category.description });
+        setEditingCategoryId(category.id);
+        setAction('edit');
+    };
+
+    const handleSaveEditCategory = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (formData.name.trim() === '' || formData.description.trim() === '') return;
         editCategory(formData);
         setFormData(initialFormData);
+        setEditingCategoryId(null);
         setAction(null);
     };
 
     const handleDeleteCategory = (id: number) => {
-        deleteCategory(id);
+        setCategoryToDelete(id);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDeleteCategory = () => {
+        if (categoryToDelete !== null) {
+            deleteCategory(categoryToDelete);
+            setShowDeleteModal(false);
+            setCategoryToDelete(null);
+        }
+    };
+
+    const cancelDelete = () => {
+        setCategoryToDelete(null);
+        setShowDeleteModal(false);
+    };
+
+    const handleCancelEdit = () => {
+        setFormData(initialFormData);
+        setEditingCategoryId(null);
         setAction(null);
     };
 
     return (
-        <div className={styles.container}>
-            <h2 className={styles.heading}>Manage Product Categories</h2>
-            {!action && (
-                <form className={styles.form}>
-                    <button className={`${styles2.smallButton} ${styles2.addButton}`} onClick={() => setAction('add')}>Add Category</button>
-                    <button className={`${styles2.smallButton} ${styles2.addButton}`} onClick={() => setAction('edit')}>Edit Category</button>
-                    <button className={`${styles2.smallButton} ${styles2.addButton}`} onClick={() => setAction('delete')}>Delete Category</button>
-                </form>
-            )}
+        <div className={`${styles.modalContent} ${styles.modalContentBig}`}>
+            <div className={styles.modalContentScrollable}>
+                <h2 className={styles.modalHeading}>Manage Product Categories</h2>
 
-            {action === 'add' && (
-                <form className={styles.form}>
-                    <h3>Add Category</h3>
-                    <input
-                        type="text"
-                        placeholder="Category Name"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className={styles.input}
-                    />
-                    <input
-                        type="text"
-                        placeholder="Category Description"
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className={styles.input}
-                    />
-                    <button className={`${styles2.smallButton} ${styles2.addButton}`} onClick={handleAddCategory}>Add</button>
-                    <button className={`${styles2.smallButton} ${styles2.cancelButton}`} onClick={() => setAction(null)}>Cancel</button>
-                </form>
-            )}
-            {action === 'edit' && (
-                <form className={styles.form}>
-                    <h3>Edit Category</h3>
-                    <select
-                        onChange={(e) => {
-                            const selectedCategory = categories.find(category => category.id === Number(e.target.value));
-                            if (selectedCategory) {
-                                setFormData({
-                                    id: selectedCategory.id,
-                                    name: selectedCategory.name,
-                                    description: selectedCategory.description
-                                });
-                            }
+                {action && (
+                    <form className={styles.modalForm} onSubmit={action === 'add' ? handleAddCategory : handleSaveEditCategory}>
+                        <input
+                            type="text"
+                            placeholder="Category Name"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            className={styles.modalInput}
+                        />
+                        <input
+                            type="text"
+                            placeholder="Category Description"
+                            value={formData.description}
+                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                            className={styles.modalInput}
+                        />
+                        <div className={styles.modalMediumButtonContainer}>
+                            <button
+                                type="button"
+                                className={styles.modalMediumButton}
+                                onClick={handleCancelEdit}
+                            >
+                                Cancel
+                            </button>
+                            <button type="submit" className={styles.modalMediumButton}>
+                                {action === 'add' ? 'Add' : 'Save'}
+                            </button>
+                        </div>
+                    </form>
+                )}
+
+                <table className={styles.modalTable}>
+                    <thead>
+                        <tr>
+                            <th>Category Name</th>
+                            <th>Description</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {categories.map((category) => (
+                            <tr key={category.id}>
+                                <td>{category.name}</td>
+                                <td>{category.description}</td>
+                                <td>
+                                    <Edit
+                                        onClick={() => handleEditCategory(category)}
+                                        className={styles.modalEditIcon}
+                                    />
+                                    <Delete
+                                        onClick={() => handleDeleteCategory(category.id)}
+                                        className={styles.modalDeleteIcon}
+                                    />
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+
+                <div className={styles.modalMediumButtonContainer}>
+                    <button
+                        className={styles.modalMediumButton}
+                        onClick={() => {
+                            setFormData(initialFormData);
+                            setEditingCategoryId(null);
+                            setAction('add');
                         }}
-                        className={styles.select}
-                        value={formData.id || ''}
                     >
-                        <option value="">Select a Category</option>
-                        {categories.map(category => (
-                            <option key={category.id} value={category.id}>
-                                {category.name}
-                            </option>
-                        ))}
-                    </select>
-                    <input
-                        type="text"
-                        placeholder="Category Name"
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className={styles.input}
-                    />
-                    <input
-                        type="text"
-                        placeholder="Category Description"
-                        value={formData.description}
-                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                        className={styles.input}
-                    />
-                    <button
-                        className={`${styles2.smallButton} ${styles2.addButton}`}
-                        onClick={handleEditCategory}>
-                        save
+                        Add Category
                     </button>
-                    <button className={`${styles2.smallButton} ${styles2.cancelButton}`} onClick={() => setAction(null)}>Cancel</button>
+                </div>
 
-                </form>
-            )}
-            {action === 'delete' && (
-                <form className={styles.form}>
-                    <h3>Delete Category</h3>
-                    <select
-                        onChange={(e) => setFormData({ ...formData, id: Number(e.target.value) })}
-                        value={formData.id || ''}
-                        className={styles.select}
-                    >
-                        <option value="">Select a Category</option>
-                        {categories.map(category => (
-                            <option key={category.id} value={category.id}>
-                                {category.name}
-                            </option>
-                        ))}
-                    </select>
-                    <button
-                        className={`${styles2.smallButton} ${styles2.deleteButton}`}
-                        onClick={(e) => {
-                            e.preventDefault(); // Prevent form submission
-                            if (formData.id) {
-                                handleDeleteCategory(formData.id);
-                            }
-                        }}>
-                        Delete
-                    </button>
-                    <button className={`${styles2.smallButton} ${styles2.cancelButton}`} onClick={() => setAction(null)}>Cancel</button>
-                </form>
-            )}
-
+                <DeleteConfirmationModal
+                    show={showDeleteModal}
+                    onClose={cancelDelete}
+                    onConfirm={confirmDeleteCategory}
+                />
+            </div>
         </div>
     );
-
 };
+
 export default ManageCategories;

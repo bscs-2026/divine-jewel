@@ -165,14 +165,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
           />
 
           <div className={styles.modalButtonContainer}>
-            <button type="submit" className={`${styles.modalButton}`}>
+            <button type="submit" className={`${styles.modalMediumButton}`}>
               {editingProduct ? 'Save Product' : 'Add Product'}
             </button>
             {editingProduct && (
               <button
                 type="button"
                 onClick={onClose}
-                className={`${styles.modalButton}`}
+                className={`${styles.modalMediumButton}`}
               >
                 Cancel
               </button>
