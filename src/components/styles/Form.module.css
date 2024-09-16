@@ -1,8 +1,8 @@
 .container {
   width: 100%;
   background-color: #FFE7EF;
-  padding: 1.5rem;
-  padding-top: 60px;
+  padding: 0.5rem;
+  padding-top: 10px;
   box-sizing: border-box;
 }
 
@@ -12,7 +12,53 @@
   font-size: 1.25rem;
   margin-top: 1rem;
   margin-bottom: 1rem;
-  font-size: 14px;
+}
+
+.heading2 {
+  color: #575757;
+  font-weight: bold;
+  font-size: 1rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  /* align-items: center; */
+}
+
+.headerLeft {
+  flex: 1;
+}
+
+.headerRight {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: #575757;
+}
+
+.verticalLine {
+  width: 1px;
+  background-color: #A7A7A7;
+  margin: 0 20px;
+  height: 100px;
+}
+.verticalLineShort {
+  width: 1px;
+  background-color: #A7A7A7;
+  margin: 0 20px;
+  height: 20px;
+}
+
+.horizontalLine {
+  width: 100%;
+  height: 1px;
+  background-color: #A7A7A7;
+  margin: 20px 0;
+  border: none;
 }
 
 .form {
@@ -49,6 +95,31 @@
   font-size: 13px;
 }
 
+.orderCustomerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.25rem;
+}
+
+.orderLeft {
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.customerRight {
+  flex: 1;
+}
+
+.customerNameInput {
+  width: 100%;
+  padding: 0.50rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  font-size: 13px;
+}
+
+
 .productBranchContainer {
   display: flex;
   flex-direction: column;
@@ -59,57 +130,20 @@
   justify-content: flex-end;
 }
 
-.custom-input {
+.customInput {
   width: 50px;
   border: 1px solid #A7A7A7;
   border-radius: 0.25rem;
   color: #575757;
   font-size: 13px;
+  text-align: center;
 }
 
-.custom-input::placeholder {
-  color: #575757;
-  font-size: 10px;
-  font-family: 'Poppins', sans-serif;
-}
-
-/* .custom-quantity-input[type="number"]::-webkit-outer-spin-button,
-.custom-quantity-input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.custom-quantity-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-.custom-quantity-input[type="number"] {
-  appearance: auto; 
-} */
-
-.primary {
-  text-align: left;
+.customInput::placeholder {
   color: #575757;
   font-size: 13px;
-}
-
-.custom-input::placeholder {
-  color: #575757;
-  font-size: 10px;
   font-family: 'Poppins', sans-serif;
 }
-
-/* .custom-quantity-input[type="number"]::-webkit-outer-spin-button,
-.custom-quantity-input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-.custom-quantity-input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-.custom-quantity-input[type="number"] {
-  appearance: auto; 
-} */
 
 .primary {
   text-align: left;
@@ -121,4 +155,255 @@
   text-align: left;
   color: #575757;
   font-size: 10px;
+}
+
+/* Order Form Styling */
+
+.orderDetails {
+  margin-bottom: 0.5rem;
+  color: #575757;
+}
+
+.productListContainer {
+  background-color: #fff;
+  max-height: 280px;
+  min-height: 280px;
+  overflow-y: auto;
+  padding-right: 1rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+}
+
+.productList {
+  margin-bottom: 0.5rem;
+  font-size: 13px;
+}
+
+.productRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #DDD;
+  font-size: 13px;
+}
+
+.removeIcon {
+  cursor: pointer;
+  color: #FF6799;
+  font-size: 18px;
+  margin-right: 2px; 
+}
+
+.productName {
+  flex: 2;
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.productQuantity {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.customInput {
+  width: 40px;
+  text-align: center;
+  border: 1px solid #A7A7A7;
+  margin: 0 0.5rem;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.quantityButton {
+  background-color: #FFDFE7;
+  border: 1px solid #A7A7A7;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.quantityButton:disabled {
+  background-color: #EEE;
+  cursor: not-allowed;
+}
+
+.quantityButton:hover:not(:disabled) {
+  background-color: #FFB7C5;
+}
+
+
+.productPrice {
+  flex: 0 0 10px;
+  text-align: right;
+  font-size: 14px;
+  white-space: nowrap;
+  margin-left: 0.25rem;
+}
+
+/* Payment Section */
+
+.paymentMethods {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 1rem;
+}
+
+.paymentButton {
+  background-color: #FF6799;
+  color: #FFDFE7;
+  border: none;
+  padding: 0.5rem 0.5rem;
+  cursor: pointer;
+  font-size: 13px;
+  border-radius: 2rem;
+  transition: background-color 0.3s ease;
+}
+
+.paymentButton:hover {
+  background-color: #FF3477;
+  color: #FFDFE7;
+}
+
+.activePaymentButton {
+  background-color: #FF6799;
+  color: #FFDFE7;
+  border: 2px solid #183D3D;
+}
+
+.tenderAmount {
+  font-size: 16px;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.payRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.payRow label {
+  font-size: 14px;
+  /* font-weight: bold; */
+  color: #333;
+}
+
+.tenderedInput {
+  width: 100px;
+  padding: 0.5rem;
+  font-size: 13px;
+  border: 1px solid #ccc;
+  color: #575757;
+  border-radius: 4px;
+  text-align: right;
+}
+
+.payRow strong {
+  font-size: 16px;
+  color: #575757;
+  padding-left: 1rem;
+}
+
+.successMessage {
+  color: #28a745;
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 1rem;
+}
+
+/* Buttons Container */
+.buttonsContainer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.newOrderButton {
+  width: 48%;
+  background-color: #575757;
+  color: #EEE;
+  border-radius: 2rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.newOrderButton:hover {
+  background-color: #575757;
+}
+
+.placeOrderButton {
+  width: 48%;
+  background-color: #FF6799;
+  color: #EEE;
+  border-radius: 2rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.placeOrderButton:hover {
+  background-color: #FF3477;
+}
+
+.placeOrderButton:disabled {
+  cursor: not-allowed;
+  background-color: #FCB6D7;
+  color: white;
+}
+
+/* Modal Styling */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5); 
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding-right: 2rem;
+}
+
+.modalContent {
+  position: relative;
+  background-color: white;
+  width: 300px;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.closeModalButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.modalContent {
+  font-size: 16px;
+  font-weight: normal;
+  color: #575757;
 }

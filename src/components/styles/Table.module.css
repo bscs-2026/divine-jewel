@@ -69,14 +69,29 @@
   font-weight: bold;
 }
 
-.tableRow:hover {
-  background-color: #f9f9f9;
-}
-
-.tableRow:hover .tableData {
-  background-color: #f0f0f0;
+.tableRow {
+  cursor: pointer;
+  background-color: white;
 }
 
 .tableRow:nth-child(even) {
   background-color: #f9f9f9;
 }
+
+.tableRow:hover {
+  background-color: #ffe7ef;
+}
+
+.disabledContainer {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.disabledRow {
+  background-color: #f9f9f9;
+  color: #aaa;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+
