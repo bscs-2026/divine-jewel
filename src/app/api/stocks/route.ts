@@ -9,6 +9,9 @@ export async function GET() {
       SELECT
         s.*,
         p.name AS product_name,
+        p.SKU AS product_SKU,
+        p.size AS product_size,
+        p.color AS product_color,
         bc.address_line AS branch_name
       FROM 
         stocks s

@@ -19,7 +19,10 @@ interface Stock {
 
 interface Product {
     id: number;
+    SKU: string;
     name: string;
+    size: string;
+    color: string;
     is_archive: number | boolean;
 }
 
