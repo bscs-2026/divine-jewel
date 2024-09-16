@@ -317,23 +317,6 @@ export default function ProductsPage() {
           deleteCategory={deleteCategory}
         />
       </Modal>
-
-
-
     </Layout>
   );
 }
-
-// rightSidebarContent={
-
-//         {showManageCategories && (
-//           <ManageCategories
-//             categories={categories}
-//             addCategory={addCategory}
-//             editCategory={editCategory}
-//             deleteCategory={deleteCategory}
-//           />
-
-//         )}
-//       </>
-//     }
