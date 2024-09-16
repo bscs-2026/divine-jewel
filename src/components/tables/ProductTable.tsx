@@ -1,6 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import styles from '../styles/Table.module.css';
-import styles2 from '../styles/Button.module.css';
 import { ArrowUpward, ArrowDownward, Edit, Archive, Unarchive} from '@mui/icons-material';
 
 interface Product {
@@ -127,17 +126,17 @@ const ProductTable: React.FC<ProductTableProps> = ({
               <td className={`${styles.td} ${styles.rightAlign}`}>    
                 <Edit
                   onClick={() => editProduct(product.id)} 
-                  style={{ cursor: 'pointer', color: '#575757', marginRight: '5px', fontSize: '2rem' }}
+                  style={{ cursor: 'pointer', color: '#575757', marginRight: '5px', fontSize: '1.5rem' }}
                 />
                 {filterCategory === 'Archive' ? (
                   <Unarchive
                   onClick={() => unarchiveProduct(product.id)}
-                  style={{ cursor: 'pointer', color: '#28a745', fontSize: '2rem' }}
+                  style={{ cursor: 'pointer', color: '#28a745', fontSize: '1.5rem' }}
                 />
                 ) : (
                   <Archive
                     onClick={() => archiveProduct(product.id)}
-                    style={{ cursor: 'pointer', color: '#ff4d4f', fontSize: '2rem' }}
+                    style={{ cursor: 'pointer', color: '#ff4d4f', fontSize: '1.5rem' }}
                   />
                 )}
               </td>

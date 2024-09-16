@@ -45,9 +45,7 @@ export default function ProductsPage() {
     fetchCategories();
   }, []);
 
-  const toggleManageCategories = () => {
-    setIsManageCategoriesModalOpen(true);
-  }
+  const toggleManageCategories = () => setIsManageCategoriesModalOpen(!isManageCategoriesModalOpen);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
@@ -108,7 +106,7 @@ export default function ProductsPage() {
   const deleteCategory = async (id: number) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this category?');
     if (!confirmDelete) return;
-    
+
     try {
       const response = await fetch(`/api/products/category/${id}`, {
         method: 'DELETE',
@@ -271,16 +269,6 @@ export default function ProductsPage() {
     }
   };
 
-  // const handleEditProduct = (productId: number) => {
-  //   const productToEdit = products.find((product) => product.id === productId);
-  //   if (productToEdit) {
-  //     setCurrentProduct(productToEdit);
-  //     setSelectedCategory(productToEdit.category_id);
-  //     setEditingProduct(true);
-  //     openModal(); // Open modal after selecting the product
-  //   }
-  // };
-
   const activeProducts = products.filter(product => !product.is_archive);
   const archivedProducts = products.filter(product => product.is_archive);
 
@@ -292,60 +280,43 @@ export default function ProductsPage() {
 
   return (
     <Layout defaultTitle="Products">
-          <CategoryTabs
-            categories={categories}
-            filterCategory={filterCategory}
-            setFilterCategory={setFilterCategory}
-            toggleManageCategories={toggleManageCategories}
-            handleAddProduct={openModal}
-          />
-          <ProductTable
-            products={filteredProducts}
-            editProduct={editProduct}
-            archiveProduct={archiveProduct}
-            unarchiveProduct={unarchiveProduct}
-            filterCategory={filterCategory}
-          />
+      <CategoryTabs
+        categories={categories}
+        filterCategory={filterCategory}
+        setFilterCategory={setFilterCategory}
+        toggleManageCategories={toggleManageCategories}
+        handleAddProduct={openModal}
+      />
+      <ProductTable
+        products={filteredProducts}
+        editProduct={editProduct}
+        archiveProduct={archiveProduct}
+        unarchiveProduct={unarchiveProduct}
+        filterCategory={filterCategory}
+      />
 
-          <Modal show={isModalOpen} onClose={closeModal}>
-            <ProductForm
-              categories={categories}
-              currentProduct={currentProduct}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-              editingProduct={editingProduct}
-              handleCancelEdit={handleCancelEdit}
-              addProduct={addProduct}
-              saveProduct={saveProduct}
-              onClose={closeModal}
-            />
-          </Modal>
+      <Modal show={isModalOpen} onClose={closeModal}>
+        <ProductForm
+          categories={categories}
+          currentProduct={currentProduct}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
+          editingProduct={editingProduct}
+          handleCancelEdit={handleCancelEdit}
+          addProduct={addProduct}
+          saveProduct={saveProduct}
+          onClose={closeModal}
+        />
+      </Modal>
 
+      <Modal show={isManageCategoriesModalOpen} onClose={toggleManageCategories}>
+        <ManageCategories
+          categories={categories}
+          addCategory={addCategory}
+          editCategory={editCategory}
+          deleteCategory={deleteCategory}
+        />
+      </Modal>
     </Layout>
   );
 }
-
-// rightSidebarContent={
-//       <>
-//         <ProductForm
-//           categories={categories}
-//           currentProduct={currentProduct}
-//           selectedCategory={selectedCategory}
-//           setSelectedCategory={setSelectedCategory}
-//           editingProduct={editingProduct}
-//           handleCancelEdit={handleCancelEdit}
-//           addProduct={addProduct}
-//           saveProduct={saveProduct}
-
-//         />
-//         {showManageCategories && (
-//           <ManageCategories
-//             categories={categories}
-//             addCategory={addCategory}
-//             editCategory={editCategory}
-//             deleteCategory={deleteCategory}
-//           />
-
-//         )}
-//       </>
-//     }

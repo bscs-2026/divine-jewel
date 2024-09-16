@@ -3,10 +3,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Layout from '../../components/PageLayout';
+import Layout from '../../components/layout/Layout';
 import SupplyTable from '../../components/tables/SupplyTable';
 import SupplierTabs from '../../components/tabs/SupplierTabs';
 import SupplyForm from '../../components/forms/SupplyForm';
+import Modal from '../../components/modals/Modal';
+
 
 interface Supplier {
   id?: number;
@@ -42,6 +44,8 @@ const suppliesPage: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [showManageSuppliers, setShowManageSuppliers] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'supplies' | 'suppliers' | 'editSupplier' | 'deleteSupplier'>('supplies');
+  
+
 
   useEffect(() => {
     fetchSuppliers();
@@ -181,7 +185,7 @@ const suppliesPage: React.FC = () => {
   const deleteSupply = async (id: number) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this supply?');
     if (!confirmDelete) return;
-    
+
     try {
       const response = await fetch(`/api/supply/${id}`, {
         method: 'DELETE',
@@ -211,50 +215,74 @@ const suppliesPage: React.FC = () => {
   };
 
   return (
-    <Layout
-      defaultTitle="Supplies"
-      rightSidebarContent={
-        !showManageSuppliers && (
-          <SupplyForm
-            currentSupply={currentSupply}
-            addSupply={addSupply}
-            saveSupply={saveSupply}
-            suppliers={suppliers}
-            addSupplier={addSupplier}
-            editSupplier={editSupplier}
-            deleteSupplier={deleteSupplier}
-            selectedSupplier={selectedSupplier}
-            setSelectedSupplier={setSelectedSupplier}
-            handleCancelEdit={handleCancelEdit}
-            switchToSuppliesTab={() => setActiveTab('supplies')}
-            setActiveTab={setActiveTab}
-            setCurrentSupply={setCurrentSupply}
-            activeTab={activeTab}
-          />
-        )
-      }
-    >
-        <>
-          <SupplierTabs
-            suppliers={suppliers}
-            filterSupplier={filterSupplier}
-            setFilterSupplier={setFilterSupplier}
-          />
-          <SupplyTable
-            supplies={supplies}
-            suppliers={suppliers}
-            filterSupplier={filterSupplier}
-            editSupply={handleSelectedToEdit}
-            deleteSupply={(id) => {
-              deleteSupply(id);
-              fetchSupplies();
-            }}
-            setActiveTab={setActiveTab}
-          />
-        </>
+    <Layout defaultTitle="Supply">
+
+      <SupplierTabs
+        suppliers={suppliers}
+        filterSupplier={filterSupplier}
+        setFilterSupplier={setFilterSupplier}
+      />
+
+      <SupplyTable
+        supplies={supplies}
+        suppliers={suppliers}
+        filterSupplier={filterSupplier}
+        editSupply={handleSelectedToEdit}
+        deleteSupply={(id) => {
+          deleteSupply(id);
+          fetchSupplies();
+        }}
+        setActiveTab={setActiveTab}
+      />
 
     </Layout>
   );
+
+  // return (
+  //   <Layout
+  //     defaultTitle="Supplies"
+  //     rightSidebarContent={
+  //       !showManageSuppliers && (
+  //         <SupplyForm
+  //           currentSupply={currentSupply}
+  //           addSupply={addSupply}
+  //           saveSupply={saveSupply}
+  //           suppliers={suppliers}
+  //           addSupplier={addSupplier}
+  //           editSupplier={editSupplier}
+  //           deleteSupplier={deleteSupplier}
+  //           selectedSupplier={selectedSupplier}
+  //           setSelectedSupplier={setSelectedSupplier}
+  //           handleCancelEdit={handleCancelEdit}
+  //           switchToSuppliesTab={() => setActiveTab('supplies')}
+  //           setActiveTab={setActiveTab}
+  //           setCurrentSupply={setCurrentSupply}
+  //           activeTab={activeTab}
+  //         />
+  //       )
+  //     }
+  //   >
+  //     <>
+  //       <SupplierTabs
+  //         suppliers={suppliers}
+  //         filterSupplier={filterSupplier}
+  //         setFilterSupplier={setFilterSupplier}
+  //       />
+  //       <SupplyTable
+  //         supplies={supplies}
+  //         suppliers={suppliers}
+  //         filterSupplier={filterSupplier}
+  //         editSupply={handleSelectedToEdit}
+  //         deleteSupply={(id) => {
+  //           deleteSupply(id);
+  //           fetchSupplies();
+  //         }}
+  //         setActiveTab={setActiveTab}
+  //       />
+  //     </>
+
+  //   </Layout>
+  // );
 };
 
 export default suppliesPage;

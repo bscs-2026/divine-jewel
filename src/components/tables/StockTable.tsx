@@ -9,7 +9,9 @@ interface Stock {
   quantity: number;
   product_name: string;
   branch_name: string | undefined;
-  // branch_address: string | undefined;
+  product_SKU: string;
+  product_size: string;
+  product_color?: string;
 }
 
 interface StockTableProps {
@@ -29,6 +31,9 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
   const columns = useMemo(
     () => [
       { Header: 'Product', accessor: 'product_name' as keyof Stock, align: 'left' },
+      { Header: 'SKU', accessor: 'product_SKU' as keyof Stock, align: 'left' },
+      { Header: 'Size', accessor: 'product_size' as keyof Stock, align: 'left' },
+      { Header: 'Color', accessor: 'product_color' as keyof Stock, align: 'left' },
       { Header: 'Branch', accessor: 'branch_name' as keyof Stock, align: 'left' },
       // { Header: 'Address', accessor: 'branch_address' as keyof Stock, align: 'left' },
       { Header: 'Quantity', accessor: 'quantity' as keyof Stock, align: 'right' },
@@ -40,8 +45,8 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
   const sortedStocks = useMemo(() => {
     const sortedData = [...stocks];
     sortedData.sort((a, b) => {
-      const valueA = a[sortConfig.key];
-      const valueB = b[sortConfig.key];
+      const valueA = a[sortConfig.key] ?? ''
+      const valueB = b[sortConfig.key] ?? ''
 
       if (valueA < valueB) return sortConfig.direction === 'asc' ? -1 : 1;
       if (valueA > valueB) return sortConfig.direction === 'asc' ? 1 : -1;
@@ -143,6 +148,9 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
                 />
               </td>
               <td className={styles.td}>{stock.product_name}</td>
+              <td className={styles.td}>{stock.product_SKU || 'Unknown'}</td>
+              <td className={styles.td}>{stock.product_size || 'Unknown'}</td>
+              <td className={styles.td}>{stock.product_color || 'Unknown'}</td>
               <td className={styles.td}>{stock.branch_name || 'Unknown'}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>{stock.quantity}</td>
             </tr>

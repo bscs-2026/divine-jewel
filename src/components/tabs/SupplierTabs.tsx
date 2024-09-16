@@ -1,5 +1,6 @@
 import React from 'react';
-import styles from '../styles/Layout.module.css';
+import styles from '../styles/Layout2.module.css';
+import { AddBox } from '@mui/icons-material';
 
 interface Supplier {
   id: number;
@@ -10,12 +11,14 @@ interface SupplierTabsProps {
   suppliers: Supplier[];
   filterSupplier: number | string | null;
   setFilterSupplier: (id: number | string | null) => void;
+  handleAddSupply: () => void;
 }
 
 const SupplierTabs: React.FC<SupplierTabsProps> = ({
   suppliers,
   filterSupplier,
   setFilterSupplier,
+  handleAddSupply
 }) => {
   return (
     <div className={styles.tabsContainer}>
@@ -34,6 +37,22 @@ const SupplierTabs: React.FC<SupplierTabsProps> = ({
           {supplier.supplier_name}
         </button>
       ))}
+
+<div className={styles.rightButtonGroup}>
+        <AddBox
+          onclick={handleAddSupply}
+          style={{ cursor: 'pointer', color: '#575757', marginRight: '5px', fontSize: '2.5rem' }}
+        />
+
+
+        {/* <button
+          className={`${styles.tabsContainerItem}`}
+          onClick={handleAddProduct}
+        >
+          Add
+        </button> */}
+
+      </div>
     </div>
   );
 };
