@@ -9,6 +9,10 @@ interface Stock {
     quantity: number;
     product_name: string;
     branch_name: string;
+    product_SKU: string; 
+    product_size: string;   
+    product_color: string;
+
 }
 
 interface StockDetails {
@@ -236,6 +240,7 @@ const StockForm: React.FC<StockFormProps> = ({
                         <div key={index} className={styles.modalItem}>
                             <div>
                                 <p className={styles.modalPrimary}>{selectedStocks[index]?.product_name}</p>
+                                <p className={styles.modalSecondary}> {selectedStocks[index]?.product_SKU}, {selectedStocks[index]?.product_size}, {selectedStocks[index]?.product_color}</p>
                                 <p className={styles.modalSecondary}>{selectedStocks[index]?.branch_name}</p>
                             </div>
                             <div>

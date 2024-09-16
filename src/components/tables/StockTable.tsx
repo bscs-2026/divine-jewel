@@ -45,8 +45,8 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
   const sortedStocks = useMemo(() => {
     const sortedData = [...stocks];
     sortedData.sort((a, b) => {
-      const valueA = a[sortConfig.key];
-      const valueB = b[sortConfig.key];
+      const valueA = a[sortConfig.key] ?? ''
+      const valueB = b[sortConfig.key] ?? ''
 
       if (valueA < valueB) return sortConfig.direction === 'asc' ? -1 : 1;
       if (valueA > valueB) return sortConfig.direction === 'asc' ? 1 : -1;

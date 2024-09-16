@@ -14,6 +14,9 @@ interface Stock {
     branch_code: number;
     quantity: number;
     product_name: string;
+    product_SKU: string; 
+    product_size: string;   
+    product_color: string;
     branch_name: string;
 }
 
