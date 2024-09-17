@@ -110,6 +110,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
         </h2>
 
         <form onSubmit={handleFormSubmit}>
+          <label className={styles.modalInputLabel}>
+            SKU
+          </label>
           <input
             type="text"
             name="SKU"
@@ -118,6 +121,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
             onChange={(e) => setProductSKU(e.target.value)}
             className={styles.modalInput}
           />
+          <label className={styles.modalInputLabel}>
+            Category
+          </label>
           <select
             name="category_id"
             value={selectedCategory ?? ''}
@@ -131,6 +137,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
               </option>
             ))}
           </select>
+          <label className={styles.modalInputLabel}>
+            Name
+          </label>
           <input
             type="text"
             name="name"
@@ -139,6 +148,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
             onChange={(e) => setProductName(e.target.value)}
             className={styles.modalInput}
           />
+          <label className={styles.modalInputLabel}>
+            Size
+          </label>
           <input
             type="text"
             name="size"
@@ -147,6 +159,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
             onChange={(e) => setProductSize(e.target.value)}
             className={styles.modalInput}
           />
+          <label className={styles.modalInputLabel}>
+            Color
+          </label>
           <input
             type="text"
             name="color"
@@ -155,6 +170,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
             onChange={(e) => setProductColor(e.target.value)}
             className={styles.modalInput}
           />
+          <label className={styles.modalInputLabel}>
+            Price
+          </label>
           <input
             type="text"
             name="price"

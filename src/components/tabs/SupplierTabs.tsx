@@ -12,46 +12,46 @@ interface SupplierTabsProps {
   filterSupplier: number | string | null;
   setFilterSupplier: (id: number | string | null) => void;
   handleAddSupply: () => void;
+  toggleManageSuppliers: () => void;
 }
 
 const SupplierTabs: React.FC<SupplierTabsProps> = ({
   suppliers,
   filterSupplier,
   setFilterSupplier,
-  handleAddSupply
+  handleAddSupply,
+  toggleManageSuppliers,
 }) => {
   return (
     <div className={styles.tabsContainer}>
-      <button
-        className={`${styles.tabsContainerItem} ${filterSupplier === null ? styles.active : styles.inactive}`}
-        onClick={() => setFilterSupplier(null)}
-      >
-        All
-      </button>
-      {suppliers.map((supplier) => (
+      <div className={styles.leftTabs}>
         <button
-          key={supplier.id}
-          className={`${styles.tabsContainerItem} ${filterSupplier === supplier.id ? styles.active : styles.inactive}`}
-          onClick={() => setFilterSupplier(supplier.id)}
+          className={`${styles.tabsContainerItem} ${filterSupplier === null ? styles.active : styles.inactive}`}
+          onClick={() => setFilterSupplier(null)}
         >
-          {supplier.supplier_name}
+          All
         </button>
-      ))}
-
-<div className={styles.rightButtonGroup}>
+        {suppliers.map((supplier) => (
+          <button
+            key={supplier.id}
+            className={`${styles.tabsContainerItem} ${filterSupplier === supplier.id ? styles.active : styles.inactive}`}
+            onClick={() => setFilterSupplier(supplier.id)}
+          >
+            {supplier.supplier_name}
+          </button>
+        ))}
+        <button
+          className={`${styles.tabsContainerItem} ${styles.verticalLine}`}
+          onClick={toggleManageSuppliers}
+        >
+          Manage Suppliers
+        </button>
+      </div>
+      <div className={styles.rightButtonGroup}>
         <AddBox
-          onclick={handleAddSupply}
+          onClick={handleAddSupply}
           style={{ cursor: 'pointer', color: '#575757', marginRight: '5px', fontSize: '2.5rem' }}
         />
-
-
-        {/* <button
-          className={`${styles.tabsContainerItem}`}
-          onClick={handleAddProduct}
-        >
-          Add
-        </button> */}
-
       </div>
     </div>
   );

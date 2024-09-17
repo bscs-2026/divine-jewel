@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
+import { ArrowDropUp, ArrowDropDown} from '@mui/icons-material';
 import styles from '../styles/Form.module.css';
 
 const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) => {
@@ -144,25 +145,27 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
             <div className={styles.orderDetails}>
                 <div className={styles.headerContainer}>
                     <div className={styles.headerLeft}>
-                        <div className={styles.heading2}>Divine Jewel</div>
-                        <div className={styles.primary}>{selectedBranch?.branch_name || 'No Branch'}</div>
-                        <div className={styles.secondary}>{selectedBranch?.branch_address || 'No Address'}</div>
+                        <div className={styles.heading2}>Current Order</div>
+                        {/* <div className={styles.primary}>{selectedBranch?.branch_name || 'No Branch'}</div>
+                        <div className={styles.secondary}>{selectedBranch?.branch_address || 'No Address'}</div> */}
                     </div>
-                    <div className={styles.verticalLine}></div>
-                    <div className={styles.headerRight}>
-                        <div className={styles.heading2}>Cashier: Divine</div>
+                    {/* <div className={styles.verticalLine}></div> */}
+                    {/* <div className={styles.headerRight}> */}
+                        <div className={styles.primary}>Cashier: Divine Villanueva</div>
                         <div className={styles.primary}>Date : {currentDateTime.date}</div>
                         <div className={styles.primary}>Time : {currentDateTime.time}</div>
-                    </div>
+                        <div className={styles.primary}>{selectedBranch?.branch_name || 'No Branch'}</div>
+                        <div className={styles.secondary}>{selectedBranch?.branch_address || 'No Address'}</div>
+                    {/* </div> */}
                 </div>
                 <div className={styles.horizontalLine}></div>
 
                 {/* Customer Name and Current Order */}
                 <div className={styles.orderCustomerContainer}>
-                    <div className={styles.orderLeft}>
+                    {/* <div className={styles.orderLeft}>
                         <div className={styles.heading2}>Current Order</div>
-                    </div>
-                    <div className={styles.verticalLineShort}></div>
+                    </div> */}
+                    {/* <div className={styles.verticalLineShort}></div> */}
                     <div className={styles.customerRight}>
                         <input
                             type="text"
@@ -187,25 +190,22 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                             <div className={styles.productName}>{product.name}</div>
                             <div className={styles.productQuantityWrapper}>
                                 <div className={styles.productQuantity}>
-                                    <button
-                                        className={styles.quantityButton}
+                                    <ArrowDropDown
+                                        // className={styles.quantityButton}
                                         onClick={() => handleQuantityChange(product.product_id, -1)}
                                         disabled={productQuantities[product.product_id] === 0}
-                                    >
-                                        -
-                                    </button>
+                                    />
+                            
                                     <input
                                         type="text"
                                         className={styles.customInput}
                                         value={productQuantities[product.product_id]}
                                         readOnly
                                     />
-                                    <button
-                                        className={styles.quantityButton}
+                                    <ArrowDropUp
+                                        // className={styles.quantityButton}
                                         onClick={() => handleQuantityChange(product.product_id, 1)}
-                                    >
-                                        +
-                                    </button>
+                                    />
                                 </div>
                             </div>
                             <div className={styles.productPrice}>{parseFloat(product.price).toFixed(2)}</div>

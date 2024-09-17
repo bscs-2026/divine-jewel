@@ -9,7 +9,7 @@
 .heading {
   color: #575757;
   font-weight: bold;
-  font-size: 1.25rem;
+  font-size: 1rem;
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
@@ -23,7 +23,7 @@
 }
 
 .headerContainer {
-  display: flex;
+  /* display: flex; */
   justify-content: space-between;
   /* align-items: center; */
 }
@@ -80,7 +80,7 @@
 .select {
   width: 100%;
   padding: 0.5rem;
-  border: 1px solid #FFE7EF;
+  border: 1px solid #DDDDDD;
   border-radius: 0.5rem;
   color: #575757;
   font-size: 13px;
@@ -169,6 +169,7 @@
   max-height: 280px;
   min-height: 280px;
   overflow-y: auto;
+  padding-left: 0.5rem;
   padding-right: 1rem;
   margin-bottom: 0.5rem;
   border: 1px solid #ccc;
@@ -214,7 +215,7 @@
   width: 40px;
   text-align: center;
   border: 1px solid #A7A7A7;
-  margin: 0 0.5rem;
+  /* margin: 0 0.5rem; */
   border-radius: 4px;
   font-size: 14px;
 }
@@ -256,15 +257,19 @@
 
 .paymentMethods {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
   margin-bottom: 1rem;
+  margin-top: 1rem;
 }
 
 .paymentButton {
-  background-color: #FF6799;
-  color: #FFDFE7;
+  background-color: #FFD4E3;;
+  color: #575757;
   border: none;
-  padding: 0.5rem 0.5rem;
+  padding: 0.5rem 1rem;
   cursor: pointer;
   font-size: 13px;
   border-radius: 2rem;
@@ -272,14 +277,14 @@
 }
 
 .paymentButton:hover {
-  background-color: #FF3477;
-  color: #FFDFE7;
+  background-color: #FFFFFF;
+  color: #575757;
 }
 
 .activePaymentButton {
-  background-color: #FF6799;
-  color: #FFDFE7;
-  border: 2px solid #183D3D;
+  background-color: #FFFFFF;
+  color: #575757;
+  border: 2px solid #575757;
 }
 
 .tenderAmount {

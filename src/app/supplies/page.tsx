@@ -1,5 +1,3 @@
-// src/pages/supplies/page.tsx
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -7,11 +5,11 @@ import Layout from '../../components/layout/Layout';
 import SupplyTable from '../../components/tables/SupplyTable';
 import SupplierTabs from '../../components/tabs/SupplierTabs';
 import SupplyForm from '../../components/forms/SupplyForm';
+import ManageSuppliers from '../../components/forms/ManageSuppliers';
 import Modal from '../../components/modals/Modal';
 
-
 interface Supplier {
-  id?: number;
+  id: number;
   supplier_name: string;
   contact_info?: string;
   address?: string;
@@ -20,37 +18,44 @@ interface Supplier {
 }
 
 interface Supply {
-  id?: number;
+  id: number;
   supply_date?: string;
   supplier_id: number;
-  sku: string;
+  sku?: string;
   material_name: string;
   quantity: number;
   unit_of_measure: string;
   price_per_unit: number;
+  total_cost?: number;
   destination_branch_id?: number;
   employee_id?: number;
   note?: string;
   status: 'pending' | 'delivered' | 'cancelled';
 }
 
-const suppliesPage: React.FC = () => {
+const SuppliesPage: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [filterSupplier, setFilterSupplier] = useState<number | string | null>(null);
   const [supplies, setSupplies] = useState<Supply[]>([]);
   const [currentSupply, setCurrentSupply] = useState<Supply | null>(null);
   const [selectedSupplier, setSelectedSupplier] = useState<number | null>(null);
-  const [editSupply, setEditSupply] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [showManageSuppliers, setShowManageSuppliers] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'supplies' | 'suppliers' | 'editSupplier' | 'deleteSupplier'>('supplies');
-  
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isManageSuppliersModalOpen, setIsManageSuppliersModalOpen] = useState(false);
+  const [editingSupply, setEditingSupply] = useState<boolean>(false);
 
   useEffect(() => {
     fetchSuppliers();
     fetchSupplies();
   }, []);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setCurrentSupply(null);
+    setEditingSupply(false);
+  };
+
+  const toggleManageSuppliers = () => setIsManageSuppliersModalOpen(!isManageSuppliersModalOpen);
 
   const fetchSupplies = async () => {
     try {
@@ -63,9 +68,7 @@ const suppliesPage: React.FC = () => {
         throw new Error('Supplies data is not an array');
       }
     } catch (error) {
-      console.error('Failed to fetch supplies:', error.message);
-    } finally {
-      setLoading(false);
+      console.error('Failed to fetch supplies:', error);
     }
   };
 
@@ -90,18 +93,17 @@ const suppliesPage: React.FC = () => {
     try {
       const response = await fetch('/api/supply/suppliers', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(supplier),
       });
 
       if (!response.ok) throw new Error('Failed to add supplier');
 
-      fetchSuppliers();
+      await fetchSuppliers();
     } catch (error) {
       console.error('Failed to add supplier:', error);
     }
+
   };
 
   const editSupplier = async (supplier: Supplier) => {
@@ -110,15 +112,13 @@ const suppliesPage: React.FC = () => {
     try {
       const response = await fetch(`/api/supply/suppliers/${supplier.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(supplier),
       });
 
       if (!response.ok) throw new Error('Failed to edit supplier');
 
-      fetchSuppliers();
+      await fetchSuppliers();
     } catch (error) {
       console.error('Failed to edit supplier:', error);
     }
@@ -131,16 +131,14 @@ const suppliesPage: React.FC = () => {
     try {
       const response = await fetch(`/api/supply/suppliers/${id}`, {
         method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) throw new Error('Failed to delete supplier');
 
-      fetchSuppliers();
+      await fetchSuppliers();
     } catch (error) {
-      console.error('Failed to delete supplier:', error.message);
+      console.error('Failed to delete supplier:', error);
     }
   };
 
@@ -148,42 +146,61 @@ const suppliesPage: React.FC = () => {
     try {
       const response = await fetch('/api/supply', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(supply),
       });
 
       if (!response.ok) throw new Error('Failed to add supply');
 
-      fetchSupplies();
+      await fetchSupplies();
     } catch (error) {
       console.error('Failed to add supply:', error);
+    }
+    closeModal();
+    alert('Supply added successfully.');
+  };
+
+  const editSupply = (supplyId: number) => {
+    const supplyToEdit = supplies.find((supply) => supply.id === supplyId);
+    if (supplyToEdit) {
+      setCurrentSupply(supplyToEdit);
+      setSelectedSupplier(supplyToEdit.supplier_id);
+      setEditingSupply(true);
+      openModal();
     }
   };
 
   const saveSupply = async (supply: Supply) => {
+    if (!currentSupply) return;
+  
+    const updatedSupply = {
+      ...currentSupply,
+      ...supply, // Merging new supply data
+    };
+  
     try {
-      const response = await fetch(`/api/supply/${supply.id}`, {
+      const response = await fetch(`/api/supply/${currentSupply.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(supply),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedSupply),
       });
-
+  
       if (!response.ok) throw new Error('Failed to save supply');
-
-      fetchSupplies();
-      setEditSupply(false);
+  
+      setEditingSupply(false);
       setCurrentSupply(null);
+      setSelectedSupplier(null);
+      await fetchSupplies(); // Refetch supplies to update the table
     } catch (error) {
       console.error('Failed to save supply:', error);
     }
+    closeModal();
+    alert('Successfully updated supply data.');
   };
+  
 
   const deleteSupply = async (id: number) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this supply?');
+    const confirmDelete = window.confirm('Are you sure you want to delete this supply data? This cannot be retrieved once confirmed.');
     if (!confirmDelete) return;
 
     try {
@@ -193,96 +210,63 @@ const suppliesPage: React.FC = () => {
 
       if (!response.ok) throw new Error('Failed to delete supply');
 
-      fetchSupplies();
+      await fetchSupplies();
     } catch (error) {
       console.error('Failed to delete supply:', error);
     }
   };
 
-  const handleSelectedToEdit = (id: number) => {
-    const supply = supplies.find((supply) => supply.id === id);
-    if (supply) {
-      setCurrentSupply(supply);
-      setEditSupply(true);
-      setActiveTab('supplies');
-      setShowManageSuppliers(false);
-    }
+  const handleCancelEdit = () => {
+    setEditingSupply(false);
+    setCurrentSupply(null);
+    setSelectedSupplier(null);
+    closeModal();
   };
 
-  const handleCancelEdit = () => {
-    setEditSupply(false);
-    setCurrentSupply(null);
-  };
+  const filteredSupplies = filterSupplier
+    ? supplies.filter((supply) => supply.supplier_id === filterSupplier)
+    : supplies;
 
   return (
     <Layout defaultTitle="Supply">
-
       <SupplierTabs
         suppliers={suppliers}
         filterSupplier={filterSupplier}
         setFilterSupplier={setFilterSupplier}
+        handleAddSupply={openModal}
+        toggleManageSuppliers={toggleManageSuppliers}
       />
 
       <SupplyTable
-        supplies={supplies}
+        supplies={filteredSupplies}
         suppliers={suppliers}
         filterSupplier={filterSupplier}
-        editSupply={handleSelectedToEdit}
-        deleteSupply={(id) => {
-          deleteSupply(id);
-          fetchSupplies();
-        }}
-        setActiveTab={setActiveTab}
+        editSupply={editSupply}
+        deleteSupply={deleteSupply}
       />
 
+      <Modal show={isModalOpen} onClose={closeModal}>
+        <SupplyForm
+          currentSupply={currentSupply}
+          addSupply={addSupply}
+          saveSupply={saveSupply}
+          suppliers={suppliers}
+          selectedSupplier={selectedSupplier}
+          setSelectedSupplier={setSelectedSupplier}
+          handleCancelEdit={handleCancelEdit}
+        />
+      </Modal>
+
+      <Modal show={isManageSuppliersModalOpen} onClose={toggleManageSuppliers}>
+        <ManageSuppliers
+          suppliers={suppliers}
+          addSupplier={addSupplier}
+          editSupplier={editSupplier}
+          deleteSupplier={deleteSupplier}
+        />
+      </Modal>
     </Layout>
   );
-
-  // return (
-  //   <Layout
-  //     defaultTitle="Supplies"
-  //     rightSidebarContent={
-  //       !showManageSuppliers && (
-  //         <SupplyForm
-  //           currentSupply={currentSupply}
-  //           addSupply={addSupply}
-  //           saveSupply={saveSupply}
-  //           suppliers={suppliers}
-  //           addSupplier={addSupplier}
-  //           editSupplier={editSupplier}
-  //           deleteSupplier={deleteSupplier}
-  //           selectedSupplier={selectedSupplier}
-  //           setSelectedSupplier={setSelectedSupplier}
-  //           handleCancelEdit={handleCancelEdit}
-  //           switchToSuppliesTab={() => setActiveTab('supplies')}
-  //           setActiveTab={setActiveTab}
-  //           setCurrentSupply={setCurrentSupply}
-  //           activeTab={activeTab}
-  //         />
-  //       )
-  //     }
-  //   >
-  //     <>
-  //       <SupplierTabs
-  //         suppliers={suppliers}
-  //         filterSupplier={filterSupplier}
-  //         setFilterSupplier={setFilterSupplier}
-  //       />
-  //       <SupplyTable
-  //         supplies={supplies}
-  //         suppliers={suppliers}
-  //         filterSupplier={filterSupplier}
-  //         editSupply={handleSelectedToEdit}
-  //         deleteSupply={(id) => {
-  //           deleteSupply(id);
-  //           fetchSupplies();
-  //         }}
-  //         setActiveTab={setActiveTab}
-  //       />
-  //     </>
-
-  //   </Layout>
-  // );
 };
 
-export default suppliesPage;
+export default SuppliesPage;
