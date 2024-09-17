@@ -77,14 +77,14 @@ const SupplyForm: React.FC<SupplyFormProps> = ({
 
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-
+  
     if (!materialName || !quantity || !unitOfMeasure || !pricePerUnit || selectedSupplier === null) {
       alert('Please fill out all required fields');
       return;
     }
-
+  
     const supplyData: Supply = {
-      id: currentSupply?.id || Date.now(),
+      id: currentSupply?.id || Date.now(), // Reuse existing ID if editing
       supplier_id: selectedSupplier,
       sku,
       material_name: materialName,
@@ -94,15 +94,16 @@ const SupplyForm: React.FC<SupplyFormProps> = ({
       note,
       status,
     };
-
+  
     if (currentSupply) {
-      saveSupply(supplyData);
+      saveSupply(supplyData); // Call saveSupply when editing
     } else {
       addSupply(supplyData);
     }
-
+  
     resetForm();
   };
+  
 
   return (
     <div className={styles.modalContent}>

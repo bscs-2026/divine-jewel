@@ -170,30 +170,31 @@ const SuppliesPage: React.FC = () => {
 
   const saveSupply = async (supply: Supply) => {
     if (!currentSupply) return;
-
+  
     const updatedSupply = {
       ...currentSupply,
-      ...supply,
+      ...supply, // Merging new supply data
     };
-
+  
     try {
       const response = await fetch(`/api/supply/${currentSupply.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedSupply),
       });
-
+  
       if (!response.ok) throw new Error('Failed to save supply');
-
+  
       setEditingSupply(false);
       setCurrentSupply(null);
       setSelectedSupplier(null);
-      await fetchSupplies();
+      await fetchSupplies(); // Refetch supplies to update the table
     } catch (error) {
       console.error('Failed to save supply:', error);
     }
     closeModal();
   };
+  
 
   const deleteSupply = async (id: number) => {
     const confirmDelete = window.confirm('Are you sure you want to delete this supply?');
@@ -245,7 +246,7 @@ const SuppliesPage: React.FC = () => {
         <SupplyForm
           currentSupply={currentSupply}
           addSupply={addSupply}
-          saveSupply
+          saveSupply={saveSupply}
           suppliers={suppliers}
           selectedSupplier={selectedSupplier}
           setSelectedSupplier={setSelectedSupplier}
