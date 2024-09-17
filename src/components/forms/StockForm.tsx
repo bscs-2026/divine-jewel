@@ -191,7 +191,7 @@ const StockForm: React.FC<StockFormProps> = ({
             setTimeout(() => {
                 setShowSuccessModal(false);
                 onClose();
-            }, 2000);
+            }, 1000);
         }
     };
 
