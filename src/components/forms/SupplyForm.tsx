@@ -77,12 +77,12 @@ const SupplyForm: React.FC<SupplyFormProps> = ({
 
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-  
+
     if (!materialName || !quantity || !unitOfMeasure || !pricePerUnit || selectedSupplier === null) {
       alert('Please fill out all required fields');
       return;
     }
-  
+
     const supplyData: Supply = {
       id: currentSupply?.id || Date.now(), // Reuse existing ID if editing
       supplier_id: selectedSupplier,
@@ -94,16 +94,16 @@ const SupplyForm: React.FC<SupplyFormProps> = ({
       note,
       status,
     };
-  
+
     if (currentSupply) {
       saveSupply(supplyData); // Call saveSupply when editing
     } else {
       addSupply(supplyData);
     }
-  
+
     resetForm();
   };
-  
+
 
   return (
     <div className={styles.modalContent}>
@@ -113,6 +113,9 @@ const SupplyForm: React.FC<SupplyFormProps> = ({
         </h2>
 
         <form onSubmit={handleFormSubmit}>
+          <label className={styles.modalInputLabel}>
+            Supplier
+          </label>
           <select
             name="supplier_id"
             value={selectedSupplier ?? ''}
@@ -127,6 +130,9 @@ const SupplyForm: React.FC<SupplyFormProps> = ({
             ))}
           </select>
 
+          <label className={styles.modalInputLabel}>
+            SKU
+          </label>
           <input
             type="text"
             name="sku"
@@ -135,6 +141,9 @@ const SupplyForm: React.FC<SupplyFormProps> = ({
             onChange={(e) => setSku(e.target.value)}
             className={styles.modalInput}
           />
+          <label className={styles.modalInputLabel}>
+            Material Name
+          </label>
           <input
             type="text"
             name="material_name"
@@ -143,6 +152,9 @@ const SupplyForm: React.FC<SupplyFormProps> = ({
             onChange={(e) => setMaterialName(e.target.value)}
             className={styles.modalInput}
           />
+          <label className={styles.modalInputLabel}>
+            Quantity
+          </label>
           <input
             type="number"
             name="quantity"
@@ -151,6 +163,9 @@ const SupplyForm: React.FC<SupplyFormProps> = ({
             onChange={(e) => setQuantity(e.target.value)}
             className={styles.modalInput}
           />
+          <label className={styles.modalInputLabel}>
+            Unit of Measure
+          </label>
           <input
             type="text"
             name="unit_of_measure"
@@ -159,6 +174,9 @@ const SupplyForm: React.FC<SupplyFormProps> = ({
             onChange={(e) => setUnitOfMeasure(e.target.value)}
             className={styles.modalInput}
           />
+          <label className={styles.modalInputLabel}>
+            Price per Unit
+          </label>
           <input
             type="number"
             name="price_per_unit"
@@ -167,6 +185,9 @@ const SupplyForm: React.FC<SupplyFormProps> = ({
             onChange={(e) => setPricePerUnit(e.target.value)}
             className={styles.modalInput}
           />
+          <label className={styles.modalInputLabel}>
+            Note
+          </label>
           <textarea
             name="note"
             placeholder="Note"
@@ -174,7 +195,9 @@ const SupplyForm: React.FC<SupplyFormProps> = ({
             onChange={(e) => setNote(e.target.value)}
             className={styles.modalInput}
           />
-
+          <label className={styles.modalInputLabel}>
+            Status
+          </label>
           <select
             name="status"
             value={status}

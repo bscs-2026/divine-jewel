@@ -169,6 +169,7 @@ const SupplyTable: React.FC<SupplyTableProps> = ({
                 <Edit
                   onClick={() => editSupply(supply.id)}
                   style={{ cursor: 'pointer', color: '#575757', marginRight: '5px', fontSize: '1.5rem' }}
+                  
 
                 />
 
