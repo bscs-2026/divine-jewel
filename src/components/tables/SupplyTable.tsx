@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import styles from '../styles/Table.module.css';
 import styles2 from '../styles/Button.module.css';
-import { ArrowUpward, ArrowDownward, Edit, Archive} from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward, Edit, Delete} from '@mui/icons-material';
 
 interface Supplier {
   id: number;
@@ -172,7 +172,7 @@ const SupplyTable: React.FC<SupplyTableProps> = ({
 
                 />
 
-                <Archive         
+                <Delete         
                   onClick={(e) => {
                     e.preventDefault();
                     if (supply.id) {

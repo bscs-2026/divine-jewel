@@ -103,6 +103,7 @@ const SuppliesPage: React.FC = () => {
     } catch (error) {
       console.error('Failed to add supplier:', error);
     }
+
   };
 
   const editSupplier = async (supplier: Supplier) => {
@@ -156,6 +157,7 @@ const SuppliesPage: React.FC = () => {
       console.error('Failed to add supply:', error);
     }
     closeModal();
+    alert('Supply added successfully.');
   };
 
   const editSupply = (supplyId: number) => {
@@ -193,11 +195,12 @@ const SuppliesPage: React.FC = () => {
       console.error('Failed to save supply:', error);
     }
     closeModal();
+    alert('Successfully updated supply data.');
   };
   
 
   const deleteSupply = async (id: number) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this supply?');
+    const confirmDelete = window.confirm('Are you sure you want to delete this supply data? This cannot be retrieved once confirmed.');
     if (!confirmDelete) return;
 
     try {
