@@ -145,15 +145,17 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 <div className={styles.headerContainer}>
                     <div className={styles.headerLeft}>
                         <div className={styles.heading2}>Divine Jewel</div>
-                        <div className={styles.primary}>{selectedBranch?.branch_name || 'No Branch'}</div>
-                        <div className={styles.secondary}>{selectedBranch?.branch_address || 'No Address'}</div>
+                        {/* <div className={styles.primary}>{selectedBranch?.branch_name || 'No Branch'}</div>
+                        <div className={styles.secondary}>{selectedBranch?.branch_address || 'No Address'}</div> */}
                     </div>
-                    <div className={styles.verticalLine}></div>
-                    <div className={styles.headerRight}>
-                        <div className={styles.heading2}>Cashier: Divine</div>
+                    {/* <div className={styles.verticalLine}></div> */}
+                    {/* <div className={styles.headerRight}> */}
+                        <div className={styles.primary}>Cashier: Divine Villanueva</div>
                         <div className={styles.primary}>Date : {currentDateTime.date}</div>
                         <div className={styles.primary}>Time : {currentDateTime.time}</div>
-                    </div>
+                        <div className={styles.primary}>{selectedBranch?.branch_name || 'No Branch'}</div>
+                        <div className={styles.secondary}>{selectedBranch?.branch_address || 'No Address'}</div>
+                    {/* </div> */}
                 </div>
                 <div className={styles.horizontalLine}></div>
 
