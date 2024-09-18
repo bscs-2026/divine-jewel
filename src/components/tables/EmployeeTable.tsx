@@ -1,6 +1,6 @@
 // components/EmployeeTable.tsx
 import React from 'react';
-import { Employee } from '../page';
+import { Employee } from '@/app/employees/page';
 
 type EmployeeTableProps = {
     employees: Employee[];
