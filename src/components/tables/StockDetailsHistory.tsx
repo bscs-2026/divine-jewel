@@ -1,35 +1,37 @@
-// /components/tables/StockDetailsTable.tsx
 import React, { useMemo, useState } from 'react';
-import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward, Info, InfoOutlined } from '@mui/icons-material';
 import styles from '../styles/Table.module.css';
 
-interface StockDetail {
+interface StockDetailGroup {
   id: number;
-  bacth_id: number;
+  batch_id: string;
   date: string;
   action: string;
   source_branch_name: string | null;
   destination_branch_name: string | null;
+  employee_fullname: string;
 }
 
 interface StockDetailsTableProps {
-  stockDetails: StockDetail[];
+  stockDetails: StockDetailGroup[];
+  onViewAction: (batch_id: string) => void;
 }
 
-const StockDetailsTable: React.FC<StockDetailsTableProps> = ({ stockDetails }) => {
-  const [sortConfig, setSortConfig] = useState<{ key: keyof StockDetail; direction: 'asc' | 'desc' }>({
+const StockDetailsTable: React.FC<StockDetailsTableProps> = ({ stockDetails, onViewAction }) => {
+  const [sortConfig, setSortConfig] = useState<{ key: keyof StockDetailGroup; direction: 'asc' | 'desc' }>({
     key: 'date',
     direction: 'desc',
   });
 
   const columns = useMemo(
     () => [
-      { Header: 'Batch ID', accessor: 'bacth_id' as keyof StockDetail, align: 'left' },
-      { Header: 'Date', accessor: 'date' as keyof StockDetail, align: 'left' },
-      { Header: 'Action', accessor: 'action' as keyof StockDetail, align: 'left' },
-      { Header: 'Source', accessor: 'source_branch_name' as keyof StockDetail, align: 'left' },
-      { Header: 'Destination', accessor: 'destination_branch_name' as keyof StockDetail, align: 'left' },
-      { Header: '', accessor: 'bacth_id' as keyof StockDetail, align: 'center' },
+      { Header: 'Batch ID', accessor: 'batch_id' as keyof StockDetailGroup, align: 'left' },
+      { Header: 'Date', accessor: 'date' as keyof StockDetailGroup, align: 'left' },
+      { Header: 'Action', accessor: 'action' as keyof StockDetailGroup, align: 'left' },
+      { Header: 'Source', accessor: 'source_branch_name' as keyof StockDetailGroup, align: 'left' },
+      { Header: 'Destination', accessor: 'destination_branch_name' as keyof StockDetailGroup, align: 'left' },
+      { Header: 'Employee', accessor: 'employee_fullname' as keyof StockDetailGroup, align: 'left' },
+      { Header: '', accessor: 'batch_id' as keyof StockDetailGroup, align: 'center' },
     ],
     []
   );
@@ -46,8 +48,7 @@ const StockDetailsTable: React.FC<StockDetailsTableProps> = ({ stockDetails }) =
     return sortedData;
   }, [stockDetails, sortConfig]);
 
-
-  const handleSort = (key: keyof StockDetail) => {
+  const handleSort = (key: keyof StockDetailGroup) => {
     let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
@@ -55,7 +56,7 @@ const StockDetailsTable: React.FC<StockDetailsTableProps> = ({ stockDetails }) =
     setSortConfig({ key, direction });
   };
 
-  const renderSortIcon = (key: keyof StockDetail) => {
+  const renderSortIcon = (key: keyof StockDetailGroup) => {
     const isActive = sortConfig.key === key;
     return (
       <span className={styles.sortIcons}>
@@ -71,12 +72,6 @@ const StockDetailsTable: React.FC<StockDetailsTableProps> = ({ stockDetails }) =
     );
   };
 
-  const handleViewAction = (id: number) => {
-    // Handle the view action, e.g., open a modal with details
-    // For now, we'll just log the batch ID
-    console.log(`View details for batch ID: ${id}`);
-  };
-
   return (
     <div className={styles.container}>
       <table className={styles.table}>
@@ -85,14 +80,12 @@ const StockDetailsTable: React.FC<StockDetailsTableProps> = ({ stockDetails }) =
             {columns.map((column) => (
               <th
                 key={column.accessor as string}
-
-
-                onClick={() => column.accessor !== 'bacth_id' && handleSort(column.accessor)}
+                onClick={() => column.accessor !== 'batch_id' && handleSort(column.accessor)}
                 className={`${styles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign}`}
               >
                 <div className={styles.sortContent}>
                   {column.Header}
-                  {column.accessor !== 'bacth_id' && renderSortIcon(column.accessor)}
+                  {column.accessor !== 'batch_id' && renderSortIcon(column.accessor)}
                 </div>
               </th>
             ))}
@@ -100,16 +93,18 @@ const StockDetailsTable: React.FC<StockDetailsTableProps> = ({ stockDetails }) =
         </thead>
         <tbody>
           {sortedStockDetails.map((detail) => (
-            <tr key={detail.bacth_id} className={styles.tableRow}>
-              <td className={styles.td}>{detail.bacth_id}</td>
+            <tr 
+            key={detail.batch_id} className={styles.tableRow}
+            onClick={() => onViewAction(detail.batch_id)}
+             >
+              <td className={styles.td}>{detail.batch_id}</td>
               <td className={styles.td}>{new Date(detail.date).toLocaleDateString()}</td>
               <td className={styles.td}>{detail.action}</td>
               <td className={styles.td}>{detail.source_branch_name || 'N/A'}</td>
               <td className={styles.td}>{detail.destination_branch_name || 'N/A'}</td>
+              <td className={styles.td}>{detail.employee_fullname}</td>
               <td className={styles.td} style={{ textAlign: 'center' }}>
-                <button className={styles.viewButton} onClick={() => handleViewAction(detail.bacth_id)}>
-                  View
-                </button>
+                <InfoOutlined className={styles.viewButton} onClick={() => onViewAction(detail.batch_id)} />         
               </td>
             </tr>
           ))}

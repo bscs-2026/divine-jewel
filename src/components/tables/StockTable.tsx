@@ -138,7 +138,11 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
         </thead>
         <tbody>
           {sortedStocks.map((stock) => (
-            <tr key={stock.id} className={styles.tableRow}>
+            <tr 
+            key={stock.id}
+            className={styles.tableRow}
+            onClick={() => handleRowSelect(stock)}
+            style={{ cursor: 'pointer' }} >
               <td>
                 <input
                   type="checkbox"

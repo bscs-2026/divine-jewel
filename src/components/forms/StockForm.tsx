@@ -262,7 +262,7 @@ const StockForm: React.FC<StockFormProps> = ({
                         <div key={index} className={styles.modalItem}>
                             <div>
                                 <p className={styles.modalPrimary}>{selectedStocks[index]?.product_name}</p>
-                                <p className={styles.modalSecondary}> {selectedStocks[index]?.product_SKU}, {selectedStocks[index]?.product_size}, {selectedStocks[index]?.product_color}</p>
+                                <p className={styles.modalSecondary}> {selectedStocks[index]?.product_SKU} |  {selectedStocks[index]?.product_size} | {selectedStocks[index]?.product_color}</p>
                                 <p className={styles.modalSecondary}>{selectedStocks[index]?.branch_name}</p>
                             </div>
                             <div>
@@ -286,7 +286,8 @@ const StockForm: React.FC<StockFormProps> = ({
                         <button
                             type="button"
                             className={`${styles.modalMediumButton} ${styles.modalBackButton}`}
-                            onClick={() => onClose()}
+                            // onClick={() => onClose()}
+                            onClick={() => onClose(false)}
                         >
                             <ArrowBack className={styles.modalBackButtonIcon} /> Back
                             <span className={styles.modalTooltipText}>Back to select more</span>
