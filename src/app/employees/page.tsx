@@ -7,6 +7,7 @@ import EmployeeModal from "@/components/modals/EmployeeModal";
 import InformationModal from "@/components/modals/InformationModal";
 import EmployeeTable from "@/components/tables/EmployeeTable";
 import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
+import { AddBox } from '@mui/icons-material';
 
 export interface Employee {
   id: number;
@@ -303,12 +304,10 @@ export default function EmployeesPage() {
           >
             Inactive
           </button>
-          <button
-            className="ml-auto px-4 py-2 rounded-full text-[#575757] bg-[#FCB6D7] hover:bg-[#FFE7EF]"
+          <AddBox
+            style={{ cursor: 'pointer', color: '#575757', marginRight: '5px', fontSize: '2.5rem', marginLeft: 'auto' }}
             onClick={handleAddEmployee}
-          >
-            Add Employee
-          </button>
+          />
         </div>
 
         <EmployeeModal
