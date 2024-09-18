@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 
 interface SuccessfulPromptProps {
   message: string;
@@ -11,7 +11,11 @@ interface DeletePromptProps {
   onClose: () => void;
 }
 
-export const SuccessfulPrompt: React.FC<SuccessfulPromptProps> = ({ message, isVisible, onClose }) => {
+export const SuccessfulPrompt: React.FC<SuccessfulPromptProps> = ({
+  message,
+  isVisible,
+  onClose,
+}) => {
   useEffect(() => {
     if (isVisible) {
       const timer = setTimeout(() => {
@@ -31,8 +35,10 @@ export const SuccessfulPrompt: React.FC<SuccessfulPromptProps> = ({ message, isV
   );
 };
 
-
-export const DeletePrompt: React.FC<DeletePromptProps> = ({ isVisible, onClose }) => {
+export const DeletePrompt: React.FC<DeletePromptProps> = ({
+  isVisible,
+  onClose,
+}) => {
   useEffect(() => {
     if (isVisible) {
       const timer = setTimeout(() => {
@@ -51,4 +57,3 @@ export const DeletePrompt: React.FC<DeletePromptProps> = ({ isVisible, onClose }
     </div>
   );
 };
-
