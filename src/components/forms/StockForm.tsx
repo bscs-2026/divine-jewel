@@ -9,13 +9,13 @@ interface Stock {
     quantity: number;
     product_name: string;
     branch_name: string;
-    product_SKU: string; 
-    product_size: string;   
+    product_SKU: string;
+    product_size: string;
     product_color: string;
-
 }
 
 interface StockDetails {
+    batch_id: string; // Updated to string for alphanumeric batch_id
     product_id: number;
     source_branch: number;
     destination_branch: number;
@@ -39,9 +39,17 @@ interface StockFormProps {
     branches: Branch[];
     selectedStocks: Stock[];
     isTransfer: boolean;
-    addStock: (stock: Stock) => Promise<{ ok: boolean, message?: string }>;
+    addStock: (stock: Stock, batch_id: string) => Promise<{ ok: boolean, message?: string }>;
     transferStock: (stockDetails: StockDetails) => Promise<{ ok: boolean, message?: string }>;
     onClose: () => void;
+}
+
+// Helper function to generate the batch ID
+function generateBatchID() {
+    // Get the current timestamp in milliseconds
+    const timestamp = Date.now().toString().slice(-6); // Take the last 6 digits of the timestamp
+    const randomNum = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a random number, and slice it to get 6 digits. Ensure it's 6 digits
+    return `B-${timestamp}${randomNum}`; // Combine the timestamp and random number, and add the prefix B-
 }
 
 const StockForm: React.FC<StockFormProps> = ({
@@ -68,6 +76,13 @@ const StockForm: React.FC<StockFormProps> = ({
     const [errors, setErrors] = useState<string[]>([]);
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
+    const [batchID, setBatchID] = useState<string>(""); // State to store the generated batch ID
+
+    // Generate the batch ID when the form is first opened
+    useEffect(() => {
+        const newBatchID = generateBatchID(); // Generate the batch ID
+        setBatchID(newBatchID); // Set the batch ID to state so it can be displayed
+    }, []);
 
     useEffect(() => {
         setFormDataList(
@@ -136,17 +151,17 @@ const StockForm: React.FC<StockFormProps> = ({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-    
+
         let formIsValid = true;
         let apiSuccess = false;
-    
+
         await Promise.all(formDataList.map(async (formData, index) => {
             if (!formData.product_id || !formData.branch_code || isNaN(parseInt(formData.quantity))) {
                 alert("Please fill all required fields correctly.");
                 formIsValid = false;
                 return;
             }
-    
+
             try {
                 let response;
                 if (isTransfer) {
@@ -156,6 +171,7 @@ const StockForm: React.FC<StockFormProps> = ({
                         return;
                     }
                     const stockDetails = {
+                        batch_id: batchID, // Use the generated batch ID
                         product_id: parseInt(formData.product_id),
                         source_branch: parseInt(formData.branch_code),
                         destination_branch: parseInt(destinationBranch),
@@ -174,7 +190,7 @@ const StockForm: React.FC<StockFormProps> = ({
                         branch_code: parseInt(formData.branch_code),
                         quantity: parseInt(formData.quantity),
                     };
-                    response = await addStock(stock);
+                    response = await addStock(stock, batchID); // Pass batch_id when adding stock
                     if (response.ok) {
                         setSuccessMessage("Stock successfully added!");
                         apiSuccess = true;
@@ -185,7 +201,7 @@ const StockForm: React.FC<StockFormProps> = ({
                 formIsValid = false;
             }
         }));
-    
+
         if (formIsValid && apiSuccess) {
             setShowSuccessModal(true);
             setTimeout(() => {
@@ -201,6 +217,12 @@ const StockForm: React.FC<StockFormProps> = ({
                 <h2 className={styles.modalHeading}>
                     {isTransfer ? 'Transfer Stocks' : 'Add Stocks'}
                 </h2>
+
+                {/* Display Batch ID */}
+                <div className={styles.batchIDContainer}>
+                    <p><strong>Batch ID:</strong> {batchID}</p>
+                </div>
+
                 <form onSubmit={handleSubmit}>
                     {isTransfer && (
                         <div>

@@ -14,12 +14,12 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-    const { product_id, source_branch, destination_branch, quantity, employee_id, note } = await request.json();
+    const { batch_id, product_id, source_branch, destination_branch, quantity, employee_id, note } = await request.json();
     try {
         console.log('Adding stock details to database...');
         const result = await query(
-            'INSERT INTO `stock_details` (product_id, source_branch, destination_branch, quantity, employee_id, note) VALUES (?, ?, ?, ?, ?, ?)',
-            [product_id, source_branch, destination_branch, quantity, employee_id || null, note || null]
+            'INSERT INTO `stock_details` (batch_id, action, product_id, source_branch, destination_branch, quantity, employee_id, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [batch_id, 'Transfer', product_id, source_branch, destination_branch, quantity, employee_id || 20, note || null]
         );
         console.log('Added stock_details:', result);
 

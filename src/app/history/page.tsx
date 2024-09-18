@@ -55,7 +55,7 @@ const HistoryPage: React.FC = () => {
   return (
     <Layout defaultTitle="History">
       <HistoryTabs filterAction={filterAction} setFilterAction={setFilterAction} />
-      {/* <StockDetailsTable stockDetails={filteredStockDetails} /> */}
+      <StockDetailsTable stockDetails={filteredStockDetails} />
     </Layout>
   );
 };
