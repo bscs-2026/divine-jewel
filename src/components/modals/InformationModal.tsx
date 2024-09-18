@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Employee } from '../page'; // Adjust the import path as needed
+import { format } from 'date-fns';
+import { Employee } from '@/app/employees/page';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 
@@ -23,6 +24,11 @@ const InformationModal: React.FC<InformationModalProps> = ({ isInfoModalOpen, on
         setShowPassword(!showPassword);
     };
 
+    const formatDate = (dateString: string): string => {
+        const date = new Date(dateString);
+        return format(date, 'MMMM d, yyyy');
+    };
+
     return (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
             <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
@@ -35,13 +41,13 @@ const InformationModal: React.FC<InformationModalProps> = ({ isInfoModalOpen, on
                         <strong>Last Name:</strong> {employee.last_name}
                     </div>
                     <div>
-                        <strong>Birth Date:</strong> {employee.birth_date? new Date(employee.birth_date).toLocaleDateString() : 'N/A'}
+                        <strong>Birth Date:</strong> {employee?.birth_date ? formatDate(employee.birth_date.toString()) : 'N/A'}
                     </div>
                     <div>
                         <strong>Address:</strong> {employee.address}
                     </div>
                     <div>
-                        <strong>Email Address:</strong> {employee.email_address}
+                        <strong>Email Address:</strong> {employee.email_address || 'N/A'}
                     </div>
                     <div>
                         <strong>Contact Number:</strong> {employee.contact_number}
