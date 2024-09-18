@@ -21,6 +21,7 @@ interface StockDetailIndividual {
   batch_id: string;
   date: string;
   action: string;
+  note: string;
   source_branch_name: string | null;
   destination_branch_name: string | null;
   employee_fullname: string;
@@ -81,6 +82,7 @@ const HistoryPage: React.FC = () => {
                 <p><strong>Source Branch:</strong> {stockMetadata.source_branch_name || 'N/A'}</p>
                 <p><strong>Destination Branch:</strong> {stockMetadata.destination_branch_name || 'N/A'}</p>
                 <p><strong>Employee:</strong> {stockMetadata.employee_fullname || 'N/A'}</p>
+                <p><strong>Note:</strong> {stockMetadata.note || 'N/A'}</p>
 
                 <br />
                 

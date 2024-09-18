@@ -18,6 +18,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             sd.batch_id, 
             sd.date, 
             sd.action, 
+            sd.note,
             b1.name AS source_branch_name, 
             b2.name AS destination_branch_name, 
             CONCAT(e.first_name, ' ', e.last_name) AS employee_fullname, 
