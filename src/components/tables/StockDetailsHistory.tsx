@@ -5,6 +5,7 @@ import styles from '../styles/Table.module.css';
 
 interface StockDetail {
   id: number;
+  bacth_id: number;
   date: string;
   action: string;
   source_branch_name: string | null;
@@ -23,12 +24,12 @@ const StockDetailsTable: React.FC<StockDetailsTableProps> = ({ stockDetails }) =
 
   const columns = useMemo(
     () => [
-      { Header: 'Batch ID', accessor: 'id' as keyof StockDetail, align: 'left' },
+      { Header: 'Batch ID', accessor: 'bacth_id' as keyof StockDetail, align: 'left' },
       { Header: 'Date', accessor: 'date' as keyof StockDetail, align: 'left' },
       { Header: 'Action', accessor: 'action' as keyof StockDetail, align: 'left' },
       { Header: 'Source', accessor: 'source_branch_name' as keyof StockDetail, align: 'left' },
       { Header: 'Destination', accessor: 'destination_branch_name' as keyof StockDetail, align: 'left' },
-      { Header: 'View', accessor: 'view' as keyof StockDetail, align: 'center' },
+      { Header: '', accessor: 'bacth_id' as keyof StockDetail, align: 'center' },
     ],
     []
   );
@@ -44,6 +45,7 @@ const StockDetailsTable: React.FC<StockDetailsTableProps> = ({ stockDetails }) =
     });
     return sortedData;
   }, [stockDetails, sortConfig]);
+
 
   const handleSort = (key: keyof StockDetail) => {
     let direction: 'asc' | 'desc' = 'asc';
@@ -83,12 +85,14 @@ const StockDetailsTable: React.FC<StockDetailsTableProps> = ({ stockDetails }) =
             {columns.map((column) => (
               <th
                 key={column.accessor as string}
-                onClick={() => column.accessor !== 'view' && handleSort(column.accessor)}
+
+
+                onClick={() => column.accessor !== 'bacth_id' && handleSort(column.accessor)}
                 className={`${styles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign}`}
               >
                 <div className={styles.sortContent}>
                   {column.Header}
-                  {column.accessor !== 'view' && renderSortIcon(column.accessor)}
+                  {column.accessor !== 'bacth_id' && renderSortIcon(column.accessor)}
                 </div>
               </th>
             ))}
@@ -96,14 +100,14 @@ const StockDetailsTable: React.FC<StockDetailsTableProps> = ({ stockDetails }) =
         </thead>
         <tbody>
           {sortedStockDetails.map((detail) => (
-            <tr key={detail.id} className={styles.tableRow}>
-              <td className={styles.td}>{detail.id}</td>
+            <tr key={detail.bacth_id} className={styles.tableRow}>
+              <td className={styles.td}>{detail.bacth_id}</td>
               <td className={styles.td}>{new Date(detail.date).toLocaleDateString()}</td>
               <td className={styles.td}>{detail.action}</td>
               <td className={styles.td}>{detail.source_branch_name || 'N/A'}</td>
               <td className={styles.td}>{detail.destination_branch_name || 'N/A'}</td>
               <td className={styles.td} style={{ textAlign: 'center' }}>
-                <button className={styles.viewButton} onClick={() => handleViewAction(detail.id)}>
+                <button className={styles.viewButton} onClick={() => handleViewAction(detail.bacth_id)}>
                   View
                 </button>
               </td>

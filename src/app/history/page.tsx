@@ -2,11 +2,12 @@
 'use client';
 import { useEffect, useState } from 'react';
 import Layout from '../../components/layout/Layout';
-import StockDetailsTable from '../../components/tables/StockDetails';
+import StockDetailsTable from '../../components/tables/StockDetailsHistory';
 import HistoryTabs from '../../components/tabs/HistoryTabs';
 
 interface StockDetail {
   id: number;
+  batch_id: number
   product_id: number;
   date: string;
   action: string;
@@ -36,7 +37,7 @@ const HistoryPage: React.FC = () => {
 
   const fetchStockDetails = async () => {
     try {
-      const response = await fetch('/api/stock_details');
+      const response = await fetch('/api,history/stockDetails');
       if (!response.ok) {
         throw new Error('Failed to fetch stock details');
       }
@@ -54,7 +55,7 @@ const HistoryPage: React.FC = () => {
   return (
     <Layout defaultTitle="History">
       <HistoryTabs filterAction={filterAction} setFilterAction={setFilterAction} />
-      <StockDetailsTable stockDetails={filteredStockDetails} />
+      {/* <StockDetailsTable stockDetails={filteredStockDetails} /> */}
     </Layout>
   );
 };

@@ -8,7 +8,7 @@ interface HistoryTabsProps {
 }
 
 const HistoryTabs: React.FC<HistoryTabsProps> = ({ filterAction, setFilterAction }) => {
-  const actions = ['All', 'Add', 'Transfer'];
+  const actions = ['Transaction', 'Stocks'];
 
   return (
     <div className={styles.tabsContainer}>
@@ -17,7 +17,7 @@ const HistoryTabs: React.FC<HistoryTabsProps> = ({ filterAction, setFilterAction
           <button
             key={action}
             className={`${styles.tabsContainerItem} ${
-              filterAction === (action === 'All' ? null : action.toLowerCase()) ? styles.active : styles.inactive
+              filterAction === (action === 'Transaction' ? null : action.toLowerCase()) ? styles.active : styles.inactive
             }`}
             onClick={() => setFilterAction(action === 'All' ? null : action.toLowerCase())}
           >
