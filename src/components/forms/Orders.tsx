@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-import { ArrowDropUp, ArrowDropDown} from '@mui/icons-material';
+import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
 import styles from '../styles/Form.module.css';
 
 const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) => {
@@ -151,11 +151,11 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                     </div>
                     {/* <div className={styles.verticalLine}></div> */}
                     {/* <div className={styles.headerRight}> */}
-                        <div className={styles.primary}>Cashier: Divine Villanueva</div>
-                        <div className={styles.primary}>Date : {currentDateTime.date}</div>
-                        <div className={styles.primary}>Time : {currentDateTime.time}</div>
-                        <div className={styles.primary}>{selectedBranch?.branch_name || 'No Branch'}</div>
-                        <div className={styles.secondary}>{selectedBranch?.branch_address || 'No Address'}</div>
+                    <div className={styles.primary}>Cashier: Divine Villanueva</div>
+                    <div className={styles.primary}>Date : {currentDateTime.date}</div>
+                    <div className={styles.primary}>Time : {currentDateTime.time}</div>
+                    <div className={styles.primary}>{selectedBranch?.branch_name || 'No Branch'}</div>
+                    <div className={styles.secondary}>{selectedBranch?.branch_address || 'No Address'}</div>
                     {/* </div> */}
                 </div>
                 <div className={styles.horizontalLine}></div>
@@ -187,7 +187,14 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                             <div>
                                 <CloseIcon className={styles.removeIcon} onClick={() => handleRemoveProduct(product.product_id)} />
                             </div>
-                            <div className={styles.productName}>{product.name}</div>
+                            <div
+                                className={styles.productName}>
+                                {product.name}
+                                <br />
+                                <p style={{ fontSize: '12px' }}>
+                                    {product.SKU} - {product.size} - {product.color}
+                                </p>
+                            </div>
                             <div className={styles.productQuantityWrapper}>
                                 <div className={styles.productQuantity}>
                                     <ArrowDropDown
@@ -195,12 +202,12 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                                         onClick={() => handleQuantityChange(product.product_id, -1)}
                                         disabled={productQuantities[product.product_id] === 0}
                                     />
-                            
+
                                     <input
                                         type="text"
                                         className={styles.customInput}
                                         value={productQuantities[product.product_id]}
-                                        readOnly
+                                    // readOnly
                                     />
                                     <ArrowDropUp
                                         // className={styles.quantityButton}
@@ -259,7 +266,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 >
                     New Order
                 </button>
-                
+
                 <button
                     onClick={handlePlaceOrder}
                     disabled={isLoading || isPlaceOrderDisabled}

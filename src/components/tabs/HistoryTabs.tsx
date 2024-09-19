@@ -11,16 +11,16 @@ const HistoryTabs: React.FC<HistoryTabsProps> = ({ selectedTab, setSelectedTab }
     <div className={styles.tabsContainer}>
       <div className={styles.leftTabs}>
         <button
-          className={`${styles.tabsContainerItem} ${selectedTab === 'transaction' ? styles.active : styles.inactive}`}
-          onClick={() => setSelectedTab('transaction')}
-        >
-          Transaction
-        </button>
-        <button
           className={`${styles.tabsContainerItem} ${selectedTab === 'stocks' ? styles.active : styles.inactive}`}
           onClick={() => setSelectedTab('stocks')}
         >
           Stocks
+        </button>
+        <button
+          className={`${styles.tabsContainerItem} ${selectedTab === 'transaction' ? styles.active : styles.inactive}`}
+          onClick={() => setSelectedTab('transaction')}
+        >
+          Transaction
         </button>
       </div>
     </div>

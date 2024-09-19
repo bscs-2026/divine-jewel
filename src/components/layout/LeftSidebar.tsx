@@ -38,12 +38,6 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
               Transactions
             </Link>
           </li>
-          <li className={styles.navItem} onClick={() => onSelectTitle('History')}>
-            <Link href="/history">
-              <FontAwesomeIcon icon={faHistory} className={styles.icon} />
-              History
-            </Link>
-          </li>
           <li className={styles.navItem} onClick={() => onSelectTitle('Products')}>
             <Link href="/products">
               <FontAwesomeIcon icon={faBox} className={styles.icon} />
@@ -66,6 +60,12 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
             <Link href="/employees">
               <FontAwesomeIcon icon={faUsers} className={styles.icon} />
               Employees
+            </Link>
+          </li>
+          <li className={styles.navItem} onClick={() => onSelectTitle('History')}>
+            <Link href="/history">
+              <FontAwesomeIcon icon={faHistory} className={styles.icon} />
+              History
             </Link>
           </li>
         </ul>
