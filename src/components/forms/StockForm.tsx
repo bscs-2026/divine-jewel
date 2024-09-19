@@ -8,10 +8,11 @@ interface Stock {
     branch_code: number;
     quantity: number;
     product_name: string;
-    branch_name: string;
+    branch_name: string | undefined;
     product_SKU: string;
+    category_name: string;
     product_size: string;
-    product_color: string;
+    product_color?: string;
 }
 
 interface StockDetails {

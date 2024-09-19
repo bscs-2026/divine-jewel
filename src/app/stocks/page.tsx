@@ -19,6 +19,7 @@ interface Stock {
     product_size: string;   
     product_color: string;
     branch_name: string;
+    last_updated: string;
 }
 
 interface Product {
@@ -84,11 +85,11 @@ export default function StocksPage() {
             const updatedStocks = stocksData.stocks.map((stock: Stock) => {
                 const branch = branchesData.branches.find((branch: Branch) => branch.id === stock.branch_code);
                 return { 
-                  ...stock, 
-                  branch_name: branch ? branch.name : 'Unknown',
-                  category_name: stock.category_name || 'Unknown',  // Ensure category_name is present
+                    ...stock, 
+                    branch_name: branch ? branch.name : 'Unknown',
+                    category_name: stock.category_name || 'Unknown',  // Ensure category_name is present
                 };
-              });
+            });
 
             setStocks(updatedStocks);
         } catch (error: any) {

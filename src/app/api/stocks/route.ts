@@ -49,3 +49,4 @@ export async function POST(request: NextRequest) {
     }
 }
 
+//curl -X GET 'http://divine-jewel.local:8000/api/stocks' | jq .
