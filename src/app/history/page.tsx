@@ -79,6 +79,7 @@ const HistoryPage: React.FC = () => {
                 <h2 className={styles.modalHeading}> Stock Details</h2>
                 <p><strong>Batch ID:</strong> {selectedBatchID}</p>
                 <p><strong>Date:</strong> {new Date(stockMetadata.date).toLocaleDateString()}</p>
+                <p><strong>Time:</strong> {new Date(stockMetadata.date).toLocaleTimeString()} </p>
                 <p><strong>Source Branch:</strong> {stockMetadata.source_branch_name || 'N/A'}</p>
                 <p><strong>Destination Branch:</strong> {stockMetadata.destination_branch_name || 'N/A'}</p>
                 <p><strong>Employee:</strong> {stockMetadata.employee_fullname || 'N/A'}</p>

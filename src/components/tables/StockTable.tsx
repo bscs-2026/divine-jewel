@@ -142,11 +142,11 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
         </thead>
         <tbody>
           {sortedStocks.map((stock) => (
-            <tr 
-            key={stock.id}
-            className={styles.tableRow}
-            onClick={() => handleRowSelect(stock)}
-            style={{ cursor: 'pointer' }} >
+            <tr
+              key={stock.id}
+              className={styles.tableRow}
+              onClick={() => handleRowSelect(stock)}
+              style={{ cursor: 'pointer' }} >
               <td>
                 <input
                   type="checkbox"
@@ -163,7 +163,9 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
               <td className={styles.td}>{stock.branch_name || 'Unknown'}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>{stock.quantity}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>
-                {new Date(stock.last_updated).toLocaleDateString()} {/* Format last_updated */}
+                {new Date(stock.last_updated).toLocaleDateString()} {/* Format date */}
+                <br />
+                {new Date(stock.last_updated).toLocaleTimeString()}
               </td>
             </tr>
           ))}
