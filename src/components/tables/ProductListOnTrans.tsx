@@ -69,9 +69,9 @@ const ProductList: React.FC<ProductListProps> = ({ products, onProductSelect, is
     const renderSortIcon = (key: keyof Product) => {
         const isActive = sortConfig.key === key;
         return (
-            <span className={key === 'stock' || key === 'price' ? styles.sortIconsRight : styles.sortIconsLeft}>
+            <span className={key === 'stock' || key === 'price' ? styles.sortIconsRight : styles.sortIconsLeft} >
                 <ArrowUpward className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'asc' ? styles.active : ''}`} />
-                <ArrowDownward className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'desc' ? styles.active : ''}`} />
+                <ArrowDownward className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'desc' ? styles.active : ''}`}  />
             </span>
         );
     };

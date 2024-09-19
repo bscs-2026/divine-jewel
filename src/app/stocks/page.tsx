@@ -15,6 +15,7 @@ interface Stock {
     quantity: number;
     product_name: string;
     product_SKU: string;
+    category_name: string;
     product_size: string;   
     product_color: string;
     branch_name: string;
@@ -82,8 +83,12 @@ export default function StocksPage() {
 
             const updatedStocks = stocksData.stocks.map((stock: Stock) => {
                 const branch = branchesData.branches.find((branch: Branch) => branch.id === stock.branch_code);
-                return { ...stock, branch_name: branch ? branch.name : 'Unknown' };
-            });
+                return { 
+                  ...stock, 
+                  branch_name: branch ? branch.name : 'Unknown',
+                  category_name: stock.category_name || 'Unknown',  // Ensure category_name is present
+                };
+              });
 
             setStocks(updatedStocks);
         } catch (error: any) {
