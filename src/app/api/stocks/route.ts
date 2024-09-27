@@ -10,6 +10,7 @@ export async function GET() {
         s.*,
         p.name AS product_name,
         p.SKU AS product_SKU,
+        c.name AS category_name,
         p.size AS product_size,
         p.color AS product_color,
         bc.address_line AS branch_name
@@ -17,6 +18,8 @@ export async function GET() {
         stocks s
       LEFT JOIN
         products p ON s.product_id = p.id
+      LEFT JOIN
+        category c ON p.category_id = c.id
       LEFT JOIN
         branches bc ON s.branch_code = bc.id
       ORDER BY
@@ -46,3 +49,4 @@ export async function POST(request: NextRequest) {
     }
 }
 
+//curl -X GET 'http://divine-jewel.local:8000/api/stocks' | jq .

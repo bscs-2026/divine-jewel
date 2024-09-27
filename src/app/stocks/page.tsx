@@ -14,10 +14,12 @@ interface Stock {
     branch_code: number;
     quantity: number;
     product_name: string;
-    product_SKU: string; 
+    product_SKU: string;
+    category_name: string;
     product_size: string;   
     product_color: string;
     branch_name: string;
+    last_updated: string;
 }
 
 interface Product {
@@ -36,6 +38,7 @@ interface Branch {
 }
 
 interface StockDetails {
+    batch_id: string;
     product_id: number;
     source_branch: number;
     destination_branch: number;
@@ -81,7 +84,11 @@ export default function StocksPage() {
 
             const updatedStocks = stocksData.stocks.map((stock: Stock) => {
                 const branch = branchesData.branches.find((branch: Branch) => branch.id === stock.branch_code);
-                return { ...stock, branch_name: branch ? branch.name : 'Unknown' };
+                return { 
+                    ...stock, 
+                    branch_name: branch ? branch.name : 'Unknown',
+                    category_name: stock.category_name || 'Unknown',  // Ensure category_name is present
+                };
             });
 
             setStocks(updatedStocks);
@@ -107,7 +114,7 @@ export default function StocksPage() {
         setIsModalOpen(true);
     };
 
-    const addStock = async (stock: Stock) => {
+    const addStock = async (stock: Stock, batch_id: string) => { // Accept batch_id as a parameter
         if (!stock.product_id || !stock.branch_code || isNaN(stock.quantity)) {
             console.error('Invalid stock data');
             return { ok: false, message: 'Invalid stock data' };
@@ -125,7 +132,11 @@ export default function StocksPage() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ branch_code: stock.branch_code, quantity: stock.quantity }),
+                body: JSON.stringify({ 
+                    branch_code: stock.branch_code, 
+                    quantity: stock.quantity, 
+                    batch_id // Include batch_id here 
+                }),
             });
     
             if (!response.ok) {
@@ -142,7 +153,7 @@ export default function StocksPage() {
     };
 
     const transferStock = async (stockDetails: StockDetails) => {
-        if (!stockDetails.product_id || !stockDetails.source_branch || !stockDetails.destination_branch || isNaN(stockDetails.quantity)) {
+        if (!stockDetails.batch_id || !stockDetails.product_id || !stockDetails.source_branch || !stockDetails.destination_branch || isNaN(stockDetails.quantity)) {
             console.error('Invalid stock transfer data');
             return { ok: false, message: 'Invalid stock transfer data' };
         }
@@ -171,6 +182,7 @@ export default function StocksPage() {
                     destination_branch: stockDetails.destination_branch,
                     quantity: stockDetails.quantity,
                     note: stockDetails.note,
+                    batch_id: stockDetails.batch_id, // Include batch_id here
                 }),
             });
     

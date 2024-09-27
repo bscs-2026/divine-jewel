@@ -42,13 +42,13 @@ const ProductTable: React.FC<ProductTableProps> = ({
   // Define columns for the table
   const columns = useMemo(
     () => [
-      { Header: 'SKU', accessor: 'SKU' as keyof Product, align: 'left' },
       { Header: 'Name', accessor: 'name' as keyof Product, align: 'left' },
+      { Header: 'SKU', accessor: 'SKU' as keyof Product, align: 'left' },
       { Header: 'Category', accessor: 'category_name' as keyof Product, align: 'left' },
       { Header: 'Size', accessor: 'size' as keyof Product, align: 'left' },
       { Header: 'Color', accessor: 'color' as keyof Product, align: 'left' },
-      { Header: 'Stock', accessor: 'stock' as keyof Product, align: 'right' },
       { Header: 'Price', accessor: 'price' as keyof Product, align: 'right' },
+      { Header: 'Stock', accessor: 'stock' as keyof Product, align: 'right' },
     ],
     []
   );
@@ -116,13 +116,13 @@ const ProductTable: React.FC<ProductTableProps> = ({
         <tbody>
           {sortedProducts.map((product) => (
             <tr key={product.id} className={styles.tableRow}>
-              <td className={styles.td}>{product.SKU}</td>
               <td className={styles.td}>{product.name}</td>
+              <td className={styles.td}>{product.SKU}</td>
               <td className={styles.td}>{product.category_name}</td>
               <td className={styles.td}>{product.size}</td>
               <td className={styles.td}>{product.color}</td>
-              <td className={`${styles.td} ${styles.rightAlign}`}>{product.stock}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>₱{product.price}</td>
+              <td className={`${styles.td} ${styles.rightAlign}`}>{product.stock}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>    
                 <Edit
                   onClick={() => editProduct(product.id)} 
