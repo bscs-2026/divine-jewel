@@ -34,7 +34,7 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
     () => [
       { Header: 'Product', accessor: 'product_name' as keyof Stock, align: 'left' },
       { Header: 'SKU', accessor: 'product_SKU' as keyof Stock, align: 'left' },
-      { Header: 'Category', accessor: 'category_name' as keyof Stock, align: 'left' },
+      // { Header: 'Category', accessor: 'category_name' as keyof Stock, align: 'left' },
       { Header: 'Size', accessor: 'product_size' as keyof Stock, align: 'left' },
       { Header: 'Color', accessor: 'product_color' as keyof Stock, align: 'left' },
       { Header: 'Branch', accessor: 'branch_name' as keyof Stock, align: 'left' },
@@ -157,14 +157,14 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
               </td>
               <td className={styles.td}>{stock.product_name}</td>
               <td className={styles.td}>{stock.product_SKU || 'Unknown'}</td>
-              <td className={styles.td}>{stock.category_name || 'Unknown'}</td>
+              {/* <td className={styles.td}>{stock.category_name || 'Unknown'}</td> */}
               <td className={styles.td}>{stock.product_size || 'Unknown'}</td>
               <td className={styles.td}>{stock.product_color || 'Unknown'}</td>
               <td className={styles.td}>{stock.branch_name || 'Unknown'}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>{stock.quantity}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>
                 {new Date(stock.last_updated).toLocaleDateString()} {/* Format date */}
-                <br />
+                {/* <br /> */}
                 {new Date(stock.last_updated).toLocaleTimeString()}
               </td>
             </tr>

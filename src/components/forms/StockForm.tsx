@@ -78,11 +78,30 @@ const StockForm: React.FC<StockFormProps> = ({
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
     const [batchID, setBatchID] = useState<string>(""); // State to store the generated batch ID
+    const [currentTime, setCurrentTime] = useState<string>("");
+    const employeeFullname = 'Divine Villanueva'; //hardcoded for now
 
     // Generate the batch ID when the form is first opened
     useEffect(() => {
         const newBatchID = generateBatchID(); // Generate the batch ID
         setBatchID(newBatchID); // Set the batch ID to state so it can be displayed
+    }, []);
+
+    useEffect(() => {
+        const updateTime = () => {
+            const now = new Date();
+            setCurrentTime(now.toLocaleTimeString('en-US', {
+                timeZone: 'Asia/Manila',
+                hour: '2-digit',
+                minute: '2-digit',
+                // second: '2-digit',
+                hour12: true
+            }));
+        };
+        updateTime(); // Initialize with the current time
+        const intervalId = setInterval(updateTime, 1000); // Update time every second
+
+        return () => clearInterval(intervalId); // Clean up the interval on component unmount
     }, []);
 
     useEffect(() => {
@@ -222,11 +241,16 @@ const StockForm: React.FC<StockFormProps> = ({
                 {/* Display Batch ID */}
                 <div className={styles.batchIDContainer}>
                     <p><strong>Batch ID:</strong> {batchID}</p>
+                    <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p> 
+                    <p><strong>Time:</strong> {currentTime}</p>
+                    <p><strong>Employee:</strong> {employeeFullname}</p> 
                 </div>
+                <br />
 
                 <form onSubmit={handleSubmit}>
                     {isTransfer && (
                         <div>
+                            <label className={styles.modalInputLabel}>Destination Branch:</label>
                             <select
                                 name="destination_branch"
                                 value={destinationBranch}
@@ -243,7 +267,8 @@ const StockForm: React.FC<StockFormProps> = ({
                                     </option>
                                 ))}
                             </select>
-
+                            
+                            
                             <input
                                 type="text"
                                 name="transfer_note"
@@ -264,7 +289,7 @@ const StockForm: React.FC<StockFormProps> = ({
                             <div>
                                 <p className={styles.modalPrimary}>{selectedStocks[index]?.product_name}</p>
                                 <p className={styles.modalSecondary}> {selectedStocks[index]?.product_SKU} |  {selectedStocks[index]?.product_size} | {selectedStocks[index]?.product_color}</p>
-                                <p className={styles.modalSecondary}>{selectedStocks[index]?.branch_name}</p>
+                                <p className={styles.modalSecondary}> {selectedStocks[index]?.branch_name}</p>
                             </div>
                             <div>
                                 <input
