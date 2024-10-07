@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from '../styles/Modal.module.css';
 import { ArrowBack } from '@mui/icons-material';
+import { generateBatchID } from '../../lib/helpers';
 
 interface Stock {
     id: number;
@@ -43,14 +44,6 @@ interface StockFormProps {
     addStock: (stock: Stock, batch_id: string) => Promise<{ ok: boolean, message?: string }>;
     transferStock: (stockDetails: StockDetails) => Promise<{ ok: boolean, message?: string }>;
     onClose: () => void;
-}
-
-// Helper function to generate the batch ID
-function generateBatchID() {
-    // Get the current timestamp in milliseconds
-    const timestamp = Date.now().toString().slice(-6); // Take the last 6 digits of the timestamp
-    const randomNum = Math.floor(100000 + Math.random() * 900000).toString(); // Generate a random number, and slice it to get 6 digits. Ensure it's 6 digits
-    return `B-${timestamp}${randomNum}`; // Combine the timestamp and random number, and add the prefix B-
 }
 
 const StockForm: React.FC<StockFormProps> = ({

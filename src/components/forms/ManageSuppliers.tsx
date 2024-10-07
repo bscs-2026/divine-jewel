@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Edit, Delete } from '@mui/icons-material';
-import DeleteConfirmationModal from '../modals/DeleteConfirmationModal';
 import styles from '../styles/Modal.module.css';
 
 interface Supplier {
@@ -36,13 +35,70 @@ const ManageSuppliers: React.FC<ManageSuppliersProps> = ({
   const [formData, setFormData] = useState<Supplier>(initialFormData);
   const [editingSupplierId, setEditingSupplierId] = useState<number | null>(null);
   const [action, setAction] = useState<'add' | 'edit' | null>(null);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [supplierToDelete, setSupplierToDelete] = useState<{ id: number | null; name: string | null }>({
+    id: null,
+    name: null,
+  });
+
+  const isDuplicateSupplierName = (name: string): boolean => {
+    return suppliers.some(
+      (supplier) =>
+        supplier.supplier_name.toLowerCase() === name.toLowerCase() &&
+        supplier.id !== editingSupplierId
+    );
+  };
+
+  const validateForm = (): boolean => {
+    let formIsValid = true;
+    const newErrors: { [key: string]: string } = {};
+
+    if (!formData.supplier_name.trim()) {
+      newErrors.supplier_name = 'Supplier name is required';
+      formIsValid = false;
+    } else if (isDuplicateSupplierName(formData.supplier_name)) {
+      setErrorMessage('Supplier name already exists');
+      setShowErrorModal(true);
+      setTimeout(() => setShowErrorModal(false), 2000);
+      formIsValid = false;
+    }
+
+    if (!formData.contact_info?.trim()) {
+      newErrors.contact_info = 'Contact info is required';
+      formIsValid = false;
+    }
+
+    if (!formData.address?.trim()) {
+      newErrors.address = 'Address is required';
+      formIsValid = false;
+    }
+
+    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Valid email is required';
+      formIsValid = false;
+    }
+
+    if (!formData.phone_number || !/^\d+$/.test(formData.phone_number)) {
+      newErrors.phone_number = 'Valid phone number is required';
+      formIsValid = false;
+    }
+
+    setErrors(newErrors);
+    return formIsValid;
+  };
 
   const handleAddSupplier = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.supplier_name.trim() === '') return;
-    addSupplier(formData);
-    setFormData(initialFormData);
-    setAction(null);
+    if (validateForm()) {
+      addSupplier(formData);
+      setFormData(initialFormData);
+      setAction(null);
+      setErrors({});
+    }
   };
 
   const handleEditSupplier = (supplier: Supplier) => {
@@ -53,23 +109,38 @@ const ManageSuppliers: React.FC<ManageSuppliersProps> = ({
 
   const handleSaveEditSupplier = (e: React.FormEvent) => {
     e.preventDefault();
-    if (formData.supplier_name.trim() === '') return;
-    editSupplier(formData);
-    setFormData(initialFormData);
-    setEditingSupplierId(null);
-    setAction(null);
+    if (validateForm()) {
+      editSupplier(formData);
+      setFormData(initialFormData);
+      setEditingSupplierId(null);
+      setAction(null);
+      setErrors({});
+    }
   };
 
-  const handleDeleteSupplier = (id: number) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this supplier?');
-    if (!confirmDelete) return;
-    deleteSupplier(id);
+  const handleDeleteSupplier = (id: number, name: string) => {
+    setSupplierToDelete({ id, name });
+    setShowDeleteModal(true);
+  };
+
+  const confirmDeleteSupplier = () => {
+    if (supplierToDelete.id !== null) {
+      deleteSupplier(supplierToDelete.id);
+      setShowDeleteModal(false);
+      setSupplierToDelete({ id: null, name: null });
+    }
+  };
+
+  const cancelDeleteSupplier = () => {
+    setShowDeleteModal(false);
+    setSupplierToDelete({ id: null, name: null });
   };
 
   const handleCancelEdit = () => {
     setFormData(initialFormData);
     setEditingSupplierId(null);
     setAction(null);
+    setErrors({});
   };
 
   return (
@@ -81,39 +152,59 @@ const ManageSuppliers: React.FC<ManageSuppliersProps> = ({
           <form className={styles.modalForm} onSubmit={action === 'add' ? handleAddSupplier : handleSaveEditSupplier}>
             <input
               type="text"
-              placeholder="Supplier Name"
+              placeholder={errors.supplier_name || 'Supplier Name'}
               value={formData.supplier_name}
-              onChange={(e) => setFormData({ ...formData, supplier_name: e.target.value })}
-              className={styles.modalInput}
+              onChange={(e) => {
+                setFormData({ ...formData, supplier_name: e.target.value });
+                setErrors({ ...errors, supplier_name: '' });
+              }}
+              className={`${styles.modalInput} ${errors.supplier_name ? styles.inputError : ''}`}
             />
+
             <input
               type="text"
-              placeholder="Contact Info"
+              placeholder={errors.contact_info || 'Contact Info'}
               value={formData.contact_info}
-              onChange={(e) => setFormData({ ...formData, contact_info: e.target.value })}
-              className={styles.modalInput}
+              onChange={(e) => {
+                setFormData({ ...formData, contact_info: e.target.value });
+                setErrors({ ...errors, contact_info: '' });
+              }}
+              className={`${styles.modalInput} ${errors.contact_info ? styles.inputError : ''}`}
             />
+
             <input
               type="text"
-              placeholder="Address"
+              placeholder={errors.address || 'Address'}
               value={formData.address}
-              onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-              className={styles.modalInput}
+              onChange={(e) => {
+                setFormData({ ...formData, address: e.target.value });
+                setErrors({ ...errors, address: '' });
+              }}
+              className={`${styles.modalInput} ${errors.address ? styles.inputError : ''}`}
             />
+
             <input
               type="email"
-              placeholder="Email"
+              placeholder={errors.email || 'Email'}
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className={styles.modalInput}
+              onChange={(e) => {
+                setFormData({ ...formData, email: e.target.value });
+                setErrors({ ...errors, email: '' });
+              }}
+              className={`${styles.modalInput} ${errors.email ? styles.inputError : ''}`}
             />
+
             <input
               type="text"
-              placeholder="Phone Number"
+              placeholder={errors.phone_number || 'Phone Number'}
               value={formData.phone_number}
-              onChange={(e) => setFormData({ ...formData, phone_number: e.target.value })}
-              className={styles.modalInput}
+              onChange={(e) => {
+                setFormData({ ...formData, phone_number: e.target.value });
+                setErrors({ ...errors, phone_number: '' });
+              }}
+              className={`${styles.modalInput} ${errors.phone_number ? styles.inputError : ''}`}
             />
+
             <div className={styles.modalMediumButtonContainer}>
               <button
                 type="button"
@@ -147,9 +238,9 @@ const ManageSuppliers: React.FC<ManageSuppliersProps> = ({
                     onClick={() => handleEditSupplier(supplier)}
                     className={styles.modalEditButton}
                   />
-    
+
                   <Delete
-                    onClick={() => handleDeleteSupplier(supplier.id!)}
+                    onClick={() => handleDeleteSupplier(supplier.id!, supplier.supplier_name)}
                     className={styles.modalDeleteIcon}
                   />
                 </td>
@@ -171,6 +262,26 @@ const ManageSuppliers: React.FC<ManageSuppliersProps> = ({
           </button>
         </div>
       </div>
+
+      {showErrorModal && (
+        <div className={styles.errorModal}>
+          <p>{errorMessage}</p>
+        </div>
+      )}
+
+      {showDeleteModal && (
+        <div className={styles.deleteModal}>
+          <p>Are you sure you want to remove {supplierToDelete.name} as your supplier?</p>
+          <div className={styles.modalMediumButtonContainer}>
+            <button onClick={confirmDeleteSupplier} className={styles.modalMediumButton}>
+              Confirm
+            </button>
+            <button onClick={cancelDeleteSupplier} className={styles.modalMediumButton}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

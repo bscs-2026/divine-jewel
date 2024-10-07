@@ -22,12 +22,17 @@ const SupplierTabs: React.FC<SupplierTabsProps> = ({
   handleAddSupply,
   toggleManageSuppliers,
 }) => {
+  const handleSupplierClick = (id: number | string | null) => {
+    // console.log("Supplier clicked, ID:", id);
+    setFilterSupplier(id);
+  };
+
   return (
     <div className={styles.tabsContainer}>
       <div className={styles.leftTabs}>
         <button
           className={`${styles.tabsContainerItem} ${filterSupplier === null ? styles.active : styles.inactive}`}
-          onClick={() => setFilterSupplier(null)}
+          onClick={() => handleSupplierClick(null)}
         >
           All
         </button>
@@ -35,7 +40,7 @@ const SupplierTabs: React.FC<SupplierTabsProps> = ({
           <button
             key={supplier.id}
             className={`${styles.tabsContainerItem} ${filterSupplier === supplier.id ? styles.active : styles.inactive}`}
-            onClick={() => setFilterSupplier(supplier.id)}
+            onClick={() => handleSupplierClick(supplier.id)} // Set the supplier ID on click
           >
             {supplier.supplier_name}
           </button>

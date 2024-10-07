@@ -2,70 +2,48 @@
 
 import React, { useState, useEffect } from 'react';
 import Layout from '../../components/layout/Layout';
-import SupplyTable from '../../components/tables/SupplyTable';
+import SupplyTable from '../../components/tables/Supply';
 import SupplierTabs from '../../components/tabs/SupplierTabs';
-import SupplyForm from '../../components/forms/SupplyForm';
+import SupplyForm from '../../components/forms/Supply';
 import ManageSuppliers from '../../components/forms/ManageSuppliers';
 import Modal from '../../components/modals/Modal';
+import SupplyBatchForm from '../../components/forms/SupplyBatch';
+import { generateBatchID } from '../../lib/helpers';
 
 interface Supplier {
   id: number;
   supplier_name: string;
-  contact_info?: string;
-  address?: string;
-  email?: string;
-  phone_number?: string;
 }
 
 interface Supply {
   id: number;
-  supply_date?: string;
   supplier_id: number;
-  sku?: string;
-  material_name: string;
-  quantity: number;
-  unit_of_measure: string;
-  price_per_unit: number;
-  total_cost?: number;
-  destination_branch_id?: number;
-  employee_id?: number;
-  note?: string;
-  status: 'pending' | 'delivered' | 'cancelled';
+  batch_id: string;
+  supply_date: string;
+  supplier_name: string;
+  status: 'Pending' | 'Delivered' | 'Cancelled';
 }
 
 const SuppliesPage: React.FC = () => {
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [filterSupplier, setFilterSupplier] = useState<number | string | null>(null);
   const [supplies, setSupplies] = useState<Supply[]>([]);
-  const [currentSupply, setCurrentSupply] = useState<Supply | null>(null);
-  const [selectedSupplier, setSelectedSupplier] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isManageSuppliersModalOpen, setIsManageSuppliersModalOpen] = useState(false);
-  const [editingSupply, setEditingSupply] = useState<boolean>(false);
+  const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
+  const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
 
   useEffect(() => {
     fetchSuppliers();
     fetchSupplies();
   }, []);
 
-  const openModal = () => setIsModalOpen(true);
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setCurrentSupply(null);
-    setEditingSupply(false);
-  };
-
-  const toggleManageSuppliers = () => setIsManageSuppliersModalOpen(!isManageSuppliersModalOpen);
-
   const fetchSupplies = async () => {
     try {
       const response = await fetch('/api/supply');
       const data = await response.json();
-
       if (data && Array.isArray(data.supply_data)) {
         setSupplies(data.supply_data);
-      } else {
-        throw new Error('Supplies data is not an array');
       }
     } catch (error) {
       console.error('Failed to fetch supplies:', error);
@@ -76,155 +54,121 @@ const SuppliesPage: React.FC = () => {
     try {
       const response = await fetch('/api/supply/suppliers');
       const data = await response.json();
-
       if (data && Array.isArray(data.suppliers)) {
         setSuppliers(data.suppliers);
-      } else if (Array.isArray(data)) {
-        setSuppliers(data);
-      } else {
-        console.error('Suppliers data is not an array:', data);
       }
     } catch (error) {
       console.error('Failed to fetch suppliers:', error);
     }
   };
 
-  const addSupplier = async (supplier: Supplier) => {
-    try {
-      const response = await fetch('/api/supply/suppliers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(supplier),
-      });
-
-      if (!response.ok) throw new Error('Failed to add supplier');
-
-      await fetchSuppliers();
-    } catch (error) {
-      console.error('Failed to add supplier:', error);
-    }
-
+  const fetchSupplyDetails = (batch_id: string) => {
+    setSelectedBatchId(batch_id);
+    setIsBatchModalOpen(true);
   };
 
-  const editSupplier = async (supplier: Supplier) => {
-    if (!supplier.id) return;
-
-    try {
-      const response = await fetch(`/api/supply/suppliers/${supplier.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(supplier),
-      });
-
-      if (!response.ok) throw new Error('Failed to edit supplier');
-
-      await fetchSuppliers();
-    } catch (error) {
-      console.error('Failed to edit supplier:', error);
-    }
+  const closeBatchModal = () => {
+    setSelectedBatchId(null);
+    setIsBatchModalOpen(false);
   };
 
-  const deleteSupplier = async (id: number) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this supplier?');
-    if (!confirmDelete) return;
-
+  const addSupply = async (supplies: Supply[], status: 'Pending' | 'Delivered'): Promise<{ ok: boolean }> => {
     try {
-      const response = await fetch(`/api/supply/suppliers/${id}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const batchID = generateBatchID();
+      const suppliesWithBatchID = supplies.map(supply => ({ ...supply, batch_id: batchID }));
 
-      if (!response.ok) throw new Error('Failed to delete supplier');
-
-      await fetchSuppliers();
-    } catch (error) {
-      console.error('Failed to delete supplier:', error);
-    }
-  };
-
-  const addSupply = async (supply: Supply) => {
-    try {
       const response = await fetch('/api/supply', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(supply),
+        body: JSON.stringify({ supplies: suppliesWithBatchID }),
       });
 
-      if (!response.ok) throw new Error('Failed to add supply');
+      if (!response.ok) {
+        throw new Error('Failed to add supplies');
+      }
 
       await fetchSupplies();
+      return { ok: true };
     } catch (error) {
-      console.error('Failed to add supply:', error);
-    }
-    closeModal();
-    alert('Supply added successfully.');
-  };
-
-  const editSupply = (supplyId: number) => {
-    const supplyToEdit = supplies.find((supply) => supply.id === supplyId);
-    if (supplyToEdit) {
-      setCurrentSupply(supplyToEdit);
-      setSelectedSupplier(supplyToEdit.supplier_id);
-      setEditingSupply(true);
-      openModal();
+      console.error('Failed to add supplies:', error);
+      return { ok: false };
     }
   };
-
-  const saveSupply = async (supply: Supply) => {
-    if (!currentSupply) return;
-  
-    const updatedSupply = {
-      ...currentSupply,
-      ...supply, // Merging new supply data
-    };
-  
-    try {
-      const response = await fetch(`/api/supply/${currentSupply.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedSupply),
-      });
-  
-      if (!response.ok) throw new Error('Failed to save supply');
-  
-      setEditingSupply(false);
-      setCurrentSupply(null);
-      setSelectedSupplier(null);
-      await fetchSupplies(); // Refetch supplies to update the table
-    } catch (error) {
-      console.error('Failed to save supply:', error);
-    }
-    closeModal();
-    alert('Successfully updated supply data.');
-  };
-  
 
   const deleteSupply = async (id: number) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this supply data? This cannot be retrieved once confirmed.');
-    if (!confirmDelete) return;
-
     try {
       const response = await fetch(`/api/supply/${id}`, {
         method: 'DELETE',
       });
-
-      if (!response.ok) throw new Error('Failed to delete supply');
-
-      await fetchSupplies();
+      if (!response.ok) {
+        throw new Error('Failed to delete supply');
+      }
+      setSupplies((prevSupplies) => prevSupplies.filter((supply) => supply.id !== id));
     } catch (error) {
-      console.error('Failed to delete supply:', error);
+      console.error('Error deleting supply:', error);
     }
   };
 
-  const handleCancelEdit = () => {
-    setEditingSupply(false);
-    setCurrentSupply(null);
-    setSelectedSupplier(null);
-    closeModal();
+  const deleteSupplier = async (id: number) => {
+    try {
+      const response = await fetch(`/api/supply/suppliers/${id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete supplier');
+      }
+      setSuppliers((prevSuppliers) => prevSuppliers.filter((supplier) => supplier.id !== id));
+    } catch (error) {
+      console.error('Error deleting supplier:', error);
+    }
   };
 
+  const addSupplier = async (newSupplier: Supplier) => {
+    try {
+      const response = await fetch('/api/supply/suppliers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newSupplier),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to add supplier');
+      }
+
+      await fetchSuppliers();
+    } catch (error) {
+      console.error('Error adding supplier:', error);
+    }
+  };
+
+  const editSupplier = async (updatedSupplier: Supplier) => {
+    try {
+      const response = await fetch(`/api/supply/suppliers/${updatedSupplier.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedSupplier),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to edit supplier');
+      }
+
+      setSuppliers((prevSuppliers) =>
+        prevSuppliers.map((supplier) =>
+          supplier.id === updatedSupplier.id ? updatedSupplier : supplier
+        )
+      );
+    } catch (error) {
+      console.error('Error editing supplier:', error);
+    }
+  };
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+  const toggleManageSuppliers = () => setIsManageSuppliersModalOpen(!isManageSuppliersModalOpen);
+
   const filteredSupplies = filterSupplier
-    ? supplies.filter((supply) => supply.supplier_id === filterSupplier)
+    ? supplies.filter(supply => supply.supplier_id === filterSupplier)
     : supplies;
 
   return (
@@ -239,22 +183,18 @@ const SuppliesPage: React.FC = () => {
 
       <SupplyTable
         supplies={filteredSupplies}
-        suppliers={suppliers}
+        fetchSupplyDetails={fetchSupplyDetails}
         filterSupplier={filterSupplier}
-        editSupply={editSupply}
-        deleteSupply={deleteSupply}
       />
 
+      {selectedBatchId && (
+        <Modal show={isBatchModalOpen} onClose={closeBatchModal}>
+          <SupplyBatchForm batchId={selectedBatchId} onClose={closeBatchModal} />
+        </Modal>
+      )}
+
       <Modal show={isModalOpen} onClose={closeModal}>
-        <SupplyForm
-          currentSupply={currentSupply}
-          addSupply={addSupply}
-          saveSupply={saveSupply}
-          suppliers={suppliers}
-          selectedSupplier={selectedSupplier}
-          setSelectedSupplier={setSelectedSupplier}
-          handleCancelEdit={handleCancelEdit}
-        />
+        <SupplyForm addSupply={addSupply} suppliers={suppliers} onClose={closeModal} />
       </Modal>
 
       <Modal show={isManageSuppliersModalOpen} onClose={toggleManageSuppliers}>
