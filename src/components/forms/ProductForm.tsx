@@ -99,25 +99,20 @@ const ProductForm: React.FC<ProductFormProps> = ({
       validateSKU(value);
     }
 
-    if (name === "price") {
-      setProductPrice(value);
-      validatePrice(value);
-    }
-
-    // Other fields
-    if (name === "name") {
-      setProductName(value);
-      if (!value) setErrors((prev) => ({ ...prev, name: "This field is required." }));
-      else setErrors((prev) => {
-        const { name, ...rest } = prev;
-        return rest;
-      });
-    }
     if (name === "category_id") {
       setSelectedCategory(value ? Number(value) : null);
       if (!value) setErrors((prev) => ({ ...prev, category: "This field is required." }));
       else setErrors((prev) => {
         const { category, ...rest } = prev;
+        return rest;
+      });
+    }
+
+    if (name === "name") {
+      setProductName(value);
+      if (!value) setErrors((prev) => ({ ...prev, name: "This field is required." }));
+      else setErrors((prev) => {
+        const { name, ...rest } = prev;
         return rest;
       });
     }
@@ -138,6 +133,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
         return rest;
       });
     }
+
+    if (name === "price") {
+      setProductPrice(value);
+      validatePrice(value);
+    }
+
   };
 
   const handleFormSubmit = (event: React.FormEvent) => {
@@ -145,11 +146,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
     // Ensure all fields are filled and valid
     if (!productSKU) validateSKU(productSKU);
+    if (selectedCategory === null) setErrors((prev) => ({ ...prev, category: "This field is required." }));
     if (!productName) setErrors((prev) => ({ ...prev, name: "This field is required." }));
     if (!productSize) setErrors((prev) => ({ ...prev, size: "This field is required." }));
     if (!productColor) setErrors((prev) => ({ ...prev, color: "This field is required." }));
     if (!productPrice) validatePrice(productPrice);
-    if (selectedCategory === null) setErrors((prev) => ({ ...prev, category: "This field is required." }));
 
     // Prevent submission if there are any validation errors
     if (Object.keys(errors).length > 0 || !productSKU || !productName || !productSize || !productColor || !productPrice || selectedCategory === null) {
@@ -211,18 +212,18 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </label>
           <select
             name="category_id"
-            value={selectedCategory ?? ''}  
-            onChange={handleInputChange}    
+            value={selectedCategory ?? ''}
+            onChange={handleInputChange}
             className={styles.modalSelect}
           >
-            <option value="">Product Category</option> 
+            <option value="">Product Category</option>
             {categories.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
               </option>
             ))}
           </select>
-          {errors.category && <p className={styles.modalErrorText}>{errors.category}</p>} 
+          {errors.category && <p className={styles.modalErrorText}>{errors.category}</p>}
 
           <label className={styles.modalInputLabel}>
             Name
@@ -235,7 +236,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             onChange={handleInputChange}
             className={styles.modalInput}
           />
-          {errors.name && <p className={styles.modalErrorText}>{errors.name}</p>} 
+          {errors.name && <p className={styles.modalErrorText}>{errors.name}</p>}
 
           <label className={styles.modalInputLabel}>
             Size
@@ -248,7 +249,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             onChange={handleInputChange}
             className={styles.modalInput}
           />
-          {errors.size && <p className={styles.modalErrorText}>{errors.size}</p>} 
+          {errors.size && <p className={styles.modalErrorText}>{errors.size}</p>}
           <label className={styles.modalInputLabel}>
             Color
           </label>
@@ -273,7 +274,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             className={styles.modalInput}
             min="0"
           />
-          {errors.price && <p className={styles.modalErrorText}>{errors.price}</p>} 
+          {errors.price && <p className={styles.modalErrorText}>{errors.price}</p>}
 
           <div className={styles.modalMediumButtonContainer}>
             <button type="submit" className={styles.modalMediumButton} disabled={Object.keys(errors).length > 0}>
