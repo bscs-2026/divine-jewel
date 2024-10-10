@@ -47,7 +47,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const [productSize, setProductSize] = useState<string>('');
   const [productColor, setProductColor] = useState<string>('');
   const [productPrice, setProductPrice] = useState<string>('');
-  const [errors, setErrors] = useState<{ [key: string]: string }>({}); // Track errors for each input
+  const [validationErrors, setValidationErrors] = useState<{ [field: string]: string }>({});
 
   useEffect(() => {
     if (editingProduct && currentProduct) {
@@ -63,105 +63,104 @@ const ProductForm: React.FC<ProductFormProps> = ({
       setProductSize('');
       setProductColor('');
       setProductPrice('');
-      setSelectedCategory(null); // Set category to null for new products
+      setSelectedCategory(null);
     }
   }, [currentProduct, editingProduct, setSelectedCategory]);
-
-  // Validate SKU length (between 1 and 15 characters)
-  const validateSKU = (sku: string) => {
-    if (sku.length < 1 || sku.length > 15) {
-      setErrors((prev) => ({ ...prev, SKU: "SKU must be between 1 and 15 characters." }));
-    } else {
-      setErrors((prev) => {
-        const { SKU, ...rest } = prev;
-        return rest; // Remove the SKU error if validation passes
-      });
-    }
-  };
-
-  // Validate Price (must be a positive number)
-  const validatePrice = (price: string) => {
-    if (price === '' || parseFloat(price) < 0) {
-      setErrors((prev) => ({ ...prev, price: "Price cannot be empty or a negative value." }));
-    } else {
-      setErrors((prev) => {
-        const { price, ...rest } = prev;
-        return rest; // Remove the price error if validation passes
-      });
-    }
-  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
     if (name === "SKU") {
       setProductSKU(value);
-      validateSKU(value);
+      setValidationErrors(prev => ({ ...prev, SKU: '' }));
     }
 
     if (name === "category_id") {
       setSelectedCategory(value ? Number(value) : null);
-      if (!value) setErrors((prev) => ({ ...prev, category: "This field is required." }));
-      else setErrors((prev) => {
-        const { category, ...rest } = prev;
-        return rest;
-      });
+      setValidationErrors(prev => ({ ...prev, category: '' }));
     }
 
     if (name === "name") {
       setProductName(value);
-      if (!value) setErrors((prev) => ({ ...prev, name: "This field is required." }));
-      else setErrors((prev) => {
-        const { name, ...rest } = prev;
-        return rest;
-      });
+      setValidationErrors(prev => ({ ...prev, name: '' }));
     }
 
     if (name === "size") {
       setProductSize(value);
-      if (!value) setErrors((prev) => ({ ...prev, size: "This field is required." }));
-      else setErrors((prev) => {
-        const { size, ...rest } = prev;
-        return rest;
-      });
+      setValidationErrors(prev => ({ ...prev, size: '' }));
     }
+
     if (name === "color") {
       setProductColor(value);
-      if (!value) setErrors((prev) => ({ ...prev, color: "This field is required." }));
-      else setErrors((prev) => {
-        const { color, ...rest } = prev;
-        return rest;
-      });
+      setValidationErrors(prev => ({ ...prev, color: '' }));
     }
 
     if (name === "price") {
-      setProductPrice(value);
-      validatePrice(value);
+      if (value === '' || (Number(value) >= 0 && !isNaN(Number(value)))) {
+        setProductPrice(value);
+      }
+      setValidationErrors(prev => ({ ...prev, price: '' }));
     }
-
   };
 
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    // Ensure all fields are filled and valid
-    if (!productSKU) validateSKU(productSKU);
-    if (selectedCategory === null) setErrors((prev) => ({ ...prev, category: "This field is required." }));
-    if (!productName) setErrors((prev) => ({ ...prev, name: "This field is required." }));
-    if (!productSize) setErrors((prev) => ({ ...prev, size: "This field is required." }));
-    if (!productColor) setErrors((prev) => ({ ...prev, color: "This field is required." }));
-    if (!productPrice) validatePrice(productPrice);
+    let formIsValid = true;
+    let errors: { [field: string]: string } = {};
 
-    // Prevent submission if there are any validation errors
-    if (Object.keys(errors).length > 0 || !productSKU || !productName || !productSize || !productColor || !productPrice || selectedCategory === null) {
-      alert('Please fill out all the required fields before submitting.');
+    // Validate SKU length (between 1 and 15 characters)
+    if (!productSKU) {
+      errors.SKU = "SKU is required";
+      formIsValid = false;
+    } else if (productSKU.length < 1 || productSKU.length > 15) {
+      errors.SKU = "Must be between 1 and 15 characters.";
+      formIsValid = false;
+    }
+
+    // Validate category
+    if (selectedCategory === null) {
+      errors.category = "Category is required";
+      formIsValid = false;
+    }
+
+    // Validate name
+    if (!productName) {
+      errors.name = "Product name is required";
+      formIsValid = false;
+    }
+
+    // Validate size
+    if (!productSize) {
+      errors.size = "Size is required";
+      formIsValid = false;
+    }
+
+    // Validate color
+    if (!productColor) {
+      errors.color = "Color is required";
+      formIsValid = false;
+    }
+
+    // Validate price
+    if (productPrice === '') {
+      errors.price = "Price is required";
+      formIsValid = false;
+    } else if (parseFloat(productPrice) < 0) {
+      errors.price = "Must be a positive number";
+      formIsValid = false;
+    }
+
+    setValidationErrors(errors);
+
+    if (!formIsValid) {
       return;
     }
 
     const updatedProduct: Product = {
       id: currentProduct ? currentProduct.id : Date.now(),
       SKU: productSKU,
-      category_id: selectedCategory || 0, // Handle null category
+      category_id: selectedCategory || 0,
       name: productName,
       price: parseFloat(productPrice),
       quantity: currentProduct ? currentProduct.quantity : 1,
@@ -182,8 +181,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
     setProductColor('');
     setProductPrice('');
     setSelectedCategory(null);
-    setErrors({}); // Clear any existing error messages
-    onClose();  // Close the modal after saving
+    setValidationErrors({});
+    onClose();
   };
 
   return (
@@ -200,12 +199,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
           <input
             type="text"
             name="SKU"
-            placeholder="SKU"
+            placeholder={validationErrors.SKU || "SKU"}
             value={productSKU}
             onChange={handleInputChange}
-            className={styles.modalInput}
+            className={`${styles.modalInput} ${validationErrors.SKU ? styles.inputError : ''}`}
           />
-          {errors.SKU && <p className={styles.modalErrorText}>{errors.SKU}</p>}
 
           <label className={styles.modalInputLabel}>
             Category
@@ -214,16 +212,15 @@ const ProductForm: React.FC<ProductFormProps> = ({
             name="category_id"
             value={selectedCategory ?? ''}
             onChange={handleInputChange}
-            className={styles.modalSelect}
+            className={`${styles.modalSelect} ${validationErrors.category ? styles.inputError : ''}`}
           >
-            <option value="">Product Category</option>
+            <option value="">{validationErrors.category || "Product Category"}</option>
             {categories.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
               </option>
             ))}
           </select>
-          {errors.category && <p className={styles.modalErrorText}>{errors.category}</p>}
 
           <label className={styles.modalInputLabel}>
             Name
@@ -231,12 +228,11 @@ const ProductForm: React.FC<ProductFormProps> = ({
           <input
             type="text"
             name="name"
-            placeholder="Product Name"
+            placeholder={validationErrors.name || "Product Name"}
             value={productName}
             onChange={handleInputChange}
-            className={styles.modalInput}
+            className={`${styles.modalInput} ${validationErrors.name ? styles.inputError : ''}`}
           />
-          {errors.name && <p className={styles.modalErrorText}>{errors.name}</p>}
 
           <label className={styles.modalInputLabel}>
             Size
@@ -244,40 +240,39 @@ const ProductForm: React.FC<ProductFormProps> = ({
           <input
             type="text"
             name="size"
-            placeholder="Size"
+            placeholder={validationErrors.size || "Size"}
             value={productSize}
             onChange={handleInputChange}
-            className={styles.modalInput}
+            className={`${styles.modalInput} ${validationErrors.size ? styles.inputError : ''}`}
           />
-          {errors.size && <p className={styles.modalErrorText}>{errors.size}</p>}
+
           <label className={styles.modalInputLabel}>
             Color
           </label>
           <input
             type="text"
             name="color"
-            placeholder="Color"
+            placeholder={validationErrors.color || "Color"}
             value={productColor}
             onChange={handleInputChange}
-            className={styles.modalInput}
+            className={`${styles.modalInput} ${validationErrors.color ? styles.inputError : ''}`}
           />
-          {errors.color && <p className={styles.modalErrorText}>{errors.color}</p>}
+
           <label className={styles.modalInputLabel}>
             Price
           </label>
           <input
             type="number"
             name="price"
-            placeholder="Price"
+            placeholder={validationErrors.price || "Price"}
             value={productPrice}
             onChange={handleInputChange}
-            className={styles.modalInput}
+            className={`${styles.modalInput} ${validationErrors.price ? styles.inputError : ''}`}
             min="0"
           />
-          {errors.price && <p className={styles.modalErrorText}>{errors.price}</p>}
 
           <div className={styles.modalMediumButtonContainer}>
-            <button type="submit" className={styles.modalMediumButton} disabled={Object.keys(errors).length > 0}>
+            <button type="submit" className={styles.modalMediumButton}>
               {editingProduct ? 'Save Product' : 'Add Product'}
             </button>
             {editingProduct && (

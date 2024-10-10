@@ -220,7 +220,15 @@ const SupplyForm: React.FC<SupplyFormProps> = ({ addSupply, suppliers, onClose }
             <select
               className={`${styles.modalSelect} ${supplierError ? styles.inputError : ''}`}
               value={selectedSupplier ?? ''}
-              onChange={(e) => setSelectedSupplier(Number(e.target.value))}
+              onChange={(e) => {
+                const selectedValue = Number(e.target.value);
+                setSelectedSupplier(selectedValue);
+                if (selectedValue) {
+                  setSupplierError(null); // Clear the error when a valid supplier is selected
+                } else {
+                  setSupplierError('Please select a supplier'); // Keep error for invalid selection
+                }
+              }}
               placeholder={supplierError || 'Select a supplier'}
             >
               <option value="">Select a Supplier</option>
