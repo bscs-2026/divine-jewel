@@ -124,15 +124,17 @@ const ProductTable: React.FC<ProductTableProps> = ({
               <td className={`${styles.td} ${styles.rightAlign}`}>₱{product.price}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>{product.stock}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>    
-                <Edit
-                  onClick={() => editProduct(product.id)} 
-                  style={{ cursor: 'pointer', color: '#575757', marginRight: '5px', fontSize: '1.5rem' }}
-                />
+              {filterCategory !== 'Archive' && product.is_archive !== true && (
+                  <Edit
+                    onClick={() => editProduct(product.id)} 
+                    style={{ cursor: 'pointer', color: '#575757', marginRight: '5px', fontSize: '1.5rem' }}
+                  />
+                )}
                 {filterCategory === 'Archive' ? (
                   <Unarchive
-                  onClick={() => unarchiveProduct(product.id)}
-                  style={{ cursor: 'pointer', color: '#28a745', fontSize: '1.5rem' }}
-                />
+                    onClick={() => unarchiveProduct(product.id)}
+                    style={{ cursor: 'pointer', color: '#28a745', fontSize: '1.5rem' }}
+                  />
                 ) : (
                   <Archive
                     onClick={() => archiveProduct(product.id)}

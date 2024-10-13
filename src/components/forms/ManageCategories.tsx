@@ -31,8 +31,7 @@ const ManageCategories: React.FC<ManageCategoriesProps> = ({
   const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null);
   const [action, setAction] = useState<'add' | 'edit' | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>('');
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [categoryToDelete, setCategoryToDelete] = useState<number | null>(null);
 
@@ -53,9 +52,9 @@ const ManageCategories: React.FC<ManageCategoriesProps> = ({
       newErrors.name = 'Category name is required';
       formIsValid = false;
     } else if (isCategoryNameDuplicate(formData.name)) {
-      setErrorMessage('Category name already exists');
-      setShowErrorModal(true);
-      setTimeout(() => setShowErrorModal(false), 2000);
+      const duplicateName = formData.name; // Capture the user's input
+      newErrors.name = `'${duplicateName}' already exists`;
+      setFormData({ ...formData, name: '' }); // Clear the name input field
       formIsValid = false;
     }
 
@@ -210,12 +209,6 @@ const ManageCategories: React.FC<ManageCategoriesProps> = ({
           </button>
         </div>
       </div>
-
-      {showErrorModal && (
-        <div className={styles.errorModal}>
-          <p>{errorMessage}</p>
-        </div>
-      )}
 
       {showDeleteModal && (
         <div className={styles.deleteModal}>

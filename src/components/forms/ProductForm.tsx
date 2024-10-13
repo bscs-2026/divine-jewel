@@ -202,6 +202,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             placeholder={validationErrors.SKU || "SKU"}
             value={productSKU}
             onChange={handleInputChange}
+            maxLength={15}
             className={`${styles.modalInput} ${validationErrors.SKU ? styles.inputError : ''}`}
           />
 

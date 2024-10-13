@@ -348,6 +348,7 @@ export default function EmployeesPage() {
         />
 
         <DeletePrompt
+          message="Employee deleted."
           isVisible={isDeletePromptVisible}
           onClose={() => setIsDeletePromptVisible(false)}
         />
