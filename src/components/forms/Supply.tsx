@@ -48,8 +48,6 @@ const SupplyForm: React.FC<SupplyFormProps> = ({ addSupply, suppliers, onClose }
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const [successMessage, setSuccessMessage] = useState<string>('');
-
   const [supplierError, setSupplierError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<{ [index: number]: { [field: string]: string } }>({});
 
@@ -161,7 +159,6 @@ const SupplyForm: React.FC<SupplyFormProps> = ({ addSupply, suppliers, onClose }
       const response = await addSupply(materialsToSubmit, 'Delivered');
 
       if (response.ok) {
-        setSuccessMessage('Supplies added successfully!');
         setShowSuccessModal(true);
 
         setTimeout(() => {
@@ -318,12 +315,6 @@ const SupplyForm: React.FC<SupplyFormProps> = ({ addSupply, suppliers, onClose }
             </button>
           </div>
         </form>
-
-        {showSuccessModal && (
-          <div className={`${styles.successModal} show`}>
-            <p>{successMessage}</p>
-          </div>
-        )}
 
         {showErrorModal && (
           <div className={`${styles.successModal} show`}>

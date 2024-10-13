@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
 import styles from '../styles/Form.module.css';
+import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
+
 
 const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) => {
     const [productQuantities, setProductQuantities] = useState(
@@ -16,7 +18,8 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
     const [currentDateTime, setCurrentDateTime] = useState({ date: '', time: '' });
     const [customerName, setCustomerName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [successMessage, setSuccessMessage] = useState(null);
+    // const [successMessage, setSuccessMessage] = useState(null);
+    const [successOrderPrompt, setSuccessOrderPrompt] = useState<boolean>(false);
 
     useEffect(() => {
         const updateDateTime = () => {
@@ -43,15 +46,15 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         return () => clearInterval(intervalId);
     }, [selectedProducts]);
 
-    useEffect(() => {
-        if (successMessage) {
-            const timer = setTimeout(() => {
-                setSuccessMessage(null);
-            }, 3000);
+    // useEffect(() => {
+    //     if (successMessage) {
+    //         const timer = setTimeout(() => {
+    //             setSuccessMessage(null);
+    //         }, 3000);
 
-            return () => clearTimeout(timer);
-        }
-    }, [successMessage]);
+    //         return () => clearTimeout(timer);
+    //     }
+    // }, [successMessage]);
 
     const handleQuantityChange = (productId, delta) => {
         setProductQuantities((prevQuantities) => {
@@ -113,7 +116,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
 
             const data = await response.json();
             if (response.ok) {
-                setSuccessMessage('Order placed successfully!');
+                setSuccessOrderPrompt(true);
             } else {
                 console.error('Failed to place order:', data.error);
             }
@@ -136,7 +139,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         setSelectedPaymentMethod('Cash');
         setTenderedAmount(0);
         setCustomerName('');
-        setSuccessMessage(null);
+        // setSuccessMessage(null);
     };
 
     return (
@@ -276,16 +279,11 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 </button>
             </div>
 
-            {successMessage && (
-                <div className={styles.modalOverlay} onClick={() => setSuccessMessage(null)}>
-                    <div className={styles.modalContent}>
-                        <button className={styles.closeModalButton} onClick={() => setSuccessMessage(null)}>
-                            &times;
-                        </button>
-                        <div>{successMessage}</div>
-                    </div>
-                </div>
-            )}
+            <SuccessfulPrompt
+                message="Order has been successfully placed!"
+                isVisible={successOrderPrompt}
+                onClose={() => setSuccessOrderPrompt(false)}
+            />
         </div>
     );
 };

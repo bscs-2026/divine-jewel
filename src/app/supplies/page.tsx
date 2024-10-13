@@ -9,6 +9,7 @@ import ManageSuppliers from '../../components/forms/ManageSuppliers';
 import Modal from '../../components/modals/Modal';
 import SupplyBatchForm from '../../components/forms/SupplyBatch';
 import { generateBatchID } from '../../lib/helpers';
+import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
 
 interface Supplier {
   id: number;
@@ -32,6 +33,10 @@ const SuppliesPage: React.FC = () => {
   const [isManageSuppliersModalOpen, setIsManageSuppliersModalOpen] = useState(false);
   const [selectedBatchId, setSelectedBatchId] = useState<string | null>(null);
   const [isBatchModalOpen, setIsBatchModalOpen] = useState(false);
+  const [successAddSupplyPrompt, setSuccessAddSupplyPrompt] = useState<boolean>(false);
+  const [sucessAddSupplierPrompt, setSuccessAddSupplierPrompt] = useState<boolean>(false);
+  const [successDeleteSupplierPrompt, setSuccessDeleteSupplierPrompt] = useState<boolean>(false);
+  const [successEditSupplierPrompt, setSuccessEditSupplierPrompt] = useState<boolean>(false);
 
   useEffect(() => {
     fetchSuppliers();
@@ -88,6 +93,7 @@ const SuppliesPage: React.FC = () => {
       }
 
       await fetchSupplies();
+      setSuccessAddSupplyPrompt(true);
       return { ok: true };
     } catch (error) {
       console.error('Failed to add supplies:', error);
@@ -118,6 +124,7 @@ const SuppliesPage: React.FC = () => {
         throw new Error('Failed to delete supplier');
       }
       setSuppliers((prevSuppliers) => prevSuppliers.filter((supplier) => supplier.id !== id));
+      setSuccessDeleteSupplierPrompt(true);
     } catch (error) {
       console.error('Error deleting supplier:', error);
     }
@@ -136,6 +143,7 @@ const SuppliesPage: React.FC = () => {
       }
 
       await fetchSuppliers();
+      setSuccessAddSupplierPrompt(true);
     } catch (error) {
       console.error('Error adding supplier:', error);
     }
@@ -158,6 +166,7 @@ const SuppliesPage: React.FC = () => {
           supplier.id === updatedSupplier.id ? updatedSupplier : supplier
         )
       );
+      setSuccessEditSupplierPrompt(true);
     } catch (error) {
       console.error('Error editing supplier:', error);
     }
@@ -205,6 +214,27 @@ const SuppliesPage: React.FC = () => {
           deleteSupplier={deleteSupplier}
         />
       </Modal>
+
+      <SuccessfulPrompt
+        message="Supply added successfully"
+        isVisible={successAddSupplyPrompt}
+        onClose={() => setSuccessAddSupplyPrompt(false)}
+      />
+      <SuccessfulPrompt
+        message="Supplier added successfully"
+        isVisible={sucessAddSupplierPrompt}
+        onClose={() => setSuccessAddSupplierPrompt(false)}
+      />
+      <SuccessfulPrompt
+        message="Supplier updated successfully"
+        isVisible={successEditSupplierPrompt}
+        onClose={() => setSuccessEditSupplierPrompt(false)}
+      />
+      <DeletePrompt
+        message="Supplier deleted successfully"
+        isVisible={successDeleteSupplierPrompt}
+        onClose={() => setSuccessDeleteSupplierPrompt(false)}
+      />
     </Layout>
   );
 };

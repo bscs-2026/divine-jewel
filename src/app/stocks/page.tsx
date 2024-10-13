@@ -261,26 +261,18 @@ export default function StocksPage() {
     };
 
     const deleteBranch = async (id: number) => {
-        setBranchToDelete(id);
-        setShowDeleteModal(true);
-    };
-
-    const confirmDeleteBranch = async () => {
-        if (branchToDelete === null) return;
         try {
-            const response = await fetch(`/api/stocks/branches/${branchToDelete}`, {
+            const response = await fetch(`/api/stocks/branches/${id}`, {  
                 method: 'DELETE',
             });
-
+    
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Failed to delete branch');
             }
-
+    
             await fetchData();
-            setSuccessDeleteBranchPrompt(true);
-            setBranchToDelete(null);
-            setShowDeleteModal(false);
+            setSuccessDeleteBranchPrompt(true); 
         } catch (error: any) {
             setError(error.message);
         }
@@ -334,11 +326,11 @@ export default function StocksPage() {
                 />
             </Modal>
 
-            <DeleteConfirmationModal
+            {/* <DeleteConfirmationModal
                 show={showDeleteModal}
                 onClose={() => setShowDeleteModal(false)}
                 onConfirm={confirmDeleteBranch}
-            />
+            /> */}
 
             <SuccessfulPrompt
                 message="Stock added successfully"

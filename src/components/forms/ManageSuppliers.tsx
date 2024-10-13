@@ -45,6 +45,7 @@ const ManageSuppliers: React.FC<ManageSuppliersProps> = ({
     name: null,
   });
 
+  // Check for duplicate supplier name
   const isDuplicateSupplierName = (name: string): boolean => {
     return suppliers.some(
       (supplier) =>
@@ -61,9 +62,10 @@ const ManageSuppliers: React.FC<ManageSuppliersProps> = ({
       newErrors.supplier_name = 'Supplier name is required';
       formIsValid = false;
     } else if (isDuplicateSupplierName(formData.supplier_name)) {
-      setErrorMessage('Supplier name already exists');
-      setShowErrorModal(true);
-      setTimeout(() => setShowErrorModal(false), 2000);
+      // Show error modal and clear input field if duplicate
+      const duplicateName = formData.supplier_name;
+      newErrors.supplier_name = `'${duplicateName}' already exists`;
+      setFormData({ ...formData, supplier_name: '' }); // Clear the supplier name input field like in ManageCategories
       formIsValid = false;
     }
 

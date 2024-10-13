@@ -68,13 +68,11 @@ const StockForm: React.FC<StockFormProps> = ({
     const [transferNote, setTransferNote] = useState("");
     const [lastAction, setLastAction] = useState<boolean | null>(null);
     const [errors, setErrors] = useState<string[]>([]);
-    // const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
     const [batchID, setBatchID] = useState<string>(""); // State to store the generated batch ID
     const [currentTime, setCurrentTime] = useState<string>("");
     const employeeFullname = 'Divine Villanueva'; //hardcoded for now
 
-    // Generate the batch ID when the form is first opened
     useEffect(() => {
         const newBatchID = generateBatchID(); // Generate the batch ID
         setBatchID(newBatchID); // Set the batch ID to state so it can be displayed
@@ -215,13 +213,6 @@ const StockForm: React.FC<StockFormProps> = ({
             }
         }));
 
-        // if (formIsValid && apiSuccess) {
-        //     setShowSuccessModal(true);
-        //     setTimeout(() => {
-        //         setShowSuccessModal(false);
-        //         onClose();
-        //     }, 1000);
-        // }
     };
 
     return (
@@ -273,10 +264,6 @@ const StockForm: React.FC<StockFormProps> = ({
                         </div>
                     )}
 
-                    <div className={styles.modalInputHeaderContainer}>
-                        <span className={styles.modalInputLabel}>Qty.</span>
-                    </div>
-
                     {formDataList.map((formData, index) => (
                         <div key={index} className={styles.modalItem}>
                             <div>
@@ -309,7 +296,7 @@ const StockForm: React.FC<StockFormProps> = ({
                             onClick={() => onClose(false)}
                         >
                             <ArrowBack className={styles.modalBackButtonIcon} /> Back
-                            <span className={styles.modalTooltipText}>Back to select more</span>
+                            {/* <span className={styles.modalTooltipText}>Back to select more</span> */}
                         </button>
                         <button
                             type="submit"
@@ -320,12 +307,6 @@ const StockForm: React.FC<StockFormProps> = ({
                     </div>
                 </form>
             </div>
-
-            {/* {showSuccessModal && (
-                <div className={`${styles.successModal} show`}>
-                    <p>{successMessage}</p>
-                </div>
-            )} */}
         </div>
     );
 };

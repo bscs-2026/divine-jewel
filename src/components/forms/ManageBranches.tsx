@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Edit, Delete } from '@mui/icons-material';
-import DeleteConfirmationModal from '../modals/DeleteConfirmationModal';
 import styles from '../styles/Modal.module.css';
 
 interface Branch {
@@ -32,8 +31,6 @@ const ManageBranches: React.FC<ManageBranchesProps> = ({
     const [editingBranchId, setEditingBranchId] = useState<number | null>(null);
     const [action, setAction] = useState<'add' | 'edit' | null>(null);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
-    const [showErrorModal, setShowErrorModal] = useState<boolean>(false);
     const [errorMessage, setErrorMessage] = useState<string>('');
 
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -57,10 +54,9 @@ const ManageBranches: React.FC<ManageBranchesProps> = ({
             newErrors.name = 'Branch name is required';
             formIsValid = false;
         } else if (isDuplicateBranchName(formData.name)) {
-            // Show error modal instead of displaying error below input
-            setErrorMessage('Branch name already exists');
-            setShowErrorModal(true);
-            setTimeout(() => setShowErrorModal(false), 2000);
+            const duplicateName = formData.name; // Capture the user's input
+            newErrors.name = `'${duplicateName}' already exists`;
+            setFormData({ ...formData, name: '' }); // Clear the name input field like in ManageCategories
             formIsValid = false;
         }
 
@@ -146,7 +142,6 @@ const ManageBranches: React.FC<ManageBranchesProps> = ({
                             }}
                             className={`${styles.modalInput} ${errors.name ? styles.inputError : ''}`}
                         />
-                        {/* Error message below input field removed */}
 
                         <input
                             type="text"
@@ -156,11 +151,9 @@ const ManageBranches: React.FC<ManageBranchesProps> = ({
                                 setFormData({ ...formData, address_line: e.target.value });
                                 setErrors({ ...errors, address_line: '' });
                             }}
-                            className={`${styles.modalInput} ${
-                                errors.address_line ? styles.inputError : ''
-                            }`}
+                            className={`${styles.modalInput} ${errors.address_line ? styles.inputError : ''
+                                }`}
                         />
-                        {/* Error message below input field removed */}
 
                         <div className={styles.modalMediumButtonContainer}>
                             <button
@@ -219,12 +212,6 @@ const ManageBranches: React.FC<ManageBranchesProps> = ({
                     </button>
                 </div>
             </div>
-
-            {showErrorModal && (
-                <div className={styles.errorModal}>
-                    <p>{errorMessage}</p>
-                </div>
-            )}
 
             {showDeleteModal && (
                 <div className={styles.deleteModal}>
