@@ -68,7 +68,7 @@ const StockForm: React.FC<StockFormProps> = ({
     const [transferNote, setTransferNote] = useState("");
     const [lastAction, setLastAction] = useState<boolean | null>(null);
     const [errors, setErrors] = useState<string[]>([]);
-    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    // const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [successMessage, setSuccessMessage] = useState("");
     const [batchID, setBatchID] = useState<string>(""); // State to store the generated batch ID
     const [currentTime, setCurrentTime] = useState<string>("");
@@ -215,13 +215,13 @@ const StockForm: React.FC<StockFormProps> = ({
             }
         }));
 
-        if (formIsValid && apiSuccess) {
-            setShowSuccessModal(true);
-            setTimeout(() => {
-                setShowSuccessModal(false);
-                onClose();
-            }, 1000);
-        }
+        // if (formIsValid && apiSuccess) {
+        //     setShowSuccessModal(true);
+        //     setTimeout(() => {
+        //         setShowSuccessModal(false);
+        //         onClose();
+        //     }, 1000);
+        // }
     };
 
     return (
@@ -321,11 +321,11 @@ const StockForm: React.FC<StockFormProps> = ({
                 </form>
             </div>
 
-            {showSuccessModal && (
+            {/* {showSuccessModal && (
                 <div className={`${styles.successModal} show`}>
                     <p>{successMessage}</p>
                 </div>
-            )}
+            )} */}
         </div>
     );
 };
