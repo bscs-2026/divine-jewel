@@ -23,7 +23,7 @@
   margin-left: 15%;
   margin-right: 25%;
   padding: 20px;
-  width: 55%;
+  width: 53%;
   background-color: white;
   display: flex;
   flex-direction: column;
@@ -48,7 +48,7 @@
   display: flex;
   justify-content: flex-start;
   margin-bottom: 20px;
-  padding: 20px;
+  padding: 15px;
   font-size: 13px;
   border: 1px solid #DDDDDD;
   background-color: #F9F9F9;
@@ -58,7 +58,7 @@
 }
 
 .tabsContainerItem {
-  padding: 0.25rem 0.75rem;
+  padding: 0.20rem 0.70rem;
   border-radius: 1.5rem;
   color: #575757;
   font-size: 13px;
@@ -97,7 +97,7 @@
 
 .rightSidebar {
   margin-left: 75%;
-  width: 30%;
+  width: 32%;
   position: fixed;
   top: 0;
   right: 0;

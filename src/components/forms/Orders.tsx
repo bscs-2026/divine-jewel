@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
+import { AddBox, IndeterminateCheckBox, ArrowDropUp, ArrowDropDown, Add } from '@mui/icons-material';
 import styles from '../styles/Form.module.css';
-import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
+import { SuccessfulPrompt } from "@/components/prompts/Prompt";
 
 
 const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) => {
@@ -46,19 +46,19 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         return () => clearInterval(intervalId);
     }, [selectedProducts]);
 
-    // useEffect(() => {
-    //     if (successMessage) {
-    //         const timer = setTimeout(() => {
-    //             setSuccessMessage(null);
-    //         }, 3000);
-
-    //         return () => clearTimeout(timer);
-    //     }
-    // }, [successMessage]);
+    // Automatically close the success prompt after a delay
+    useEffect(() => {
+        if (successOrderPrompt) {
+            const timer = setTimeout(() => {
+                setSuccessOrderPrompt(false);
+            }, 3000); // Adjust the delay as needed (3 seconds in this case)
+            return () => clearTimeout(timer);
+        }
+    }, [successOrderPrompt]);
 
     const handleQuantityChange = (productId, delta) => {
         setProductQuantities((prevQuantities) => {
-            const newQuantity = Math.max(0, (prevQuantities[productId] || 0) + delta);
+            const newQuantity = Math.max(0, (prevQuantities[productId] || 1) + delta);
             return { ...prevQuantities, [productId]: newQuantity };
         });
     };
@@ -78,7 +78,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
     };
 
     const totalAmount = selectedProducts.reduce((total, product) => {
-        const quantity = productQuantities[product.product_id] || 0;
+        const quantity = productQuantities[product.product_id] || 1;
         return total + (parseFloat(product.price) * quantity || 0);
     }, 0);
 
@@ -88,7 +88,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
 
         const orderItems = selectedProducts.map(product => ({
             product_id: product.product_id,
-            quantity: productQuantities[product.product_id],
+            quantity: productQuantities[product.product_id] || 1,
             unit_price: parseFloat(product.price),
         }));
 
@@ -188,7 +188,11 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                     {selectedProducts.map((product) => (
                         <div key={product.product_id} className={styles.productRow}>
                             <div>
-                                <CloseIcon className={styles.removeIcon} onClick={() => handleRemoveProduct(product.product_id)} />
+                                <CloseIcon
+                                    style={{ color: '#A7A7A7', marginRight: '2px', fontSize: '1rem' }}
+                                    // className={styles.removeIcon} 
+                                    onClick={() => handleRemoveProduct(product.product_id)}
+                                />
                             </div>
                             <div
                                 className={styles.productName}>
@@ -200,19 +204,20 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                             </div>
                             <div className={styles.productQuantityWrapper}>
                                 <div className={styles.productQuantity}>
-                                    <ArrowDropDown
+                                    <IndeterminateCheckBox
                                         // className={styles.quantityButton}
                                         onClick={() => handleQuantityChange(product.product_id, -1)}
                                         disabled={productQuantities[product.product_id] === 0}
                                     />
 
                                     <input
-                                        type="text"
+                                        type="number"
                                         className={styles.customInput}
-                                        value={productQuantities[product.product_id]}
-                                    // readOnly
+                                        value={productQuantities[product.product_id] || 1}
+                                        onChange={(e) => handleQuantityChange(product.product_id, parseInt(e.target.value) - (productQuantities[product.product_id] || 0))}
+
                                     />
-                                    <ArrowDropUp
+                                    <AddBox
                                         // className={styles.quantityButton}
                                         onClick={() => handleQuantityChange(product.product_id, 1)}
                                     />
@@ -240,7 +245,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
             {/* Total Amount and Cash Info */}
             <div className={styles.payRow}>
                 <label>Total Amount:</label>
-                <strong>{totalAmount.toFixed(2)}</strong>
+                <strong>{"₱ " + totalAmount.toFixed(2)}</strong>
             </div>
 
             {selectedPaymentMethod === 'Cash' && (
@@ -253,6 +258,76 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                             value={tenderedAmount === 0 ? '' : tenderedAmount}
                             onChange={handleTenderedAmountChange}
                         />
+                    </div>
+                    <div className={styles.payRow}>
+                        <label>Change:</label>
+                        <strong>{change.toFixed(2)}</strong>
+                    </div>
+                </div>
+            )}
+
+            {selectedPaymentMethod === 'E-Wallet' && (
+                <div className={styles.tenderAmount}>
+                    <div className={styles.payRow}>
+                        <label>Select E-wallet:</label>
+                        <select className={styles.selectWallet}>
+                            <option value="G-Cash">GCash</option>
+                            <option value="Maya">Maya</option>
+                        </select>
+
+                    </div>
+                    <div className={styles.payRow}>
+                        <label>Tendered Amount:</label>
+                        <input
+                            type="number"
+                            className={styles.tenderedInput}
+                            value={tenderedAmount === 0 ? '' : tenderedAmount}
+                            onChange={handleTenderedAmountChange}
+                        />
+
+                    </div>
+                    <div className={styles.payRow}>
+                        <label>Referencce No.</label>
+                        <input
+                            type="text"
+                            className={styles.tenderedInput}
+                        />
+
+                    </div>
+                    <div className={styles.payRow}>
+                        <label>Change:</label>
+                        <strong>{change.toFixed(2)}</strong>
+                    </div>
+                </div>
+            )}
+
+            {selectedPaymentMethod === 'Bank Transfer' && (
+                <div className={styles.tenderAmount}>
+                    <div className={styles.payRow}>
+                        <label>Select Bank:</label>
+                        <select className={styles.selectWallet}>
+                            <option value="BPI">GCash</option>
+                            {/* <option value="Maya">Maya</option> */}
+                        </select>
+
+                    </div>
+                    <div className={styles.payRow}>
+                        <label>Tendered Amount:</label>
+                        <input
+                            type="number"
+                            className={styles.tenderedInput}
+                            value={tenderedAmount === 0 ? '' : tenderedAmount}
+                            onChange={handleTenderedAmountChange}
+                        />
+
+                    </div>
+                    <div className={styles.payRow}>
+                        <label>Referencce No.</label>
+                        <input
+                            type="text"
+                            className={styles.tenderedInput}
+                        />
+
                     </div>
                     <div className={styles.payRow}>
                         <label>Change:</label>

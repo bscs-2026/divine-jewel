@@ -127,7 +127,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
               {filterCategory !== 'Archive' && product.is_archive !== true && (
                   <Edit
                     onClick={() => editProduct(product.id)} 
-                    style={{ cursor: 'pointer', color: '#575757', marginRight: '5px', fontSize: '1.5rem' }}
+                    style={{ cursor: 'pointer', color: '#575757', marginRight: '2px', fontSize: '1.5rem' }}
                   />
                 )}
                 {filterCategory === 'Archive' ? (

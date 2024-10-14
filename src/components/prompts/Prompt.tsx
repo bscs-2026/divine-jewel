@@ -34,6 +34,7 @@ export const SuccessfulPrompt: React.FC<SuccessfulPromptProps> = ({
     <div className="fixed top-4 right-4 bg-white text-gray p-4 rounded-md shadow-lg animate-slide-in" style={{ zIndex: 9999 }}>
       
       <Check style={{ color: '#FCB6D7', fontSize: '2rem', marginRight: '0.5rem' }} />
+
       {message}
     </div>
   );
