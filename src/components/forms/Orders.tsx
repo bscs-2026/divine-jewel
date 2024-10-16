@@ -15,6 +15,8 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
 
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('Cash');
     const [tenderedAmount, setTenderedAmount] = useState(0);
+    const [selectedEWalletProvider, setSelectedEWalletProvider] = useState('G-Cash'); // Set default to 'G-Cash'
+    const [referenceNumber, setReferenceNumber] = useState('');
     const [currentDateTime, setCurrentDateTime] = useState({ date: '', time: '' });
     const [customerName, setCustomerName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -76,6 +78,12 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
     const handleTenderedAmountChange = (event) => {
         setTenderedAmount(parseFloat(event.target.value) || 0);
     };
+    const handleEWalletProviderChange = (event) => {
+        setSelectedEWalletProvider(event.target.value);
+    };
+    const handleReferenceNumberChange = (event) => {
+        setReferenceNumber(event.target.value);
+    };
 
     const totalAmount = selectedProducts.reduce((total, product) => {
         const quantity = productQuantities[product.product_id] || 1;
@@ -103,8 +111,10 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
             total_amount: totalAmount,
             order_items: orderItems,
             payment_method: selectedPaymentMethod,
-            tendered_amount: selectedPaymentMethod === 'Cash' ? tenderedAmount : null,
+            tendered_amount:tenderedAmount,
             change: selectedPaymentMethod === 'Cash' ? change : null,
+            reference_number: selectedPaymentMethod !== 'Cash' ? referenceNumber : null, // Add reference number if not Cash
+            e_wallet_provider: selectedPaymentMethod === 'E-Wallet' ? selectedEWalletProvider : null, // This is important
         };
 
         try {
@@ -137,6 +147,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         setSelectedProducts([]);
         setProductQuantities({});
         setSelectedPaymentMethod('Cash');
+        setReferenceNumber('');
         setTenderedAmount(0);
         setCustomerName('');
         // setSuccessMessage(null);
@@ -149,13 +160,9 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 <div className={styles.headerContainer}>
                     <div className={styles.headerLeft}>
                         <div className={styles.heading2}>Current Order</div>
-                        {/* <div className={styles.primary}>{selectedBranch?.branch_name || 'No Branch'}</div>
-                        <div className={styles.secondary}>{selectedBranch?.branch_address || 'No Address'}</div> */}
                     </div>
-                    {/* <div className={styles.verticalLine}></div> */}
-                    {/* <div className={styles.headerRight}> */}
                     <div className={styles.primary}>Cashier: Divine Villanueva</div>
-                    <div className={styles.primary}>Date : {currentDateTime.date}</div>
+                    <div className={styles.primary}>Date : {currentDateTime.date} </div>
                     <div className={styles.primary}>Time : {currentDateTime.time}</div>
                     <div className={styles.primary}>{selectedBranch?.branch_name || 'No Branch'}</div>
                     <div className={styles.secondary}>{selectedBranch?.branch_address || 'No Address'}</div>
@@ -189,7 +196,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                         <div key={product.product_id} className={styles.productRow}>
                             <div>
                                 <CloseIcon
-                                    style={{ color: '#A7A7A7', marginRight: '2px', fontSize: '1rem' }}
+                                    style={{ color: '#A7A7A7', marginRight: '10px', fontSize: '1rem' }}
                                     // className={styles.removeIcon} 
                                     onClick={() => handleRemoveProduct(product.product_id)}
                                 />
@@ -237,9 +244,9 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 <button className={`${styles.paymentButton} ${selectedPaymentMethod === 'E-Wallet' ? styles.activePaymentButton : ''}`} onClick={() => handlePaymentMethodChange('E-Wallet')}>
                     E-Wallet
                 </button>
-                <button className={`${styles.paymentButton} ${selectedPaymentMethod === 'Bank Transfer' ? styles.activePaymentButton : ''}`} onClick={() => handlePaymentMethodChange('Bank Transfer')}>
+                {/* <button className={`${styles.paymentButton} ${selectedPaymentMethod === 'Bank Transfer' ? styles.activePaymentButton : ''}`} onClick={() => handlePaymentMethodChange('Bank Transfer')}>
                     Bank Transfer
-                </button>
+                </button> */}
             </div>
 
             {/* Total Amount and Cash Info */}
@@ -269,8 +276,12 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
             {selectedPaymentMethod === 'E-Wallet' && (
                 <div className={styles.tenderAmount}>
                     <div className={styles.payRow}>
-                        <label>Select E-wallet:</label>
-                        <select className={styles.selectWallet}>
+                        <label>E-wallet Provider:</label>
+                        <select
+                            className={styles.selectWallet}
+                            value={selectedEWalletProvider || 'G-Cash'}
+                            onChange={handleEWalletProviderChange}
+                        >
                             <option value="G-Cash">GCash</option>
                             <option value="Maya">Maya</option>
                         </select>
@@ -289,8 +300,10 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                     <div className={styles.payRow}>
                         <label>Referencce No.</label>
                         <input
-                            type="text"
                             className={styles.tenderedInput}
+                            type="text"
+                            value={referenceNumber} // Add this input field for reference number
+                            onChange={handleReferenceNumberChange} // Handle reference number change
                         />
 
                     </div>
@@ -306,7 +319,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                     <div className={styles.payRow}>
                         <label>Select Bank:</label>
                         <select className={styles.selectWallet}>
-                            <option value="BPI">GCash</option>
+                            <option value="BPI">BPI</option>
                             {/* <option value="Maya">Maya</option> */}
                         </select>
 
@@ -326,6 +339,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                         <input
                             type="text"
                             className={styles.tenderedInput}
+
                         />
 
                     </div>
