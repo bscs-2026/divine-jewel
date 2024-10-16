@@ -292,3 +292,41 @@ body.no-scroll {
 .inputError {
     border: 2px solid #ff7081;
 }
+
+/* receipts */
+
+.companyDetails {
+    text-align: center; /* Corrected property */
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.receiptSubHeading {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center; /* Corrected property */
+}
+
+.orderDetails {
+    flex-direction: column;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.receiptTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .receiptTable th,
+  .receiptTable td {
+    border: 1px solid #ffffff;
+    padding: 8px;
+  }
+  
+  .receiptTable th {
+    background-color: #ffffff;
+    text-align: left;
+  }
+  
