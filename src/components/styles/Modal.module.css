@@ -250,11 +250,11 @@ body.no-scroll {
 
 .deleteModal {
     position: fixed;
-    top: 50%;
+    top: 2%; /* Adjust this value to move the modal closer or further from the top */
     left: 50%;
-    transform: translate(-50%, -50%);
-    background-color: #f8d7da;
-    border: 2px solid #f5c2c7;
+    transform: translateX(-50%); /* Only translate horizontally to center */
+    background-color: #ffffff;
+    /* border: 2px solid #575757; */
     padding: 20px;
     z-index: 1000;
     font-size: 0.8rem;
@@ -262,6 +262,7 @@ body.no-scroll {
     text-align: center;
     border-radius: 8px;
 }
+
 
 
 .iconButtonContainer {
@@ -290,5 +291,42 @@ body.no-scroll {
 
 .inputError {
     border: 2px solid #ff7081;
-    background-color: #ffe6e6;
 }
+
+/* receipts */
+
+.companyDetails {
+    text-align: center; /* Corrected property */
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.receiptSubHeading {
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-align: center; /* Corrected property */
+}
+
+.orderDetails {
+    flex-direction: column;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.receiptTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .receiptTable th,
+  .receiptTable td {
+    border: 1px solid #ffffff;
+    padding: 8px;
+  }
+  
+  .receiptTable th {
+    background-color: #ffffff;
+    text-align: left;
+  }
+  

@@ -7,6 +7,7 @@ import ProductTable from '../../components/tables/ProductTable';
 import CategoryTabs from '../../components/tabs/CategoryTabs';
 import ProductForm from '../../components/forms/ProductForm';
 import ManageCategories from '../../components/forms/ManageCategories';
+import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
 import Modal from '../../components/modals/Modal';
 
 interface Product {
@@ -39,6 +40,13 @@ export default function ProductsPage() {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isManageCategoriesModalOpen, setIsManageCategoriesModalOpen] = useState(false);
+  const [sucessAddProductPrompt, setsucessAddProductPrompt] = useState<boolean>(false);
+  const [successEditProductPrompt, setSuccessEditProductPrompt] = useState<boolean>(false);
+  const [sucessArchiveProductPrompt, setsucessArchiveProductPrompt] = useState<boolean>(false);
+  const [sucessUnarchiveProductPrompt, setsucessUnarchiveProductPrompt] = useState<boolean>(false);
+  const [sucessAddCateory, setSuccessAddCategory] = useState<boolean>(false);
+  const [successEditCategory, setSuccessEditCategory] = useState<boolean>(false);
+  const [successDeleteCategory, setSuccessDeleteCategory] = useState<boolean>(false);
 
   useEffect(() => {
     fetchProducts();
@@ -98,15 +106,13 @@ export default function ProductsPage() {
       }
 
       await fetchCategories();
+      setSuccessAddCategory(true);
     } catch (error: any) {
       setError(error.message);
     }
   }
 
   const deleteCategory = async (id: number) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this category?');
-    if (!confirmDelete) return;
-
     try {
       const response = await fetch(`/api/products/category/${id}`, {
         method: 'DELETE',
@@ -117,6 +123,7 @@ export default function ProductsPage() {
       }
 
       await fetchCategories();
+      setSuccessDeleteCategory(true);
     } catch (error: any) {
       setError(error.message);
     }
@@ -138,6 +145,7 @@ export default function ProductsPage() {
       }
 
       await fetchCategories();
+      setSuccessEditCategory(true);
     } catch (error: any) {
       setError(error.message);
     }
@@ -160,6 +168,7 @@ export default function ProductsPage() {
       setCurrentProduct(null);
       setSelectedCategory(null);
       await fetchProducts();
+      setsucessAddProductPrompt(true);
     } catch (error: any) {
       setError(error.message);
     }
@@ -207,6 +216,7 @@ export default function ProductsPage() {
       setCurrentProduct(null);
       setSelectedCategory(null);
       await fetchProducts();
+      setSuccessEditProductPrompt(true);
     } catch (error: any) {
       setError(error.message);
     }
@@ -240,6 +250,7 @@ export default function ProductsPage() {
       }
 
       await fetchProducts();
+      setsucessArchiveProductPrompt(true);
     } catch (error: any) {
       setError(error.message);
     }
@@ -264,6 +275,7 @@ export default function ProductsPage() {
       }
 
       await fetchProducts();
+      setsucessUnarchiveProductPrompt(true);
     } catch (error: any) {
       setError(error.message);
     }
@@ -317,6 +329,43 @@ export default function ProductsPage() {
           deleteCategory={deleteCategory}
         />
       </Modal>
+
+      <SuccessfulPrompt
+        message="Product added successfully"
+        isVisible={sucessAddProductPrompt}
+        onClose={() => setsucessAddProductPrompt(false)}
+      />
+      <SuccessfulPrompt
+        message="Product updated successfully"
+        isVisible={successEditProductPrompt}
+        onClose={() => setSuccessEditProductPrompt(false)}
+      />
+      <SuccessfulPrompt
+        message="Product archived successfully"
+        isVisible={sucessArchiveProductPrompt}
+        onClose={() => setsucessArchiveProductPrompt(false)}
+      />
+      <SuccessfulPrompt
+        message="Product unarchived successfully"
+        isVisible={sucessUnarchiveProductPrompt}
+        onClose={() => setsucessUnarchiveProductPrompt(false)}
+      />
+      <SuccessfulPrompt
+        message="Category added successfully"
+        isVisible={sucessAddCateory}
+        onClose={() => setSuccessAddCategory(false)}
+      />
+      <SuccessfulPrompt
+        message="Category updated successfully"
+        isVisible={successEditCategory}
+        onClose={() => setSuccessEditCategory(false)}
+      />
+      <DeletePrompt
+        message="Category deleted successfully"
+        isVisible={successDeleteCategory}
+        onClose={() => setSuccessDeleteCategory(false)}
+      />
+
     </Layout>
   );
 }

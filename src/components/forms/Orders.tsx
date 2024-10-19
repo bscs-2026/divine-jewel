@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
-import { ArrowDropUp, ArrowDropDown } from '@mui/icons-material';
+import { AddBox, IndeterminateCheckBox, ArrowDropUp, ArrowDropDown, Add } from '@mui/icons-material';
 import styles from '../styles/Form.module.css';
+import { SuccessfulPrompt } from "@/components/prompts/Prompt";
+
 
 const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) => {
     const [productQuantities, setProductQuantities] = useState(
@@ -13,10 +15,13 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
 
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('Cash');
     const [tenderedAmount, setTenderedAmount] = useState(0);
+    const [selectedEWalletProvider, setSelectedEWalletProvider] = useState('G-Cash'); // Set default to 'G-Cash'
+    const [referenceNumber, setReferenceNumber] = useState('');
     const [currentDateTime, setCurrentDateTime] = useState({ date: '', time: '' });
     const [customerName, setCustomerName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [successMessage, setSuccessMessage] = useState(null);
+    // const [successMessage, setSuccessMessage] = useState(null);
+    const [successOrderPrompt, setSuccessOrderPrompt] = useState<boolean>(false);
 
     useEffect(() => {
         const updateDateTime = () => {
@@ -43,19 +48,19 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         return () => clearInterval(intervalId);
     }, [selectedProducts]);
 
+    // Automatically close the success prompt after a delay
     useEffect(() => {
-        if (successMessage) {
+        if (successOrderPrompt) {
             const timer = setTimeout(() => {
-                setSuccessMessage(null);
-            }, 3000);
-
+                setSuccessOrderPrompt(false);
+            }, 3000); // Adjust the delay as needed (3 seconds in this case)
             return () => clearTimeout(timer);
         }
-    }, [successMessage]);
+    }, [successOrderPrompt]);
 
     const handleQuantityChange = (productId, delta) => {
         setProductQuantities((prevQuantities) => {
-            const newQuantity = Math.max(0, (prevQuantities[productId] || 0) + delta);
+            const newQuantity = Math.max(0, (prevQuantities[productId] || 1) + delta);
             return { ...prevQuantities, [productId]: newQuantity };
         });
     };
@@ -73,9 +78,15 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
     const handleTenderedAmountChange = (event) => {
         setTenderedAmount(parseFloat(event.target.value) || 0);
     };
+    const handleEWalletProviderChange = (event) => {
+        setSelectedEWalletProvider(event.target.value);
+    };
+    const handleReferenceNumberChange = (event) => {
+        setReferenceNumber(event.target.value);
+    };
 
     const totalAmount = selectedProducts.reduce((total, product) => {
-        const quantity = productQuantities[product.product_id] || 0;
+        const quantity = productQuantities[product.product_id] || 1;
         return total + (parseFloat(product.price) * quantity || 0);
     }, 0);
 
@@ -85,7 +96,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
 
         const orderItems = selectedProducts.map(product => ({
             product_id: product.product_id,
-            quantity: productQuantities[product.product_id],
+            quantity: productQuantities[product.product_id] || 1,
             unit_price: parseFloat(product.price),
         }));
 
@@ -100,8 +111,10 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
             total_amount: totalAmount,
             order_items: orderItems,
             payment_method: selectedPaymentMethod,
-            tendered_amount: selectedPaymentMethod === 'Cash' ? tenderedAmount : null,
+            tendered_amount:tenderedAmount,
             change: selectedPaymentMethod === 'Cash' ? change : null,
+            reference_number: selectedPaymentMethod !== 'Cash' ? referenceNumber : null, // Add reference number if not Cash
+            e_wallet_provider: selectedPaymentMethod === 'E-Wallet' ? selectedEWalletProvider : null, // This is important
         };
 
         try {
@@ -113,7 +126,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
 
             const data = await response.json();
             if (response.ok) {
-                setSuccessMessage('Order placed successfully!');
+                setSuccessOrderPrompt(true);
             } else {
                 console.error('Failed to place order:', data.error);
             }
@@ -134,9 +147,10 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         setSelectedProducts([]);
         setProductQuantities({});
         setSelectedPaymentMethod('Cash');
+        setReferenceNumber('');
         setTenderedAmount(0);
         setCustomerName('');
-        setSuccessMessage(null);
+        // setSuccessMessage(null);
     };
 
     return (
@@ -146,13 +160,9 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 <div className={styles.headerContainer}>
                     <div className={styles.headerLeft}>
                         <div className={styles.heading2}>Current Order</div>
-                        {/* <div className={styles.primary}>{selectedBranch?.branch_name || 'No Branch'}</div>
-                        <div className={styles.secondary}>{selectedBranch?.branch_address || 'No Address'}</div> */}
                     </div>
-                    {/* <div className={styles.verticalLine}></div> */}
-                    {/* <div className={styles.headerRight}> */}
                     <div className={styles.primary}>Cashier: Divine Villanueva</div>
-                    <div className={styles.primary}>Date : {currentDateTime.date}</div>
+                    <div className={styles.primary}>Date : {currentDateTime.date} </div>
                     <div className={styles.primary}>Time : {currentDateTime.time}</div>
                     <div className={styles.primary}>{selectedBranch?.branch_name || 'No Branch'}</div>
                     <div className={styles.secondary}>{selectedBranch?.branch_address || 'No Address'}</div>
@@ -185,7 +195,11 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                     {selectedProducts.map((product) => (
                         <div key={product.product_id} className={styles.productRow}>
                             <div>
-                                <CloseIcon className={styles.removeIcon} onClick={() => handleRemoveProduct(product.product_id)} />
+                                <CloseIcon
+                                    style={{ color: '#A7A7A7', marginRight: '10px', fontSize: '1rem' }}
+                                    // className={styles.removeIcon} 
+                                    onClick={() => handleRemoveProduct(product.product_id)}
+                                />
                             </div>
                             <div
                                 className={styles.productName}>
@@ -197,19 +211,20 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                             </div>
                             <div className={styles.productQuantityWrapper}>
                                 <div className={styles.productQuantity}>
-                                    <ArrowDropDown
+                                    <IndeterminateCheckBox
                                         // className={styles.quantityButton}
                                         onClick={() => handleQuantityChange(product.product_id, -1)}
                                         disabled={productQuantities[product.product_id] === 0}
                                     />
 
                                     <input
-                                        type="text"
+                                        type="number"
                                         className={styles.customInput}
-                                        value={productQuantities[product.product_id]}
-                                    // readOnly
+                                        value={productQuantities[product.product_id] || 1}
+                                        onChange={(e) => handleQuantityChange(product.product_id, parseInt(e.target.value) - (productQuantities[product.product_id] || 0))}
+
                                     />
-                                    <ArrowDropUp
+                                    <AddBox
                                         // className={styles.quantityButton}
                                         onClick={() => handleQuantityChange(product.product_id, 1)}
                                     />
@@ -229,15 +244,15 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 <button className={`${styles.paymentButton} ${selectedPaymentMethod === 'E-Wallet' ? styles.activePaymentButton : ''}`} onClick={() => handlePaymentMethodChange('E-Wallet')}>
                     E-Wallet
                 </button>
-                <button className={`${styles.paymentButton} ${selectedPaymentMethod === 'Bank Transfer' ? styles.activePaymentButton : ''}`} onClick={() => handlePaymentMethodChange('Bank Transfer')}>
+                {/* <button className={`${styles.paymentButton} ${selectedPaymentMethod === 'Bank Transfer' ? styles.activePaymentButton : ''}`} onClick={() => handlePaymentMethodChange('Bank Transfer')}>
                     Bank Transfer
-                </button>
+                </button> */}
             </div>
 
             {/* Total Amount and Cash Info */}
             <div className={styles.payRow}>
                 <label>Total Amount:</label>
-                <strong>{totalAmount.toFixed(2)}</strong>
+                <strong>{"₱ " + totalAmount.toFixed(2)}</strong>
             </div>
 
             {selectedPaymentMethod === 'Cash' && (
@@ -250,6 +265,83 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                             value={tenderedAmount === 0 ? '' : tenderedAmount}
                             onChange={handleTenderedAmountChange}
                         />
+                    </div>
+                    <div className={styles.payRow}>
+                        <label>Change:</label>
+                        <strong>{change.toFixed(2)}</strong>
+                    </div>
+                </div>
+            )}
+
+            {selectedPaymentMethod === 'E-Wallet' && (
+                <div className={styles.tenderAmount}>
+                    <div className={styles.payRow}>
+                        <label>E-wallet Provider:</label>
+                        <select
+                            className={styles.selectWallet}
+                            value={selectedEWalletProvider || 'G-Cash'}
+                            onChange={handleEWalletProviderChange}
+                        >
+                            <option value="G-Cash">GCash</option>
+                            <option value="Maya">Maya</option>
+                        </select>
+
+                    </div>
+                    <div className={styles.payRow}>
+                        <label>Tendered Amount:</label>
+                        <input
+                            type="number"
+                            className={styles.tenderedInput}
+                            value={tenderedAmount === 0 ? '' : tenderedAmount}
+                            onChange={handleTenderedAmountChange}
+                        />
+
+                    </div>
+                    <div className={styles.payRow}>
+                        <label>Referencce No.</label>
+                        <input
+                            className={styles.tenderedInput}
+                            type="text"
+                            value={referenceNumber} // Add this input field for reference number
+                            onChange={handleReferenceNumberChange} // Handle reference number change
+                        />
+
+                    </div>
+                    <div className={styles.payRow}>
+                        <label>Change:</label>
+                        <strong>{change.toFixed(2)}</strong>
+                    </div>
+                </div>
+            )}
+
+            {selectedPaymentMethod === 'Bank Transfer' && (
+                <div className={styles.tenderAmount}>
+                    <div className={styles.payRow}>
+                        <label>Select Bank:</label>
+                        <select className={styles.selectWallet}>
+                            <option value="BPI">BPI</option>
+                            {/* <option value="Maya">Maya</option> */}
+                        </select>
+
+                    </div>
+                    <div className={styles.payRow}>
+                        <label>Tendered Amount:</label>
+                        <input
+                            type="number"
+                            className={styles.tenderedInput}
+                            value={tenderedAmount === 0 ? '' : tenderedAmount}
+                            onChange={handleTenderedAmountChange}
+                        />
+
+                    </div>
+                    <div className={styles.payRow}>
+                        <label>Referencce No.</label>
+                        <input
+                            type="text"
+                            className={styles.tenderedInput}
+
+                        />
+
                     </div>
                     <div className={styles.payRow}>
                         <label>Change:</label>
@@ -276,16 +368,11 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 </button>
             </div>
 
-            {successMessage && (
-                <div className={styles.modalOverlay} onClick={() => setSuccessMessage(null)}>
-                    <div className={styles.modalContent}>
-                        <button className={styles.closeModalButton} onClick={() => setSuccessMessage(null)}>
-                            &times;
-                        </button>
-                        <div>{successMessage}</div>
-                    </div>
-                </div>
-            )}
+            <SuccessfulPrompt
+                message="Order has been successfully placed!"
+                isVisible={successOrderPrompt}
+                onClose={() => setSuccessOrderPrompt(false)}
+            />
         </div>
     );
 };

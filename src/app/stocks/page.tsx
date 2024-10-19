@@ -7,6 +7,8 @@ import BranchTabs from '../../components/tabs/BranchTabs';
 import ManageBranches from '../../components/forms/ManageBranches';
 import Modal from '../../components/modals/Modal';
 import DeleteConfirmationModal from '../../components/modals/DeleteConfirmationModal';
+import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
+
 
 interface Stock {
     id: number;
@@ -16,7 +18,7 @@ interface Stock {
     product_name: string;
     product_SKU: string;
     category_name: string;
-    product_size: string;   
+    product_size: string;
     product_color: string;
     branch_name: string;
     last_updated: string;
@@ -58,7 +60,12 @@ export default function StocksPage() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [branchToDelete, setBranchToDelete] = useState<number | null>(null);
     const [error, setError] = useState<string | null>(null);
-
+    const [successAddStockPrompt, setSuccessAddStockPrompt] = useState(false);
+    const [successTransferStockPrompt, setSuccessTransferStockPrompt] = useState<boolean>(false);
+    const [successAddBranchPrompt, setSuccessAddBranchPrompt] = useState<boolean>(false);
+    const [successEditBranchPrompt, setSuccessEditBranchPrompt] = useState<boolean>(false);
+    const [successDeleteBranchPrompt, setSuccessDeleteBranchPrompt] = useState<boolean>(false);
+    
     useEffect(() => {
         fetchData();
     }, []);
@@ -84,8 +91,8 @@ export default function StocksPage() {
 
             const updatedStocks = stocksData.stocks.map((stock: Stock) => {
                 const branch = branchesData.branches.find((branch: Branch) => branch.id === stock.branch_code);
-                return { 
-                    ...stock, 
+                return {
+                    ...stock,
                     branch_name: branch ? branch.name : 'Unknown',
                     category_name: stock.category_name || 'Unknown',  // Ensure category_name is present
                 };
@@ -119,32 +126,31 @@ export default function StocksPage() {
             console.error('Invalid stock data');
             return { ok: false, message: 'Invalid stock data' };
         }
-    
+
         try {
             setStocks((prevStocks) =>
                 prevStocks.map((s) =>
                     s.id === stock.id ? { ...s, quantity: s.quantity + stock.quantity } : s
                 )
             );
-    
+
             const response = await fetch(`/api/stocks/${stock.product_id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ 
-                    branch_code: stock.branch_code, 
-                    quantity: stock.quantity, 
+                body: JSON.stringify({
+                    branch_code: stock.branch_code,
+                    quantity: stock.quantity,
                     batch_id // Include batch_id here 
                 }),
             });
-    
+
             if (!response.ok) {
                 throw new Error('Failed to update stock');
             }
-    
-            await fetchData(); 
-    
+            await fetchData();
+            setSuccessAddStockPrompt(true);
             return { ok: true };
         } catch (error: any) {
             setError(error.message);
@@ -157,7 +163,7 @@ export default function StocksPage() {
             console.error('Invalid stock transfer data');
             return { ok: false, message: 'Invalid stock transfer data' };
         }
-    
+
         try {
             setStocks((prevStocks) =>
                 prevStocks.map((s) => {
@@ -170,7 +176,7 @@ export default function StocksPage() {
                     return s;
                 })
             );
-    
+
             const response = await fetch(`/api/stocks/stock_details`, {
                 method: 'POST',
                 headers: {
@@ -185,20 +191,20 @@ export default function StocksPage() {
                     batch_id: stockDetails.batch_id, // Include batch_id here
                 }),
             });
-    
+
             if (!response.ok) {
                 throw new Error('Failed to transfer stock');
             }
-    
+
             await fetchData();
-    
+            setSuccessTransferStockPrompt(true);
             return { ok: true };
         } catch (error: any) {
             setError(error.message);
             return { ok: false, message: error.message };
         }
     };
-    
+
     const closeManageBranchesModal = () => {
         setIsManageBranchesModalOpen(false);
     };
@@ -215,18 +221,19 @@ export default function StocksPage() {
                     address_line: branch.address_line,
                 }),
             });
-    
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Failed to add branch');
             }
-    
+
             await fetchData();
+            setSuccessAddBranchPrompt(true);
         } catch (error: any) {
             setError(error.message);
         }
     };
-    
+
 
     const editBranch = async (branch: Branch) => {
         try {
@@ -240,27 +247,22 @@ export default function StocksPage() {
                     address_line: branch.address_line,
                 }),
             });
-    
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Failed to edit branch');
             }
-    
-            await fetchData(); 
+
+            await fetchData();
+            setSuccessEditBranchPrompt(true);
         } catch (error: any) {
             setError(error.message);
         }
     };
 
     const deleteBranch = async (id: number) => {
-        setBranchToDelete(id);  
-        setShowDeleteModal(true);  
-    };
-    
-    const confirmDeleteBranch = async () => {
-        if (branchToDelete === null) return;
         try {
-            const response = await fetch(`/api/stocks/branches/${branchToDelete}`, {
+            const response = await fetch(`/api/stocks/branches/${id}`, {  
                 method: 'DELETE',
             });
     
@@ -270,13 +272,12 @@ export default function StocksPage() {
             }
     
             await fetchData();
-            setBranchToDelete(null);  
-            setShowDeleteModal(false);  
+            setSuccessDeleteBranchPrompt(true); 
         } catch (error: any) {
             setError(error.message);
         }
     };
-    
+
     const activeProductIds = products.map((product) => product.id);
     const filteredStocks = stocks.filter(
         (stock) =>
@@ -325,11 +326,40 @@ export default function StocksPage() {
                 />
             </Modal>
 
-            <DeleteConfirmationModal
+            {/* <DeleteConfirmationModal
                 show={showDeleteModal}
                 onClose={() => setShowDeleteModal(false)}
                 onConfirm={confirmDeleteBranch}
+            /> */}
+
+            <SuccessfulPrompt
+                message="Stock added successfully"
+                isVisible={successAddStockPrompt}
+                onClose={() => setSuccessAddStockPrompt(false)}
             />
+            <SuccessfulPrompt
+                message="Stock transferred successfully"
+                isVisible={successTransferStockPrompt}
+                onClose={() => setSuccessTransferStockPrompt(false)}
+            />
+            <SuccessfulPrompt
+                message="Branch added successfully"
+                isVisible={successAddBranchPrompt}
+                onClose={() => setSuccessAddBranchPrompt(false)}
+            />
+            <SuccessfulPrompt
+                message="Branch updated successfully"
+                isVisible={successEditBranchPrompt}
+                onClose={() => setSuccessEditBranchPrompt(false)}
+            />
+            <DeletePrompt
+                message="Branch deleted successfully"
+                isVisible={successDeleteBranchPrompt}
+                onClose={() => setSuccessDeleteBranchPrompt(false)}
+            />
+            
+
+
         </Layout>
     );
 }

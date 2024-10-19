@@ -57,7 +57,7 @@
   width: 100%;
   height: 1px;
   background-color: #A7A7A7;
-  margin: 20px 0;
+  margin: 10px 0;
   border: none;
 }
 
@@ -148,7 +148,7 @@
 .primary {
   text-align: left;
   color: #575757;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .secondary {
@@ -166,8 +166,8 @@
 
 .productListContainer {
   background-color: #fff;
-  max-height: 280px;
-  min-height: 280px;
+  max-height: 300px;
+  min-height: 300px;
   overflow-y: auto;
   padding-left: 0.5rem;
   padding-right: 1rem;
@@ -192,8 +192,8 @@
 
 .removeIcon {
   cursor: pointer;
-  color: #FF6799;
-  font-size: 18px;
+  color: #A7A7A7;
+  font-size: 5px;
   margin-right: 2px; 
 }
 
@@ -203,6 +203,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 120px; /* Fixed width for the product name */
 }
 
 
@@ -210,10 +211,11 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  width: 100px; /* Fixed width for the quantity section */
 }
 
 .customInput {
-  width: 40px;
+  width: 50px;
   text-align: center;
   border: 1px solid #A7A7A7;
   /* margin: 0 0.5rem; */
@@ -247,7 +249,7 @@
 
 
 .productPrice {
-  flex: 0 0 10px;
+  flex: 0 0 60px; /* Fixed width for price */
   text-align: right;
   font-size: 14px;
   white-space: nowrap;
@@ -259,10 +261,10 @@
 .paymentMethods {
   display: flex;
   justify-content: center;
-  align-items: center;
-  justify-content: center;
+  align-items: left;
+  justify-content: left;
   gap: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
   margin-top: 1rem;
 }
 
@@ -273,7 +275,7 @@
   padding: 0.5rem 1rem;
   cursor: pointer;
   font-size: 13px;
-  border-radius: 2rem;
+  border-radius: 0.75rem;
   transition: background-color 0.3s ease;
 }
 
@@ -286,6 +288,13 @@
   background-color: #FFFFFF;
   color: #575757;
   border: 2px solid #575757;
+}
+.eWallet {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .tenderAmount {
@@ -307,8 +316,8 @@
   color: #333;
 }
 
-.tenderedInput {
-  width: 100px;
+.tenderedInput, .selectWallet {
+  width: 110px;
   padding: 0.5rem;
   font-size: 13px;
   border: 1px solid #ccc;
@@ -335,16 +344,17 @@
   display: flex;
   justify-content: space-between;
   margin-top: 1rem;
+  
 }
 
 .newOrderButton {
   width: 48%;
   background-color: #575757;
   color: #EEE;
-  border-radius: 2rem;
+  border-radius: 0.75rem;
   padding: 0.5rem;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   transition: background-color 0.3s ease;
 }
@@ -357,10 +367,10 @@
   width: 48%;
   background-color: #FF6799;
   color: #EEE;
-  border-radius: 2rem;
+  border-radius: 0.75rem;
   padding: 0.5rem;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   transition: background-color 0.3s ease;
 }

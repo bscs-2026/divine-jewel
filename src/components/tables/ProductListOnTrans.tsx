@@ -70,8 +70,8 @@ const ProductList: React.FC<ProductListProps> = ({ products, onProductSelect, is
         const isActive = sortConfig.key === key;
         return (
             <span className={key === 'stock' || key === 'price' ? styles.sortIconsRight : styles.sortIconsLeft} >
-                <ArrowUpward className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'asc' ? styles.active : ''}`} />
-                <ArrowDownward className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'desc' ? styles.active : ''}`}  />
+                {/* <ArrowUpward className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'asc' ? styles.active : ''}`} />
+                <ArrowDownward className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'desc' ? styles.active : ''}`}  /> */}
             </span>
         );
     };
@@ -102,11 +102,11 @@ const ProductList: React.FC<ProductListProps> = ({ products, onProductSelect, is
                             className={`${styles.tableRow} ${(!product.stock || product.stock <= 0) ? styles.disabledRow : ''}`}
                             onClick={() => handleRowClick(product)}
                         >
-                            <td className={styles.td}>{product.name}</td>
+                            <td className={styles.tdProductName}>{product.name}</td>
                             <td className={styles.td}>{product.SKU || 'N/A'}</td>
                             <td className={styles.td}>{product.size || 'N/A'}</td>
                             <td className={styles.td}>{product.color || 'N/A'}</td>
-                            <td className={`${styles.td} ${styles.rightAlign}`}>
+                            <td className={styles.tdStock}>
                                 {product.stock !== null ? (product.stock > 0 ? product.stock : 0) : ''}
                             </td>
                             <td className={`${styles.td} ${styles.rightAlign}`}>

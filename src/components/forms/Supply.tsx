@@ -48,8 +48,6 @@ const SupplyForm: React.FC<SupplyFormProps> = ({ addSupply, suppliers, onClose }
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string>('');
-  const [successMessage, setSuccessMessage] = useState<string>('');
-
   const [supplierError, setSupplierError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<{ [index: number]: { [field: string]: string } }>({});
 
@@ -161,7 +159,6 @@ const SupplyForm: React.FC<SupplyFormProps> = ({ addSupply, suppliers, onClose }
       const response = await addSupply(materialsToSubmit, 'Delivered');
 
       if (response.ok) {
-        setSuccessMessage('Supplies added successfully!');
         setShowSuccessModal(true);
 
         setTimeout(() => {
@@ -220,7 +217,15 @@ const SupplyForm: React.FC<SupplyFormProps> = ({ addSupply, suppliers, onClose }
             <select
               className={`${styles.modalSelect} ${supplierError ? styles.inputError : ''}`}
               value={selectedSupplier ?? ''}
-              onChange={(e) => setSelectedSupplier(Number(e.target.value))}
+              onChange={(e) => {
+                const selectedValue = Number(e.target.value);
+                setSelectedSupplier(selectedValue);
+                if (selectedValue) {
+                  setSupplierError(null); // Clear the error when a valid supplier is selected
+                } else {
+                  setSupplierError('Please select a supplier'); // Keep error for invalid selection
+                }
+              }}
               placeholder={supplierError || 'Select a supplier'}
             >
               <option value="">Select a Supplier</option>
@@ -310,12 +315,6 @@ const SupplyForm: React.FC<SupplyFormProps> = ({ addSupply, suppliers, onClose }
             </button>
           </div>
         </form>
-
-        {showSuccessModal && (
-          <div className={`${styles.successModal} show`}>
-            <p>{successMessage}</p>
-          </div>
-        )}
 
         {showErrorModal && (
           <div className={`${styles.successModal} show`}>

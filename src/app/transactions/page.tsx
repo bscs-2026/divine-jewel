@@ -123,7 +123,7 @@ export default function TransactionsPage() {
 
   return (
     <Layout
-      defaultTitle="Transactions"
+      defaultTitle="Sales Transactions"
       rightSidebarContent={
         <OrderForm
           selectedProducts={selectedProducts}
