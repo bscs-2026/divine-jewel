@@ -3,6 +3,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { AddBox, IndeterminateCheckBox, ArrowDropUp, ArrowDropDown, Add } from '@mui/icons-material';
 import styles from '../styles/Form.module.css';
 import { SuccessfulPrompt } from "@/components/prompts/Prompt";
+import ReturnOrder from './ReturnOrder';
 
 
 const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) => {
@@ -13,6 +14,10 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         }, {})
     );
 
+    const [isReturnModalOpen, setIsReturnModalOpen] = useState(false); 
+    const handleOpenReturnModal = () => setIsReturnModalOpen(true);
+    const handleCloseReturnModal = () => setIsReturnModalOpen(false);
+
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('Cash');
     const [tenderedAmount, setTenderedAmount] = useState(0);
     const [selectedEWalletProvider, setSelectedEWalletProvider] = useState('G-Cash'); // Set default to 'G-Cash'
@@ -20,7 +25,6 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
     const [currentDateTime, setCurrentDateTime] = useState({ date: '', time: '' });
     const [customerName, setCustomerName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    // const [successMessage, setSuccessMessage] = useState(null);
     const [successOrderPrompt, setSuccessOrderPrompt] = useState<boolean>(false);
 
     useEffect(() => {
@@ -48,12 +52,11 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         return () => clearInterval(intervalId);
     }, [selectedProducts]);
 
-    // Automatically close the success prompt after a delay
     useEffect(() => {
         if (successOrderPrompt) {
             const timer = setTimeout(() => {
                 setSuccessOrderPrompt(false);
-            }, 3000); // Adjust the delay as needed (3 seconds in this case)
+            }, 3000);
             return () => clearTimeout(timer);
         }
     }, [successOrderPrompt]);
@@ -96,6 +99,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
 
         const orderItems = selectedProducts.map(product => ({
             product_id: product.product_id,
+            sku: product.SKU,
             quantity: productQuantities[product.product_id] || 1,
             unit_price: parseFloat(product.price),
         }));
@@ -113,8 +117,8 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
             payment_method: selectedPaymentMethod,
             tendered_amount:tenderedAmount,
             change: selectedPaymentMethod === 'Cash' ? change : null,
-            reference_number: selectedPaymentMethod !== 'Cash' ? referenceNumber : null, // Add reference number if not Cash
-            e_wallet_provider: selectedPaymentMethod === 'E-Wallet' ? selectedEWalletProvider : null, // This is important
+            reference_number: selectedPaymentMethod !== 'Cash' ? referenceNumber : null,
+            e_wallet_provider: selectedPaymentMethod === 'E-Wallet' ? selectedEWalletProvider : null,
         };
 
         try {
@@ -302,8 +306,8 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                         <input
                             className={styles.tenderedInput}
                             type="text"
-                            value={referenceNumber} // Add this input field for reference number
-                            onChange={handleReferenceNumberChange} // Handle reference number change
+                            value={referenceNumber}
+                            onChange={handleReferenceNumberChange}
                         />
 
                     </div>
@@ -350,8 +354,8 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 </div>
             )}
 
-            {/* Action Buttons */}
             <div className={styles.buttonsContainer}>
+
                 <button
                     onClick={handleNewOrder}
                     className={styles.newOrderButton}
@@ -366,6 +370,16 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 >
                     {isLoading ? 'Placing Order...' : 'Place Order'}
                 </button>
+
+                <button
+                    onClick={handleOpenReturnModal}
+                    className={styles.returnOrderButton}>
+                    Return Order
+                </button>
+                <ReturnOrder
+                    isOpen={isReturnModalOpen}
+                    onClose={handleCloseReturnModal}
+                />
             </div>
 
             <SuccessfulPrompt

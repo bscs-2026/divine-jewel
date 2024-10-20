@@ -5,6 +5,7 @@ import CategoryTabs from '../../components/tabs/ProductCategoryOnTrans';
 import ProductStocksTable from '../../components/tables/ProductListOnTrans';
 import BranchFilter from '../../components/filters/StoreBranchOnTrans';
 import OrderForm from '../../components/forms/Orders';
+import { SuccessfulPrompt } from '@/components/prompts/Prompt';
 
 interface Product {
   product_id: number;
@@ -35,6 +36,7 @@ export default function TransactionsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+  const [successOrderPrompt, setSuccessOrderPrompt] = useState<boolean>(false);
 
   useEffect(() => {
     fetchData();
@@ -115,6 +117,11 @@ export default function TransactionsPage() {
     fetchData();
   };
 
+  const handleOrderSuccess = () => {
+    setSuccessOrderPrompt(true);
+    setTimeout(() => setSuccessOrderPrompt(false), 3000);
+  };
+
   const filteredProducts = filterProducts();
 
   if (error) {
@@ -123,12 +130,13 @@ export default function TransactionsPage() {
 
   return (
     <Layout
-      defaultTitle="Sales Transactions"
+      defaultTitle="Orders"
       rightSidebarContent={
         <OrderForm
           selectedProducts={selectedProducts}
           setSelectedProducts={setSelectedProducts}
           selectedBranch={selectedBranch}
+          onSuccess={handleOrderSuccess}
         />
       }
     >
@@ -149,6 +157,12 @@ export default function TransactionsPage() {
         products={filteredProducts}
         onProductSelect={handleProductSelect}
         isDisabled={!selectedBranch}
+      />
+
+      <SuccessfulPrompt
+        message="Order placed successfully!"
+        isVisible={successOrderPrompt}
+        onClose={() => setSuccessOrderPrompt(false)}
       />
 
     </Layout>
