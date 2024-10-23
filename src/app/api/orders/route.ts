@@ -6,17 +6,19 @@ export async function POST(request: NextRequest) {
 
     try {
         const {
-            date, 
-            customer_name, 
-            employee_id, 
-            branch_code, 
-            total_amount, 
-            order_items, 
-            payment_method, 
-            tendered_amount, 
-            change, 
-            e_wallet_provider, 
-            reference_number, 
+            date,
+            customer_name,
+            employee_id,
+            branch_code,
+            total_amount,
+            discount_percentage,
+            discounted_amount,
+            order_items,
+            payment_method,
+            tendered_amount,
+            change,
+            e_wallet_provider,
+            reference_number,
             receipt_image
         } = await request.json();
 
@@ -25,9 +27,20 @@ export async function POST(request: NextRequest) {
         await connection.beginTransaction();
 
         const [orderResult] = await connection.query(
-            'INSERT INTO `orders` (date, customer_name, employee_id, branch_code, total_amount) VALUES (?, ?, ?, ?, ?)',
-            [date, customer_name, employee_id, branch_code, total_amount]
+            `INSERT INTO orders 
+             (date, customer_name, employee_id, branch_code, total_amount, discount_pct, discounted_amount) 
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+            [
+                date,
+                customer_name,
+                employee_id,
+                branch_code,
+                total_amount,
+                discount_percentage || null,
+                discounted_amount || null
+            ]
         );
+
         const orderId = orderResult.insertId;
 
         for (const item of order_items) {
