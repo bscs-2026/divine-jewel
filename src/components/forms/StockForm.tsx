@@ -225,9 +225,9 @@ const StockForm: React.FC<StockFormProps> = ({
                 {/* Display Batch ID */}
                 <div className={styles.batchIDContainer}>
                     <p><strong>Batch ID:</strong> {batchID}</p>
-                    <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p> 
+                    <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
                     <p><strong>Time:</strong> {currentTime}</p>
-                    <p><strong>Employee:</strong> {employeeFullname}</p> 
+                    <p><strong>Employee:</strong> {employeeFullname}</p>
                 </div>
                 <br />
 
@@ -251,8 +251,8 @@ const StockForm: React.FC<StockFormProps> = ({
                                     </option>
                                 ))}
                             </select>
-                            
-                            
+
+
                             <input
                                 type="text"
                                 name="transfer_note"
@@ -262,26 +262,43 @@ const StockForm: React.FC<StockFormProps> = ({
                                 className={styles.modalInput}
                             />
                         </div>
+
                     )}
+                    <br />
+
+                    <div className={styles.modalItem}>
+                        <h3 style={{ width: '330px' }}>Product Details</h3>
+                        <h3 style={{ width: '150px' }}>Current Qty.</h3>
+                        {isTransfer ? (
+                            <h3 style={{ width: '100px' }}>Transfer</h3>
+                        ) : (
+                            <h3 style={{ width: '100px' }}>Add</h3>
+                        )}
+                    </div>
 
                     {formDataList.map((formData, index) => (
                         <div key={index} className={styles.modalItem}>
-                            <div>
+                            <div style={{ width: '350px' }}>
                                 <p className={styles.modalPrimary}>{selectedStocks[index]?.product_name}</p>
                                 <p className={styles.modalSecondary}> {selectedStocks[index]?.product_SKU} |  {selectedStocks[index]?.product_size} | {selectedStocks[index]?.product_color}</p>
                                 <p className={styles.modalSecondary}> {selectedStocks[index]?.branch_name}</p>
                             </div>
-                            <div>
+
+                            <div style={{ width: '150px' }}>
+                                <p className={styles.modalPrimary}>{selectedStocks[index].quantity}</p>
+                            </div>
+
+                            <div style={{ width: '100px' }}>
                                 <input
                                     type="number"
                                     name="quantity"
                                     value={formData.quantity}
                                     onChange={(e) => handleInputChange(e, index)}
                                     required
-                                    className={styles.modalInputFixed}
+                                    className={styles.modalStockInputFixed}
                                     min="1"
                                     {...(isTransfer ? { max: selectedStocks[index].quantity } : {})}
-                                    placeholder={`Current qty. ${selectedStocks[index].quantity}`}
+                                    placeholder={' qty.'}
                                 />
                                 {errors[index] && <p className={styles.modalErrorText}>{errors[index]}</p>}
                             </div>
