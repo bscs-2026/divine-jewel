@@ -7,7 +7,7 @@ export function generateBatchID() {
 }
 
 // Function to format the date
-export const formatDate = (dateString: string, timeZone: string = 'Asia/Singapore') => {
+export const formatDate = (dateString: string, timeZone: string = 'Asia/Manila') => {
     const date = new Date(dateString);
     const options: Intl.DateTimeFormatOptions = {
         timeZone: timeZone,

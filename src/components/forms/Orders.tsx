@@ -40,7 +40,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         updateTime();
         const intervalId = setInterval(updateTime, 1000);
         return () => clearInterval(intervalId);
-    }, [selectedProducts]);
+    }, []);
 
     useEffect(() => {
         if (successOrderPrompt) {

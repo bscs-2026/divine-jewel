@@ -146,7 +146,7 @@ const HistoryPage: React.FC = () => {
                   <strong>Batch ID:</strong> {selectedBatchID}
                 </p>
                 <p>
-                  <strong>Date:</strong> {new Date(stockMetadata.date).toLocaleDateString()}
+                  <strong>Date & Time:</strong> {new Date(stockMetadata.date).toLocaleDateString()}
                 </p>
                 <p>
                   <strong>Time:</strong> {new Date(stockMetadata.date).toLocaleTimeString()}
@@ -210,11 +210,11 @@ const HistoryPage: React.FC = () => {
                   <strong>Order ID:</strong> {selectedOrderID}
                 </p>
                 <p>
-                  <strong>Date:</strong> {new Date(orderMetadata.order_date).toLocaleDateString()}
+                <strong>Date and Time:</strong> {new Date(orderMetadata.order_date).toLocaleString()}
                 </p>
-                <p>
+                {/* <p>
                   <strong>Time:</strong> {new Date(orderMetadata.order_date).toLocaleTimeString()}
-                </p>
+                </p> */}
                 <p>
                   <strong>Customer Name:</strong> {orderMetadata.customer_name || 'N/A'}
                 </p>
