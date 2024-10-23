@@ -59,7 +59,7 @@ const SupplyForm: React.FC<SupplyFormProps> = ({ addSupply, suppliers, onClose }
 
     const updateTime = () => {
       const now = new Date();
-      setCurrentTime(formatDate(now.toISOString(), 'Asia/Singapore'));
+      setCurrentTime(formatDate(now.toISOString(), 'Asia/Manila'));
     };
     updateTime();
     const intervalId = setInterval(updateTime, 1000);
@@ -203,15 +203,14 @@ const SupplyForm: React.FC<SupplyFormProps> = ({ addSupply, suppliers, onClose }
     <div className={styles.modalContent}>
       <div className={styles.modalContentScrollable}>
         <h2 className={styles.modalHeading}>Add Supplies</h2>
-        <div className={styles.batchIDContainer}>
+        <div className={styles.modalSubHeading}>
           <p><strong>Batch ID:</strong> {batchID}</p>
-          <p><strong>Date:</strong> {formatDate(new Date().toISOString(), 'Asia/Singapore').split(' ')[0]}</p>
-          <p><strong>Time:</strong> {currentTime}</p>
+          <p><strong>Date & Time:</strong> {currentTime}</p>
           <p><strong>Employee:</strong> {employeeFullname}</p>
         </div>
         <br />
 
-        <form onSubmit={handleFormSubmit}>
+        <form onSubmit={handleFormSubmit} >
           <div className={styles.modalItem}>
             <label>Supplier</label>
             <select
@@ -238,7 +237,7 @@ const SupplyForm: React.FC<SupplyFormProps> = ({ addSupply, suppliers, onClose }
           </div>
 
           {materials.map((material, index) => (
-            <div key={index} className={styles.supplyGroup}>
+            <div key={index} >
               <p><strong>Material {index + 1}</strong></p>
 
               <div className={styles.modalItem}>
@@ -269,7 +268,7 @@ const SupplyForm: React.FC<SupplyFormProps> = ({ addSupply, suppliers, onClose }
                   className={`${styles.modalInputFixed} ${validationErrors[index]?.quantity ? styles.inputError : ''}`}
                   type="number"
                   value={material.quantity}
-                  onChange={(e) => handleInputChange(index, 'quantity', e.target.value)}
+                  onChange={(e) => handleInputChange(index, 'quantity', parseInt(e.target.value))}
                   placeholder={validationErrors[index]?.quantity || 'Enter quantity'}
                 />
               </div>

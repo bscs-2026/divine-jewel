@@ -344,6 +344,8 @@
   display: flex;
   justify-content: space-between;
   margin-top: 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
   
 }
 
@@ -383,6 +385,22 @@
   cursor: not-allowed;
   background-color: #FCB6D7;
   color: white;
+}
+
+.returnOrderButton {
+    width: 48%;
+    background-color: #B23537;
+    color: #EEE;
+    border-radius: 0.75rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+  }
+
+.returnOrderButton:hover {
+  background-color: #B23537;
 }
 
 /* Modal Styling */

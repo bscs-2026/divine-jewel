@@ -53,12 +53,20 @@ body.no-scroll {
     margin: 0.25rem 0;
 }
 
+.modalSubHeading {
+    color: #575757;
+    font-weight: normal;
+    font-size: 14px;
+    margin: 0.25rem 0;
+}
+
 .modalItem {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 2px 0;
     border-bottom: 1px solid #ddd;
+    font-size: 13px !important;
 }
 
 .modalSelect,
@@ -68,7 +76,7 @@ body.no-scroll {
     border: 1px solid #ACACAC;
     border-radius: 0.5rem;
     color: #575757;
-    font-size: 13px;
+    font-size: 13px !important;
     margin-bottom: 0.25rem;
 }
 
@@ -78,8 +86,9 @@ body.no-scroll {
     border: 1px solid #ACACAC;
     border-radius: 0.5rem;
     color: #575757;
-    font-size: 13px;
+    font-size: 13px !important;
     margin-bottom: 0.25rem;
+    opacity: 1;
 }
 
 .modalMediumButtonContainer {
