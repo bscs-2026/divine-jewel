@@ -4,6 +4,7 @@ import { AddBox, IndeterminateCheckBox, ArrowDropUp, ArrowDropDown, Add } from '
 import styles from '../styles/Form.module.css';
 import { SuccessfulPrompt } from "@/components/prompts/Prompt";
 import ReturnOrder from './ReturnOrder';
+import { formatDate } from '../../lib/helpers';
 
 
 const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) => {
@@ -14,7 +15,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         }, {})
     );
 
-    const [isReturnModalOpen, setIsReturnModalOpen] = useState(false); 
+    const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
     const handleOpenReturnModal = () => setIsReturnModalOpen(true);
     const handleCloseReturnModal = () => setIsReturnModalOpen(false);
 
@@ -22,33 +23,22 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
     const [tenderedAmount, setTenderedAmount] = useState(0);
     const [selectedEWalletProvider, setSelectedEWalletProvider] = useState('G-Cash'); // Set default to 'G-Cash'
     const [referenceNumber, setReferenceNumber] = useState('');
-    const [currentDateTime, setCurrentDateTime] = useState({ date: '', time: '' });
+    const [currentTimeTime, setcurrentTimeTime] = useState({ date: '', time: '' });
     const [customerName, setCustomerName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [successOrderPrompt, setSuccessOrderPrompt] = useState<boolean>(false);
+    const [currentTime, setCurrentTime] = useState<string>('');
+    const [discountPercentage, setDiscountPercentage] = useState(0);
+    const [discountedAmount, setDiscountedAmount] = useState(0);
+
 
     useEffect(() => {
-        const updateDateTime = () => {
-            const currentDate = new Date();
-            const formattedDate = currentDate.toLocaleDateString('en-US', {
-                timeZone: 'Asia/Manila',
-                month: '2-digit',
-                day: '2-digit',
-                year: 'numeric',
-            });
-            const formattedTime = currentDate.toLocaleTimeString('en-US', {
-                timeZone: 'Asia/Manila',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: true,
-            });
-            setCurrentDateTime({ date: formattedDate, time: formattedTime });
+        const updateTime = () => {
+            const now = new Date();
+            setCurrentTime(formatDate(now.toISOString(), 'Asia/Manila'));
         };
-
-        updateDateTime();
-        const intervalId = setInterval(updateDateTime, 1000);
-
+        updateTime();
+        const intervalId = setInterval(updateTime, 1000);
         return () => clearInterval(intervalId);
     }, [selectedProducts]);
 
@@ -60,6 +50,16 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
             return () => clearTimeout(timer);
         }
     }, [successOrderPrompt]);
+
+    useEffect(() => {
+        const totalAmountBeforeDiscount = selectedProducts.reduce((total, product) => {
+            const quantity = productQuantities[product.product_id] || 1;
+            return total + (parseFloat(product.price) * quantity || 0);
+        }, 0);
+
+        const discount = (totalAmountBeforeDiscount * discountPercentage) / 100;
+        setDiscountedAmount(totalAmountBeforeDiscount - discount);
+    }, [discountPercentage, selectedProducts, productQuantities]);
 
     const handleQuantityChange = (productId, delta) => {
         setProductQuantities((prevQuantities) => {
@@ -88,14 +88,14 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         setReferenceNumber(event.target.value);
     };
 
-    const totalAmount = selectedProducts.reduce((total, product) => {
+    const totalAmountBeforeDiscount = selectedProducts.reduce((total, product) => {
         const quantity = productQuantities[product.product_id] || 1;
         return total + (parseFloat(product.price) * quantity || 0);
     }, 0);
 
     const handlePlaceOrder = async () => {
         setIsLoading(true);
-        const change = tenderedAmount > totalAmount ? tenderedAmount - totalAmount : 0;
+        const change = tenderedAmount > discountedAmount ? tenderedAmount - discountedAmount : 0;
 
         const orderItems = selectedProducts.map(product => ({
             product_id: product.product_id,
@@ -104,22 +104,23 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
             unit_price: parseFloat(product.price),
         }));
 
-        const currentDate = new Date();
-        const formattedDateTime = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(currentDate.getDate()).padStart(2, '0')} ${String(currentDate.getHours()).padStart(2, '0')}:${String(currentDate.getMinutes()).padStart(2, '0')}:${String(currentDate.getSeconds()).padStart(2, '0')}`;
+        const formattedDateTime = formatDate(new Date().toISOString(), 'Asia/Manila');
 
         const orderPayload = {
             date: formattedDateTime,
-            customer_name: customerName,
-            employee_id: 20,
-            branch_code: selectedBranch ? selectedBranch.branch_code : 'Unknown',
-            total_amount: totalAmount,
+            customer_name: customerName || null,
+            employee_id: 20, // Fixed employee ID for now
+            branch_code: selectedBranch ? selectedBranch.branch_code : null,
+            total_amount: totalAmountBeforeDiscount,
+            discount_percentage: discountPercentage || null,
+            discounted_amount: discountedAmount || null,
             order_items: orderItems,
             payment_method: selectedPaymentMethod,
-            tendered_amount:tenderedAmount,
+            tendered_amount: tenderedAmount,
             change: selectedPaymentMethod === 'Cash' ? change : null,
             reference_number: selectedPaymentMethod !== 'Cash' ? referenceNumber : null,
             e_wallet_provider: selectedPaymentMethod === 'E-Wallet' ? selectedEWalletProvider : null,
-        };
+        };             
 
         try {
             const response = await fetch('/api/orders', {
@@ -141,11 +142,11 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         }
     };
 
-    const change = tenderedAmount > totalAmount ? tenderedAmount - totalAmount : 0;
+    const change = tenderedAmount > discountedAmount ? tenderedAmount - discountedAmount : 0;
 
     const isPlaceOrderDisabled = selectedPaymentMethod === 'Cash'
-        ? tenderedAmount < totalAmount || totalAmount === 0
-        : totalAmount === 0;
+        ? tenderedAmount < discountedAmount || discountedAmount === 0
+        : discountedAmount === 0;
 
     const handleNewOrder = () => {
         setSelectedProducts([]);
@@ -166,10 +167,11 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                         <div className={styles.heading2}>Current Order</div>
                     </div>
                     <div className={styles.primary}>Cashier: Divine Villanueva</div>
-                    <div className={styles.primary}>Date : {currentDateTime.date} </div>
-                    <div className={styles.primary}>Time : {currentDateTime.time}</div>
-                    <div className={styles.primary}>{selectedBranch?.branch_name || 'No Branch'}</div>
-                    <div className={styles.secondary}>{selectedBranch?.branch_address || 'No Address'}</div>
+                    <div className={styles.primary}>Date & Time: {currentTime}</div>
+                    <div className={styles.primary}>
+                        {(selectedBranch?.branch_name || 'No Branch') + ', ' + (selectedBranch?.branch_address || 'No Address')}
+                    </div>
+
                     {/* </div> */}
                 </div>
                 <div className={styles.horizontalLine}></div>
@@ -253,11 +255,27 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 </button> */}
             </div>
 
-            {/* Total Amount and Cash Info */}
             <div className={styles.payRow}>
                 <label>Total Amount:</label>
-                <strong>{"₱ " + totalAmount.toFixed(2)}</strong>
+                <strong>{"₱ " + totalAmountBeforeDiscount.toFixed(2)}</strong>
             </div>
+
+            <div className={styles.payRow}>
+                <label>Discount (%):</label>
+                <input
+                    type="number"
+                    className={styles.discountInput}
+                    value={discountPercentage === 0 ? '' : discountPercentage}
+                    onChange={(e) => setDiscountPercentage(parseFloat(e.target.value) || 0)}
+                />
+            </div>
+
+            {discountPercentage > 0 && (
+                <div className={styles.payRow}>
+                    <label>Discounted Amount:</label>
+                    <strong>{"₱ " + discountedAmount.toFixed(2)}</strong>
+                </div>
+            )}
 
             {selectedPaymentMethod === 'Cash' && (
                 <div className={styles.tenderAmount}>
