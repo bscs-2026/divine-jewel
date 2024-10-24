@@ -8,6 +8,7 @@ import CategoryTabs from '../../components/tabs/CategoryTabs';
 import ProductForm from '../../components/forms/ProductForm';
 import ManageCategories from '../../components/forms/ManageCategories';
 import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
+import CircularIndeterminate from '@/components/loading/Loading';
 import Modal from '../../components/modals/Modal';
 
 interface Product {
@@ -200,6 +201,7 @@ export default function ProductsPage() {
     };
 
     try {
+      setLoading(true);
       const response = await fetch(`/api/products/${currentProduct.id}/update`, {
         method: 'PUT',
         headers: {
@@ -215,12 +217,15 @@ export default function ProductsPage() {
       setEditingProduct(false);
       setCurrentProduct(null);
       setSelectedCategory(null);
+
       await fetchProducts();
       setSuccessEditProductPrompt(true);
     } catch (error: any) {
       setError(error.message);
+    } finally {
+      setLoading(false);
+      closeModal();
     }
-    closeModal();
   };
 
   const handleCancelEdit = () => {
@@ -289,6 +294,8 @@ export default function ProductsPage() {
     : filterCategory
       ? activeProducts.filter(product => product.category_id === filterCategory)
       : activeProducts;
+
+  if (loading) return <CircularIndeterminate />;
 
   return (
     <Layout defaultTitle="Products">
