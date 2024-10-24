@@ -48,6 +48,9 @@ interface OrderDetail {
   customer_name: string;
   employee_fullname: string;
   product_name: string;
+  sku: String | null;
+  product_size: String | null;
+  product_color: String | null;
   quantity: number;
   price: number | string; // Updated to handle possible string type
   total_price: number | string; // Updated to handle possible string type
@@ -200,7 +203,7 @@ const HistoryPage: React.FC = () => {
               <div className={styles.modalContentScrollable}>
 
                 <h2 className={styles.receiptSubHeading}>Divine Jewel</h2>
-                
+
                 <div className={styles.companyDetails}>
                   <h2>{orderMetadata.branch_name}</h2>
                   <h2>{orderMetadata.branch_address}</h2>
@@ -210,11 +213,11 @@ const HistoryPage: React.FC = () => {
                   <strong>Order ID:</strong> {selectedOrderID}
                 </p>
                 <p>
-                <strong>Date and Time:</strong> {new Date(orderMetadata.order_date).toLocaleString()}
+                  <strong>Date and Time:</strong>
+                  {new Date(orderMetadata.order_date).toLocaleString('en-US', {
+                    timeZone: 'Asia/Manila'
+                  })}
                 </p>
-                {/* <p>
-                  <strong>Time:</strong> {new Date(orderMetadata.order_date).toLocaleTimeString()}
-                </p> */}
                 <p>
                   <strong>Customer Name:</strong> {orderMetadata.customer_name || 'N/A'}
                 </p>
@@ -234,7 +237,7 @@ const HistoryPage: React.FC = () => {
                   <tbody>
                     {orderDetails.map((detail, index) => (
                       <tr key={index}>
-                        <td>{detail.product_name}</td>
+                        <td>{detail.sku} - {detail.product_name} - {detail.product_size}, {detail.product_color}</td>
                         <td>{detail.quantity}</td>
                         <td>{Number(detail.price).toFixed(2)}</td>
                         <td>{Number(detail.total_price).toFixed(2)}</td>

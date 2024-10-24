@@ -6,6 +6,7 @@ interface Order {
     order_id: number;
     date: string;
     employee_name: string;
+    branch_name: string;
     total_amount: string;
 }
 
@@ -25,6 +26,7 @@ const OrdersTable: React.FC<OrdersTableProps> = ({ orders, onViewAction }) => {
             { Header: 'Order ID', accessor: 'order_id' as keyof Order, align: 'left' },
             { Header: 'Date', accessor: 'date' as keyof Order, align: 'left' },
             { Header: 'Employee', accessor: 'employee_name' as keyof Order, align: 'left' },
+            // { Header: 'Branch', accessor: 'branch_name' as keyof Order, align: 'left' },
             { Header: 'Total Amount', accessor: 'total_amount' as keyof Order, align: 'right' },
             { Header: '', accessor: 'order_id' as keyof Order, align: 'center' },
         ],
@@ -91,10 +93,11 @@ const OrdersTable: React.FC<OrdersTableProps> = ({ orders, onViewAction }) => {
                         <tr key={order.order_id} className={styles.tableRow} onClick={() => onViewAction(order.order_id)}>
                             <td className={styles.td}>{order.order_id}</td>
                             <td className={styles.td}>
-                                {new Date(order.date).toLocaleDateString()} 
-                                {/* {new Date(order.date).toLocaleTimeString()} */}
+                                {new Date(order.date).toLocaleDateString()}  {new Date(order.date).toLocaleTimeString()}
                             </td>
                             <td className={styles.td}>{order.employee_name}</td>
+                            {/* <td className={styles.td}>{order.branch_name}</td> */}
+                            
                             <td className={`${styles.td} ${styles.rightAlign}`}>₱{order.total_amount}</td>
                             <td className={styles.td} style={{ textAlign: 'center' }}>
                                 <InfoOutlined className={styles.viewButton} onClick={() => onViewAction(order.order_id)} />

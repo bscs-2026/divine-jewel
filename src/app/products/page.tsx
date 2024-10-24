@@ -295,10 +295,16 @@ export default function ProductsPage() {
       ? activeProducts.filter(product => product.category_id === filterCategory)
       : activeProducts;
 
-  if (loading) return <CircularIndeterminate />;
+  // if (loading) return <CircularIndeterminate />;
 
   return (
     <Layout defaultTitle="Products">
+    {loading && (
+      <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-10">
+        <CircularIndeterminate />
+      </div>
+    )}
+
       <CategoryTabs
         categories={categories}
         filterCategory={filterCategory}
