@@ -8,6 +8,8 @@ import ManageBranches from '../../components/forms/ManageBranches';
 import Modal from '../../components/modals/Modal';
 import DeleteConfirmationModal from '../../components/modals/DeleteConfirmationModal';
 import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
+import CircularIndeterminate from '@/components/loading/Loading';
+import { fi } from 'date-fns/locale';
 
 
 interface Stock {
@@ -65,13 +67,15 @@ export default function StocksPage() {
     const [successAddBranchPrompt, setSuccessAddBranchPrompt] = useState<boolean>(false);
     const [successEditBranchPrompt, setSuccessEditBranchPrompt] = useState<boolean>(false);
     const [successDeleteBranchPrompt, setSuccessDeleteBranchPrompt] = useState<boolean>(false);
-    
+    const [loading, setLoading] = useState<boolean>(false);
+
     useEffect(() => {
         fetchData();
     }, []);
 
     const fetchData = async () => {
         try {
+            setLoading(true);
             const [branchesRes, productsRes, stocksRes] = await Promise.all([
                 fetch('/api/stocks/branches'),
                 fetch('/api/products'),
@@ -101,6 +105,8 @@ export default function StocksPage() {
             setStocks(updatedStocks);
         } catch (error: any) {
             setError(error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -128,6 +134,7 @@ export default function StocksPage() {
         }
 
         try {
+            setLoading(true);
             setStocks((prevStocks) =>
                 prevStocks.map((s) =>
                     s.id === stock.id ? { ...s, quantity: s.quantity + stock.quantity } : s
@@ -155,6 +162,8 @@ export default function StocksPage() {
         } catch (error: any) {
             setError(error.message);
             return { ok: false, message: error.message };
+        }finally {
+            setLoading(false);
         }
     };
 
@@ -165,6 +174,7 @@ export default function StocksPage() {
         }
 
         try {
+            setLoading(true);
             setStocks((prevStocks) =>
                 prevStocks.map((s) => {
                     if (s.product_id === stockDetails.product_id && s.branch_code === stockDetails.source_branch) {
@@ -202,6 +212,8 @@ export default function StocksPage() {
         } catch (error: any) {
             setError(error.message);
             return { ok: false, message: error.message };
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -211,6 +223,7 @@ export default function StocksPage() {
 
     const addBranch = async (branch: Branch) => {
         try {
+            setLoading(true);
             const response = await fetch('/api/stocks/branches', {
                 method: 'POST',
                 headers: {
@@ -231,12 +244,15 @@ export default function StocksPage() {
             setSuccessAddBranchPrompt(true);
         } catch (error: any) {
             setError(error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
 
     const editBranch = async (branch: Branch) => {
         try {
+            setLoading(true);
             const response = await fetch(`/api/stocks/branches/${branch.id}`, {
                 method: 'PUT',
                 headers: {
@@ -257,24 +273,29 @@ export default function StocksPage() {
             setSuccessEditBranchPrompt(true);
         } catch (error: any) {
             setError(error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
     const deleteBranch = async (id: number) => {
         try {
-            const response = await fetch(`/api/stocks/branches/${id}`, {  
+            setLoading(true);
+            const response = await fetch(`/api/stocks/branches/${id}`, {
                 method: 'DELETE',
             });
-    
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Failed to delete branch');
             }
-    
+
             await fetchData();
-            setSuccessDeleteBranchPrompt(true); 
+            setSuccessDeleteBranchPrompt(true);
         } catch (error: any) {
             setError(error.message);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -287,6 +308,10 @@ export default function StocksPage() {
 
     return (
         <Layout defaultTitle="Stocks">
+            {loading && (
+                <CircularIndeterminate />
+            )}
+
             <BranchTabs
                 branches={branches}
                 filterBranch={filterBranch}
@@ -357,7 +382,7 @@ export default function StocksPage() {
                 isVisible={successDeleteBranchPrompt}
                 onClose={() => setSuccessDeleteBranchPrompt(false)}
             />
-            
+
 
 
         </Layout>

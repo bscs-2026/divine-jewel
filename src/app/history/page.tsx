@@ -6,6 +6,8 @@ import StockDetailsTable from '../../components/tables/StockDetailsHistory';
 import HistoryTabs from '../../components/tabs/HistoryTabs';
 import Modal from '../../components/modals/Modal';
 import styles from '@/components/styles/Modal.module.css';
+import CircularIndeterminate from '@/components/loading/Loading';
+import { se } from 'date-fns/locale';
 
 interface StockDetailGroup {
   id: number;
@@ -69,6 +71,8 @@ const HistoryPage: React.FC = () => {
   const [selectedOrderID, setSelectedOrderID] = useState<number | null>(null); // State for selected order
   const [stockDetailsIndividual, setStockDetailsIndividual] = useState<StockDetailIndividual[]>([]);
   const [orderDetails, setOrderDetails] = useState<OrderDetail[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
 
   // Separate modal states for each tab
   const [isStockModalOpen, setIsStockModalOpen] = useState(false);
@@ -83,27 +87,35 @@ const HistoryPage: React.FC = () => {
   }, [selectedTab]);
 
   const fetchStockDetailsGroup = async () => {
+    setLoading(true);
     const response = await fetch('/api/history/stockDetailsGroup');
     const data = await response.json();
     setStockDetailsGroup(data.stockDetails);
+    setLoading(false);
   };
 
   const fetchOrders = async () => {
+    setLoading(true);
     const response = await fetch('/api/history/orders');
     const data = await response.json();
     setOrders(data.orders);
+    setLoading(false);
   };
 
   const fetchStockDetailsIndividual = async (batch_id: string) => {
+    setLoading(true);
     const response = await fetch(`/api/history/${batch_id}/stockDetailsIndividual`);
     const data = await response.json();
     setStockDetailsIndividual(data.stockDetails);
+    setLoading(false);
   };
 
   const fetchOrderDetails = async (order_id: number) => {
+    setLoading(true);
     const response = await fetch(`/api/history/${order_id}/orderDetails`);
     const data = await response.json();
     setOrderDetails(data.orderDetails); // Store order details in state
+    setLoading(false);
   };
 
   const handleViewStockAction = (batch_id: string) => {
@@ -128,6 +140,9 @@ const HistoryPage: React.FC = () => {
 
   return (
     <Layout defaultTitle="History">
+      {loading && (
+        <CircularIndeterminate />
+      )}
       <div>
         <HistoryTabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
 

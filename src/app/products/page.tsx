@@ -93,6 +93,7 @@ export default function ProductsPage() {
   };
 
   const addCategory = async (category: Category) => {
+    setLoading(true);
     try {
       const response = await fetch('/api/products/category', {
         method: 'POST',
@@ -110,10 +111,13 @@ export default function ProductsPage() {
       setSuccessAddCategory(true);
     } catch (error: any) {
       setError(error.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   const deleteCategory = async (id: number) => {
+    setLoading(true);
     try {
       const response = await fetch(`/api/products/category/${id}`, {
         method: 'DELETE',
@@ -127,11 +131,14 @@ export default function ProductsPage() {
       setSuccessDeleteCategory(true);
     } catch (error: any) {
       setError(error.message);
+    } finally {
+      setLoading(false);
     }
   }
 
 
   const editCategory = async (category: Category) => {
+    setLoading(true);
     try {
       const response = await fetch(`/api/products/category/${category.id}`, {
         method: 'PUT',
@@ -149,10 +156,13 @@ export default function ProductsPage() {
       setSuccessEditCategory(true);
     } catch (error: any) {
       setError(error.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   const addProduct = async (product: Product) => {
+    setLoading(true);
     try {
       const response = await fetch('/api/products', {
         method: 'POST',
@@ -172,6 +182,8 @@ export default function ProductsPage() {
       setsucessAddProductPrompt(true);
     } catch (error: any) {
       setError(error.message);
+    } finally {
+      setLoading(false);
     }
     // closeModal();
   };
@@ -242,6 +254,7 @@ export default function ProductsPage() {
     if (!confirmArchive) return;
 
     try {
+      setLoading(true);
       const response = await fetch(`/api/products/${productId}/archive`, {
         method: 'PUT',
         headers: {
@@ -258,6 +271,8 @@ export default function ProductsPage() {
       setsucessArchiveProductPrompt(true);
     } catch (error: any) {
       setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -267,6 +282,7 @@ export default function ProductsPage() {
     if (!confirmUnarchive) return;
 
     try {
+      setLoading(true);
       const response = await fetch(`/api/products/${productId}/archive`, {
         method: 'PUT',
         headers: {
@@ -283,6 +299,8 @@ export default function ProductsPage() {
       setsucessUnarchiveProductPrompt(true);
     } catch (error: any) {
       setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -300,9 +318,7 @@ export default function ProductsPage() {
   return (
     <Layout defaultTitle="Products">
     {loading && (
-      <div className="fixed inset-0 z-50 flex justify-center items-center bg-black bg-opacity-10">
         <CircularIndeterminate />
-      </div>
     )}
 
       <CategoryTabs
@@ -320,7 +336,7 @@ export default function ProductsPage() {
         filterCategory={filterCategory}
       />
 
-      <Modal show={isModalOpen} onClose={closeModal}>
+      <Modal show={isModalOpen} onClose={closeModal}>       
         <ProductForm
           categories={categories}
           currentProduct={currentProduct}

@@ -38,12 +38,15 @@ export default function TransactionsPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   const [successOrderPrompt, setSuccessOrderPrompt] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
 
   useEffect(() => {
     fetchData();
   }, [selectedBranch, selectedCategory]);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const response = await fetch('/api/orders/products');
 
@@ -73,6 +76,8 @@ export default function TransactionsPage() {
     } catch (error: any) {
       console.error('Error occurred during data fetch:', error);
       setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 

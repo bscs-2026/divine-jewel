@@ -2,12 +2,15 @@
 "use client";
 
 import { Suspense, useEffect, useState, FormEvent } from "react";
-import MainLayout from "@/components/MainLayout";
+import Layout from '../../components/layout/Layout';
 import EmployeeModal from "@/components/modals/EmployeeModal";
 import InformationModal from "@/components/modals/InformationModal";
 import EmployeeTable from "@/components/tables/EmployeeTable";
 import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
 import { AddBox } from '@mui/icons-material';
+import CircularIndeterminate from '@/components/loading/Loading';
+import { se } from "date-fns/locale";
+
 
 export interface Employee {
   id: number;
@@ -66,6 +69,7 @@ export default function EmployeesPage() {
   }, [currentEmployee]);
 
   const fetchEmployees = async () => {
+    setLoading(true);
     try {
       const response = await fetch("/api/employees");
       if (!response.ok) {
@@ -77,7 +81,7 @@ export default function EmployeesPage() {
       setError(error.message);
     } finally {
       setLoading(false);
-    }
+    } 
   };
 
   const fetchRoles = async () => {
@@ -100,6 +104,7 @@ export default function EmployeesPage() {
     const data = Object.fromEntries(formData.entries());
 
     try {
+      setLoading(true);
       const response = await fetch("/api/employees", {
         method: "POST",
         headers: {
@@ -121,6 +126,8 @@ export default function EmployeesPage() {
     } catch (error: any) {
       setError(error.message);
       console.error("An error occurred while adding employee:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -145,6 +152,7 @@ export default function EmployeesPage() {
     const formData = new FormData(form);
     const data = Object.fromEntries(formData.entries());
 
+    setLoading(true);
     try {
       const response = await fetch(`/api/employees/${currentEmployee?.id}`, {
         method: "PUT",
@@ -169,6 +177,8 @@ export default function EmployeesPage() {
     } catch (error: any) {
       setError(error.message);
       console.error("An error occurred while updating employee:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -240,6 +250,7 @@ export default function EmployeesPage() {
     }
 
     try {
+      setLoading(true);
       const response = await fetch(`/api/employees/${id}`, {
         method: "DELETE",
       });
@@ -253,7 +264,10 @@ export default function EmployeesPage() {
     } catch (error: any) {
       setError(error.message);
       console.error("An error occurred while deleting employee:", error);
+    } finally {
+      setLoading(false);
     }
+    
   };
 
   const handleAddEmployee = () => {
@@ -285,8 +299,12 @@ export default function EmployeesPage() {
   );
 
   return (
-    <MainLayout defaultTitle="Employees">
-      <div className="m-4">
+    <Layout defaultTitle="Employees">
+      {loading && (
+        <CircularIndeterminate />
+      )}
+
+      <div>
         <div className="flex justify-start mb-5 p-5 text-[13px] border border-[#DDDDDD] bg-[#F9F9F9] rounded-lg shadow-md text-[#575757]">
           <button
             className={`px-2 py-1.5 rounded-full text-[#575757] text-[13px] bg-[${
@@ -373,6 +391,6 @@ export default function EmployeesPage() {
           />
         </div>
       </div>
-    </MainLayout>
+    </Layout>
   );
 }
