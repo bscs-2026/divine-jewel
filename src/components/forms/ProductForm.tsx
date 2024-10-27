@@ -29,6 +29,7 @@ interface ProductFormProps {
   addProduct: (product: Product) => void;
   saveProduct: (product: Product) => void;
   onClose: () => void;
+  loading: boolean;
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({

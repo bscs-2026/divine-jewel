@@ -10,6 +10,8 @@ import Modal from '../../components/modals/Modal';
 import SupplyBatchForm from '../../components/forms/SupplyBatch';
 import { generateBatchID } from '../../lib/helpers';
 import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
+import CircularIndeterminate from '@/components/loading/Loading';
+
 
 interface Supplier {
   id: number;
@@ -37,6 +39,8 @@ const SuppliesPage: React.FC = () => {
   const [sucessAddSupplierPrompt, setSuccessAddSupplierPrompt] = useState<boolean>(false);
   const [successDeleteSupplierPrompt, setSuccessDeleteSupplierPrompt] = useState<boolean>(false);
   const [successEditSupplierPrompt, setSuccessEditSupplierPrompt] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
 
   useEffect(() => {
     fetchSuppliers();
@@ -44,6 +48,7 @@ const SuppliesPage: React.FC = () => {
   }, []);
 
   const fetchSupplies = async () => {
+    setLoading(true);
     try {
       const response = await fetch('/api/supply');
       const data = await response.json();
@@ -53,6 +58,7 @@ const SuppliesPage: React.FC = () => {
     } catch (error) {
       console.error('Failed to fetch supplies:', error);
     }
+    setLoading(false);
   };
 
   const fetchSuppliers = async () => {
@@ -78,6 +84,7 @@ const SuppliesPage: React.FC = () => {
   };
 
   const addSupply = async (supplies: Supply[], status: 'Pending' | 'Delivered'): Promise<{ ok: boolean }> => {
+    setLoading(true);
     try {
       const batchID = generateBatchID();
       const suppliesWithBatchID = supplies.map(supply => ({ ...supply, batch_id: batchID }));
@@ -98,6 +105,8 @@ const SuppliesPage: React.FC = () => {
     } catch (error) {
       console.error('Failed to add supplies:', error);
       return { ok: false };
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -182,6 +191,10 @@ const SuppliesPage: React.FC = () => {
 
   return (
     <Layout defaultTitle="Supply">
+      {loading && (
+        <CircularIndeterminate />
+      )}
+
       <SupplierTabs
         suppliers={suppliers}
         filterSupplier={filterSupplier}

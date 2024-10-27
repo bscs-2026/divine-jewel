@@ -6,6 +6,8 @@ import StockDetailsTable from '../../components/tables/StockDetailsHistory';
 import HistoryTabs from '../../components/tabs/HistoryTabs';
 import Modal from '../../components/modals/Modal';
 import styles from '@/components/styles/Modal.module.css';
+import CircularIndeterminate from '@/components/loading/Loading';
+import { se } from 'date-fns/locale';
 
 interface StockDetailGroup {
   id: number;
@@ -48,6 +50,9 @@ interface OrderDetail {
   customer_name: string;
   employee_fullname: string;
   product_name: string;
+  sku: String | null;
+  product_size: String | null;
+  product_color: String | null;
   quantity: number;
   price: number | string; // Updated to handle possible string type
   total_price: number | string; // Updated to handle possible string type
@@ -66,6 +71,8 @@ const HistoryPage: React.FC = () => {
   const [selectedOrderID, setSelectedOrderID] = useState<number | null>(null); // State for selected order
   const [stockDetailsIndividual, setStockDetailsIndividual] = useState<StockDetailIndividual[]>([]);
   const [orderDetails, setOrderDetails] = useState<OrderDetail[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+
 
   // Separate modal states for each tab
   const [isStockModalOpen, setIsStockModalOpen] = useState(false);
@@ -80,27 +87,35 @@ const HistoryPage: React.FC = () => {
   }, [selectedTab]);
 
   const fetchStockDetailsGroup = async () => {
+    setLoading(true);
     const response = await fetch('/api/history/stockDetailsGroup');
     const data = await response.json();
     setStockDetailsGroup(data.stockDetails);
+    setLoading(false);
   };
 
   const fetchOrders = async () => {
+    setLoading(true);
     const response = await fetch('/api/history/orders');
     const data = await response.json();
     setOrders(data.orders);
+    setLoading(false);
   };
 
   const fetchStockDetailsIndividual = async (batch_id: string) => {
+    setLoading(true);
     const response = await fetch(`/api/history/${batch_id}/stockDetailsIndividual`);
     const data = await response.json();
     setStockDetailsIndividual(data.stockDetails);
+    setLoading(false);
   };
 
   const fetchOrderDetails = async (order_id: number) => {
+    setLoading(true);
     const response = await fetch(`/api/history/${order_id}/orderDetails`);
     const data = await response.json();
     setOrderDetails(data.orderDetails); // Store order details in state
+    setLoading(false);
   };
 
   const handleViewStockAction = (batch_id: string) => {
@@ -125,6 +140,9 @@ const HistoryPage: React.FC = () => {
 
   return (
     <Layout defaultTitle="History">
+      {loading && (
+        <CircularIndeterminate />
+      )}
       <div>
         <HistoryTabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
 
@@ -146,7 +164,7 @@ const HistoryPage: React.FC = () => {
                   <strong>Batch ID:</strong> {selectedBatchID}
                 </p>
                 <p>
-                  <strong>Date:</strong> {new Date(stockMetadata.date).toLocaleDateString()}
+                  <strong>Date & Time:</strong> {new Date(stockMetadata.date).toLocaleDateString()}
                 </p>
                 <p>
                   <strong>Time:</strong> {new Date(stockMetadata.date).toLocaleTimeString()}
@@ -200,7 +218,7 @@ const HistoryPage: React.FC = () => {
               <div className={styles.modalContentScrollable}>
 
                 <h2 className={styles.receiptSubHeading}>Divine Jewel</h2>
-                
+
                 <div className={styles.companyDetails}>
                   <h2>{orderMetadata.branch_name}</h2>
                   <h2>{orderMetadata.branch_address}</h2>
@@ -210,10 +228,10 @@ const HistoryPage: React.FC = () => {
                   <strong>Order ID:</strong> {selectedOrderID}
                 </p>
                 <p>
-                  <strong>Date:</strong> {new Date(orderMetadata.order_date).toLocaleDateString()}
-                </p>
-                <p>
-                  <strong>Time:</strong> {new Date(orderMetadata.order_date).toLocaleTimeString()}
+                  <strong>Date and Time:</strong>
+                  {new Date(orderMetadata.order_date).toLocaleString('en-US', {
+                    timeZone: 'Asia/Manila'
+                  })}
                 </p>
                 <p>
                   <strong>Customer Name:</strong> {orderMetadata.customer_name || 'N/A'}
@@ -234,7 +252,7 @@ const HistoryPage: React.FC = () => {
                   <tbody>
                     {orderDetails.map((detail, index) => (
                       <tr key={index}>
-                        <td>{detail.product_name}</td>
+                        <td>{detail.sku} - {detail.product_name} - {detail.product_size}, {detail.product_color}</td>
                         <td>{detail.quantity}</td>
                         <td>{Number(detail.price).toFixed(2)}</td>
                         <td>{Number(detail.total_price).toFixed(2)}</td>

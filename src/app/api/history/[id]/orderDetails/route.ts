@@ -20,6 +20,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         b.name AS branch_name,
         b.address_line AS branch_address,
         p.name AS product_name,
+        p.size AS product_size,
+        p.color AS product_color,
         od.sku,
         od.quantity,
         od.unit_price AS price,

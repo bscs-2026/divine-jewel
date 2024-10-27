@@ -6,6 +6,7 @@ import ProductStocksTable from '../../components/tables/ProductListOnTrans';
 import BranchFilter from '../../components/filters/StoreBranchOnTrans';
 import OrderForm from '../../components/forms/Orders';
 import { SuccessfulPrompt } from '@/components/prompts/Prompt';
+import CircularIndeterminate from '@/components/loading/Loading';
 
 interface Product {
   product_id: number;
@@ -37,12 +38,15 @@ export default function TransactionsPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   const [successOrderPrompt, setSuccessOrderPrompt] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
+
 
   useEffect(() => {
     fetchData();
   }, [selectedBranch, selectedCategory]);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const response = await fetch('/api/orders/products');
 
@@ -72,6 +76,8 @@ export default function TransactionsPage() {
     } catch (error: any) {
       console.error('Error occurred during data fetch:', error);
       setError(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 

@@ -5,6 +5,7 @@ import styles from '../styles/Form.module.css';
 import { SuccessfulPrompt } from "@/components/prompts/Prompt";
 import ReturnOrder from './ReturnOrder';
 import { formatDate } from '../../lib/helpers';
+import CircularIndeterminate from '@/components/loading/Loading';
 
 
 const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) => {
@@ -40,7 +41,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         updateTime();
         const intervalId = setInterval(updateTime, 1000);
         return () => clearInterval(intervalId);
-    }, [selectedProducts]);
+    }, []);
 
     useEffect(() => {
         if (successOrderPrompt) {
