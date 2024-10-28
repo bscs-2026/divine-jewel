@@ -146,6 +146,10 @@ export default function TransactionsPage() {
         />
       }
     >
+      {loading && (
+        <CircularIndeterminate />
+      )}
+      
       <BranchFilter
         branches={branches}
         selectedBranch={selectedBranch}
