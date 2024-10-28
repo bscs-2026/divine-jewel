@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { AddBox, IndeterminateCheckBox, ArrowDropUp, ArrowDropDown, Add } from '@mui/icons-material';
 import styles from '../styles/Form.module.css';
@@ -74,11 +74,6 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         setSelectedProducts(updatedProducts);
     };
 
-    const handlePaymentMethodChange = (method) => {
-        setSelectedPaymentMethod(method);
-        setTenderedAmount(0);
-    };
-
     const handleTenderedAmountChange = (event) => {
         setTenderedAmount(parseFloat(event.target.value) || 0);
     };
@@ -89,10 +84,40 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         setReferenceNumber(event.target.value);
     };
 
-    const totalAmountBeforeDiscount = selectedProducts.reduce((total, product) => {
-        const quantity = productQuantities[product.product_id] || 1;
-        return total + (parseFloat(product.price) * quantity || 0);
-    }, 0);
+    const totalAmountBeforeDiscount = useMemo(() => {
+        return selectedProducts.reduce((total, product) => {
+            const quantity = productQuantities[product.product_id] || 1;
+            return total + (parseFloat(product.price) * quantity || 0);
+        }, 0);
+    }, [selectedProducts, productQuantities]);
+
+    useEffect(() => {
+        const discount = (totalAmountBeforeDiscount * discountPercentage) / 100;
+        setDiscountedAmount(totalAmountBeforeDiscount - discount);
+    }, [discountPercentage, totalAmountBeforeDiscount]);
+
+    useEffect(() => {
+        if (selectedPaymentMethod === 'E-Wallet') {
+            if (discountPercentage > 0) {
+                setTenderedAmount(discountedAmount);
+            } else {
+                setTenderedAmount(totalAmountBeforeDiscount);
+            }
+        }
+    }, [selectedPaymentMethod, discountPercentage, discountedAmount, totalAmountBeforeDiscount]);
+
+    const handlePaymentMethodChange = (method) => {
+        setSelectedPaymentMethod(method);
+        if (method === 'E-Wallet') {
+            if (discountPercentage > 0) {
+                setTenderedAmount(discountedAmount);
+            } else {
+                setTenderedAmount(totalAmountBeforeDiscount);
+            }
+        } else {
+            setTenderedAmount(0);
+        }
+    };
 
     const handlePlaceOrder = async () => {
         setIsLoading(true);
@@ -317,6 +342,8 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                             className={styles.tenderedInput}
                             value={tenderedAmount === 0 ? '' : tenderedAmount}
                             onChange={handleTenderedAmountChange}
+                            readOnly
+
                         />
 
                     </div>
