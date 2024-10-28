@@ -40,6 +40,10 @@ interface Order {
   date: string;
   employee_name: string;
   total_amount: string;
+  discount_pct: string;
+  discounted_amount: string;
+  branch_name: string;
+
 }
 
 interface OrderDetail {
@@ -228,18 +232,18 @@ const HistoryPage: React.FC = () => {
                   <strong>Order ID:</strong> {selectedOrderID}
                 </p>
                 <p>
-                  <strong>Date and Time:</strong>
+                  <strong>Date and Time: </strong>
                   {new Date(orderMetadata.order_date).toLocaleString('en-US', {
                     timeZone: 'Asia/Manila'
                   })}
                 </p>
                 <p>
-                  <strong>Customer Name:</strong> {orderMetadata.customer_name || 'N/A'}
-                </p>
-                <p>
                   <strong>Employee Name:</strong> {orderMetadata.employee_fullname}
                 </p>
 
+                <p>
+                  <strong>Customer Name:</strong> {orderMetadata.customer_name || 'N/A'}
+                </p>
                 <table className={styles.receiptTable}>
                   <thead>
                     <tr>
@@ -276,14 +280,11 @@ const HistoryPage: React.FC = () => {
                 <br />
 
                 <p>
-                  <strong>MOP:</strong> {orderMetadata.mop}
+                  <strong>MOP:</strong> {orderMetadata.mop === 'E-Wallet' ? (orderMetadata.e_wallet_provider || 'N/A') : orderMetadata.mop}
                 </p>
 
                 {orderMetadata.mop && orderMetadata.mop.toLowerCase() === 'e-wallet' && (
                   <>
-                    <p>
-                      <strong>E-Wallet Provider:</strong> {orderMetadata.e_wallet_provider || 'N/A'}
-                    </p>
                     <p>
                       <strong>Reference Number:</strong> {orderMetadata.reference_number || 'N/A'}
                     </p>
