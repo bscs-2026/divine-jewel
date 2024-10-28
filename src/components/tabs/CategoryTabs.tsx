@@ -1,8 +1,6 @@
-// src/components/CategoryTabs.tsx
 import React from 'react';
 import styles from '../styles/Layout2.module.css';
-import { AddBox } from '@mui/icons-material';
-
+import formStyles from '../styles/Form.module.css';
 
 interface Category {
   id: number;
@@ -22,54 +20,53 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
   filterCategory,
   setFilterCategory,
   toggleManageCategories,
-  handleAddProduct
+  handleAddProduct,
 }) => {
+  const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value;
+    setFilterCategory(value === 'null' ? null : parseInt(value));
+  };
+
   return (
     <div className={styles.tabsContainer}>
       <div className={styles.leftTabs}>
-        <button
-          className={`${styles.tabsContainerItem}  ${filterCategory === null ? styles.active : styles.inactive}`}
-          onClick={() => setFilterCategory(null)}
+        <label className={formStyles.heading} htmlFor="category-filter">
+          Select Category:
+        </label>
+        <select
+          className={formStyles.select}
+          id="category-filter"
+          value={filterCategory === null ? 'null' : filterCategory.toString()}
+          onChange={handleCategoryChange}
         >
-          All
-        </button>
-        {categories.map(category => (
-          <button
-            key={category.id}
-            className={`${styles.tabsContainerItem} ${filterCategory === category.id ? styles.active : styles.inactive}`}
-            onClick={() => setFilterCategory(category.id)}
-          >
-            {category.name}
-          </button>
-        ))}
-        <button
-          className={`${styles.tabsContainerItem} ${filterCategory === 'Archive' ? styles.active : styles.inactive}`}
-          onClick={() => setFilterCategory('Archive')}
-        >
-          Archived
-        </button>
+          <option value="null">All</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id.toString()}>
+              {category.name}
+            </option>
+          ))}
+          <option value="Archive">Archived</option>
+        </select>
+      </div>
 
+      <div className={styles.rightButtonGroup}>
         <button
-          className={`${styles.tabsContainerItem} ${styles.verticalLine}`}
+          className={`${styles.tabsContainerItem} ${
+            filterCategory === 'manage' ? styles.active : styles.inactive
+          }`}
           onClick={toggleManageCategories}
         >
           Manage Categories
         </button>
-      </div>
-      <div className={styles.rightButtonGroup}>
-        <AddBox
-          onClick={handleAddProduct}
-          style={{ cursor: 'pointer', color: '#575757', marginRight: '5px', fontSize: '2.5rem' }}
-        />
 
-
-        {/* <button
-          className={`${styles.tabsContainerItem}`}
+        <button
+          className={`${styles.tabsContainerItem} ${
+            filterCategory === 'add' ? styles.active : styles.inactive
+          }`}
           onClick={handleAddProduct}
         >
-          Add
-        </button> */}
-
+          Add Product
+        </button>
       </div>
     </div>
   );

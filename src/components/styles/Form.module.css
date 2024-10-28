@@ -78,7 +78,8 @@
 }
 
 .select {
-  width: 100%;
+  width: 300px;
+  max-width: 100%;
   padding: 0.5rem;
   border: 1px solid #DDDDDD;
   border-radius: 0.5rem;
@@ -440,4 +441,20 @@
   font-size: 16px;
   font-weight: normal;
   color: #575757;
+}
+
+.tabButtons {
+  white-space: nowrap;
+  padding: 5px 10px;
+  cursor: pointer;
+  border: 1px solid #DDD;
+  border-radius: 5px;
+  transition: background-color 0.3s, color 0.3s;
+  margin-left: auto;
+}
+
+
+.tabButtons:hover {
+  background-color: #FFE7EF;
+  cursor: pointer;
 }

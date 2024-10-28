@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from '../styles/Layout2.module.css';
+import formStyles from '../styles/Form.module.css';
 import { AddBox } from '@mui/icons-material';
 
 interface Supplier {
@@ -22,41 +23,50 @@ const SupplierTabs: React.FC<SupplierTabsProps> = ({
   handleAddSupply,
   toggleManageSuppliers,
 }) => {
-  const handleSupplierClick = (id: number | string | null) => {
-    // console.log("Supplier clicked, ID:", id);
-    setFilterSupplier(id);
+  const handleSupplierChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = event.target.value === 'null' ? null : parseInt(event.target.value);
+    setFilterSupplier(value);
   };
 
   return (
     <div className={styles.tabsContainer}>
       <div className={styles.leftTabs}>
-        <button
-          className={`${styles.tabsContainerItem} ${filterSupplier === null ? styles.active : styles.inactive}`}
-          onClick={() => handleSupplierClick(null)}
+        <label className={formStyles.heading} htmlFor="supplier-filter">
+          Select Supplier:
+        </label>
+        <select
+          className={formStyles.select}
+          id="supplier-filter"
+          value={filterSupplier === null ? 'null' : filterSupplier.toString()}
+          onChange={handleSupplierChange}
         >
-          All
-        </button>
-        {suppliers.map((supplier) => (
-          <button
-            key={supplier.id}
-            className={`${styles.tabsContainerItem} ${filterSupplier === supplier.id ? styles.active : styles.inactive}`}
-            onClick={() => handleSupplierClick(supplier.id)} // Set the supplier ID on click
-          >
-            {supplier.supplier_name}
-          </button>
-        ))}
+          <option value="null">All</option>
+          {suppliers.map((supplier) => (
+            <option key={supplier.id} value={supplier.id.toString()}>
+              {supplier.supplier_name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className={styles.rightButtonGroup}>
         <button
-          className={`${styles.tabsContainerItem} ${styles.verticalLine}`}
+          className={`${styles.tabsContainerItem} ${
+            filterSupplier === 'manage' ? styles.active : styles.inactive
+          }`}
           onClick={toggleManageSuppliers}
         >
           Manage Suppliers
         </button>
-      </div>
-      <div className={styles.rightButtonGroup}>
-        <AddBox
+
+        <button
+          className={`${styles.tabsContainerItem} ${
+            filterSupplier === 'add' ? styles.active : styles.inactive
+          }`}
           onClick={handleAddSupply}
-          style={{ cursor: 'pointer', color: '#575757', marginRight: '5px', fontSize: '2.5rem' }}
-        />
+        >
+          Add Supply
+        </button>
       </div>
     </div>
   );
