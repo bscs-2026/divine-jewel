@@ -59,10 +59,10 @@
 }
 
 .tabsContainerItem {
-    padding: 0.25rem 0.75rem;
+    padding: 0.75rem 0.75rem;
     border-radius: 1.5rem;
     color: #575757;
-    font-size: 13px;
+    font-size: 14px;
     transition: background-color 0.3s, color 0.3s;
     cursor: pointer;
 }
@@ -72,11 +72,11 @@
 }
 
 .tabsContainerItem.inactive {
-    background-color: #F9F9F9;
+    background-color: #FFE7EF;
 }
 
 .tabsContainerItem.inactive:hover {
-    background-color: #FFE7EF;
+    background-color: #FCB6D7;
     color: #575757;
 }
 
@@ -99,6 +99,8 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    justify-content: flex-end;
+    margin-left: auto;
 }
 
 .tabsContainerItem:disabled {
