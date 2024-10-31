@@ -282,7 +282,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
             </div>
 
             <div className={styles.payRow}>
-                <label>Total Amount:</label>
+                <label>SubTotal Amount:</label>  {/*Total Amount in db Before Discount*/}
                 <strong>{"₱ " + totalAmountBeforeDiscount.toFixed(2)}</strong>
             </div>
 
@@ -296,12 +296,16 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 />
             </div>
 
-            {discountPercentage > 0 && (
+            {/* {discountPercentage > 0 && (
                 <div className={styles.payRow}>
                     <label>Discounted Amount:</label>
                     <strong>{"₱ " + discountedAmount.toFixed(2)}</strong>
                 </div>
-            )}
+            )} */}
+            <div className={styles.payRow}>
+                <label>Total Amount:</label> {/*Discounted Amount in db */}
+                <strong>{"₱ " + discountedAmount.toFixed(2)}</strong>
+            </div>
 
             {selectedPaymentMethod === 'Cash' && (
                 <div className={styles.tenderAmount}>
