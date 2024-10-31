@@ -139,8 +139,10 @@ const HistoryPage: React.FC = () => {
   const calculateDiscountInPesos = (totalAmount: number, discountPercent: number) => {
     return (totalAmount * (discountPercent / 100)).toFixed(2);
   };
-
-
+  const handlePrint = () => {
+    window.print();
+  };
+  
 
   const stockMetadata = stockDetailsIndividual.length > 0 ? stockDetailsIndividual[0] : null;
   const orderMetadata = orderDetails.length > 0 ? orderDetails[0] : null;
@@ -236,22 +238,13 @@ const HistoryPage: React.FC = () => {
                   <h2>{orderMetadata.branch_address}</h2>
                 </div>
 
-                <p>
-                  <strong>Order ID:</strong> {selectedOrderID}
-                </p>
-                <p>
-                  <strong>Date and Time: </strong>
-                  {new Date(orderMetadata.order_date).toLocaleString('en-US', {
-                    timeZone: 'Asia/Manila'
-                  })}
-                </p>
-                <p>
-                  <strong>Employee Name:</strong> {orderMetadata.employee_fullname}
-                </p>
+                <br />
 
-                <p>
-                  <strong>Customer Name:</strong> {orderMetadata.customer_name || 'N/A'}
-                </p>
+                <p><strong>Order ID:</strong> {selectedOrderID}</p>
+                <p><strong>Date and Time: </strong>{new Date(orderMetadata.order_date).toLocaleString('en-US', { timeZone: 'Asia/Manila' })}</p>
+                <p><strong>Employee Name:</strong> {orderMetadata.employee_fullname}</p>
+                <p><strong>Customer Name:</strong> {orderMetadata.customer_name || 'N/A'}</p>
+
                 <table className={styles.receiptTable}>
                   <thead>
                     <tr>
@@ -264,7 +257,7 @@ const HistoryPage: React.FC = () => {
                   <tbody>
                     {orderDetails.map((detail, index) => (
                       <tr key={index}>
-                        <td>{detail.sku} - {detail.product_name} - {detail.product_size}, {detail.product_color}</td>
+                        <td className={styles.itemDescription}>{detail.sku} - {detail.product_name} - {detail.product_size}, {detail.product_color}</td>
                         <td>{detail.quantity}</td>
                         <td>{Number(detail.price).toFixed(2)}</td>
                         <td>{Number(detail.total_price).toFixed(2)}</td>
@@ -273,40 +266,27 @@ const HistoryPage: React.FC = () => {
                   </tbody>
                 </table>
 
-                <br />
-
-                <p>
-                  <strong>Sub Total:</strong> {calculateTotalAmount(orderDetails).toFixed(2)}
-                </p>
-                <p>
-                  <strong>Discount: </strong> 
-                  -{calculateDiscountInPesos(calculateTotalAmount(orderDetails), orderMetadata.discount_percent)} PHP 
-                  ({orderMetadata.discount_percent}% off)
-                </p>
-                <p>
-                  <strong>Total:</strong> {orderMetadata.discounted_amount}
-                </p>
-
-                <p>
-                  <strong>MOP:</strong> {orderMetadata.mop === 'E-Wallet' ? (orderMetadata.e_wallet_provider || 'N/A') : orderMetadata.mop}
-                </p>
-
-                {orderMetadata.mop && orderMetadata.mop.toLowerCase() === 'e-wallet' && (
-                  <>
-                    <p>
-                      <strong>Reference Number:</strong> {orderMetadata.reference_number || 'N/A'}
-                    </p>
-                  </>
-                )}
+                <div className={styles.receiptSummary}>
+                  <p><strong>Sub Total:</strong> {calculateTotalAmount(orderDetails).toFixed(2)}</p>
+                  <p><strong>Discount ({orderMetadata.discount_percent}% off):</strong> -{calculateDiscountInPesos(calculateTotalAmount(orderDetails), orderMetadata.discount_percent)}</p>
+                  <br />
+                  <p><strong>Total:</strong> {orderMetadata.discounted_amount}</p>
+                  <p><strong>MOP:</strong> {orderMetadata.mop === 'E-Wallet' ? (orderMetadata.e_wallet_provider || 'N/A') : orderMetadata.mop}</p>
+                  {orderMetadata.mop && orderMetadata.mop.toLowerCase() === 'e-wallet' && (
+                    <p><strong>Reference Number:</strong> {orderMetadata.reference_number || 'N/A'}</p>
+                  )}
+                  <p><strong>Amount Tendered:</strong> {orderMetadata.amount_tendered}</p>
+                  <p><strong>Change:</strong> {orderMetadata.amount_change}</p>
+                </div>
                 
-                <p>
-                  <strong>Amount Tendered:</strong> {orderMetadata.amount_tendered}
-                </p>
-                <p>
-                  <strong>Change:</strong> {orderMetadata.amount_change}
-                </p>
-
                 <br />
+                <h2 className={styles.receiptSubHeading}>Thank You!</h2>
+                <br />
+
+                {/* Print Button */}
+                <div className={styles.printButtonContainer}>
+                  <button onClick={handlePrint} className={styles.printButton}>Print Receipt</button>
+                </div>
 
               </div>
             </div>

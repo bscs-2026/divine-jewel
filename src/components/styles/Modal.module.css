@@ -305,38 +305,79 @@ body.no-scroll {
 
 /* receipts */
 
-.companyDetails {
-    text-align: center; /* Corrected property */
-    margin-bottom: 10px;
-    font-size: 14px;
-}
-
-.receiptSubHeading {
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-align: center; /* Corrected property */
-}
-
-.orderDetails {
-    flex-direction: column;
-    margin-top: 20px;
-    font-size: 14px;
-}
+/* Modal.module.css */
 
 .receiptTable {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 1em;
   }
   
   .receiptTable th,
   .receiptTable td {
-    border: 1px solid #ffffff;
-    padding: 8px;
+    padding-left: 5px;
+    border-bottom: 1px solid #ddd;
   }
   
   .receiptTable th {
-    background-color: #ffffff;
     text-align: left;
   }
   
+  .receiptTable td {
+    text-align: right;
+  }
+  
+  .receiptTable .itemDescription {
+    text-align: left;
+  }
+  
+  .receiptSummary {
+    margin-top: 1em;
+  }
+  
+  .receiptSummary p {
+    display: flex;
+    justify-content: space-between;
+    margin: 4px 0;
+  }
+  
+  .receiptSubHeading {
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+  }
+  
+  .companyDetails h2 {
+    text-align: center;
+    margin: 0;
+    font-size: 1em;
+  }
+  
+  .modalContentMedium {
+    max-width: 500px;
+    margin: auto;
+    padding: 20px;
+  }
+  
+
+  .printButtonContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 1em;
+  }
+  
+  .printButton {
+    padding: 10px 20px;
+    font-size: 1em;
+    color: white;
+    background-color: #4CAF50; /* Customize the color as needed */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .printButton:hover {
+    background-color: #45a049; /* Darken on hover */
+  }
