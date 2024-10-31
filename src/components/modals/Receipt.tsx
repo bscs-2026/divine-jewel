@@ -55,7 +55,9 @@ const Receipt: React.FC<ReceiptProps> = ({
   return (
     <div className={`${styles.modalContent} ${styles.modalContentMedium}`}>
       <div className={styles.modalContentScrollable}>
-        <h2 className={styles.receiptSubHeading}>Divine Jewel</h2>
+        <div className={styles.header}>
+            <img src="/img/divine-jewel-logo.png" alt="Divine Jewel Logo" className={styles.logo} />
+        </div>
         <div className={styles.companyDetails}>
           <h2>{orderMetadata.branch_name}</h2>
           <h2>{orderMetadata.branch_address}</h2>

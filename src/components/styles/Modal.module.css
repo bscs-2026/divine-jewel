@@ -343,15 +343,14 @@ body.no-scroll {
   
   .receiptSubHeading {
     text-align: center;
-    font-weight: bold;
-    font-size: 2 rem;
-    margin-bottom: 10px;
+    margin: 0;
+    font-size: 1rem;
   }
   
   .companyDetails h2 {
     text-align: center;
     margin: 0;
-    font-size: 1em;
+    font-size: 14px;
   }
   
   .printButtonContainer {
@@ -373,4 +372,15 @@ body.no-scroll {
   
   .printButton:hover {
     background-color: #45a049; /* Darken on hover */
+  }
+
+  .header {
+    text-align: center;
+  }
+  
+  .logo {
+    width: 50%;
+    max-width: 150px;
+    height: auto;
+    margin: 0 auto;
   }
