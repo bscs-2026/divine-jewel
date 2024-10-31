@@ -149,7 +149,7 @@ body.no-scroll {
 }
 
 .modalTable th {
-    background-color: #ffe7ef;
+    /* background-color: #ffe7ef; */
     color: #575757;
     font-weight: bold;
 }

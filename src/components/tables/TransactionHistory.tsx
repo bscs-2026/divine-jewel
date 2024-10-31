@@ -29,9 +29,8 @@ const OrdersTable: React.FC<OrdersTableProps> = ({ orders, onViewAction }) => {
             { Header: 'Date', accessor: 'date' as keyof Order, align: 'left' },
             { Header: 'Employee', accessor: 'employee_name' as keyof Order, align: 'left' },
             { Header: 'Branch', accessor: 'branch_name' as keyof Order, align: 'left' },
-            { Header: 'Total Amount', accessor: 'total_amount' as keyof Order, align: 'right' },
-            { Header: 'Discounted Amount', accessor: 'discounted_amount' as keyof Order, align: 'right' },
-
+            { Header: 'Sub Total', accessor: 'total_amount' as keyof Order, align: 'right' },
+            { Header: 'Total', accessor: 'discounted_amount' as keyof Order, align: 'right' },
             { Header: '', accessor: 'order_id' as keyof Order, align: 'center' },
         ],
         []

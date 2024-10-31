@@ -61,6 +61,8 @@ interface OrderDetail {
   price: number | string; // Updated to handle possible string type
   total_price: number | string; // Updated to handle possible string type
   mop: string;
+  discount_percent: number;
+  discounted_amount: number;
   amount_tendered: number;
   amount_change: number;
   e_wallet_provider: string | null;
@@ -98,19 +100,25 @@ const HistoryPage: React.FC = () => {
     setLoading(false);
   };
 
-  const fetchOrders = async () => {
-    setLoading(true);
-    const response = await fetch('/api/history/orders');
-    const data = await response.json();
-    setOrders(data.orders);
-    setLoading(false);
-  };
-
   const fetchStockDetailsIndividual = async (batch_id: string) => {
     setLoading(true);
     const response = await fetch(`/api/history/${batch_id}/stockDetailsIndividual`);
     const data = await response.json();
     setStockDetailsIndividual(data.stockDetails);
+    setLoading(false);
+  };
+
+  const handleViewStockAction = (batch_id: string) => {
+    fetchStockDetailsIndividual(batch_id);
+    setSelectedBatchID(batch_id);
+    setIsStockModalOpen(true); // Open Stock Modal
+  };
+
+  const fetchOrders = async () => {
+    setLoading(true);
+    const response = await fetch('/api/history/orders');
+    const data = await response.json();
+    setOrders(data.orders);
     setLoading(false);
   };
 
@@ -122,17 +130,17 @@ const HistoryPage: React.FC = () => {
     setLoading(false);
   };
 
-  const handleViewStockAction = (batch_id: string) => {
-    fetchStockDetailsIndividual(batch_id);
-    setSelectedBatchID(batch_id);
-    setIsStockModalOpen(true); // Open Stock Modal
-  };
-
   const handleViewOrderAction = (order_id: number) => {
     setSelectedOrderID(order_id);
     fetchOrderDetails(order_id); // Fetch order details when an order is clicked
     setIsOrderModalOpen(true); // Open Order Modal
   };
+
+  const calculateDiscountInPesos = (totalAmount: number, discountPercent: number) => {
+    return (totalAmount * (discountPercent / 100)).toFixed(2);
+  };
+
+
 
   const stockMetadata = stockDetailsIndividual.length > 0 ? stockDetailsIndividual[0] : null;
   const orderMetadata = orderDetails.length > 0 ? orderDetails[0] : null;
@@ -268,16 +276,16 @@ const HistoryPage: React.FC = () => {
                 <br />
 
                 <p>
-                  <strong>Total:</strong> {calculateTotalAmount(orderDetails).toFixed(2)}
+                  <strong>Sub Total:</strong> {calculateTotalAmount(orderDetails).toFixed(2)}
                 </p>
                 <p>
-                  <strong>Amount Tendered:</strong> {orderMetadata.amount_tendered}
+                  <strong>Discount: </strong> 
+                  -{calculateDiscountInPesos(calculateTotalAmount(orderDetails), orderMetadata.discount_percent)} PHP 
+                  ({orderMetadata.discount_percent}% off)
                 </p>
                 <p>
-                  <strong>Change:</strong> {orderMetadata.amount_change}
+                  <strong>Total:</strong> {orderMetadata.discounted_amount}
                 </p>
-
-                <br />
 
                 <p>
                   <strong>MOP:</strong> {orderMetadata.mop === 'E-Wallet' ? (orderMetadata.e_wallet_provider || 'N/A') : orderMetadata.mop}
@@ -290,6 +298,15 @@ const HistoryPage: React.FC = () => {
                     </p>
                   </>
                 )}
+                
+                <p>
+                  <strong>Amount Tendered:</strong> {orderMetadata.amount_tendered}
+                </p>
+                <p>
+                  <strong>Change:</strong> {orderMetadata.amount_change}
+                </p>
+
+                <br />
 
               </div>
             </div>
