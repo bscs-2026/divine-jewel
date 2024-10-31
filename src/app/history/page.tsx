@@ -7,6 +7,8 @@ import HistoryTabs from '../../components/tabs/HistoryTabs';
 import Modal from '../../components/modals/Modal';
 import styles from '@/components/styles/Modal.module.css';
 import CircularIndeterminate from '@/components/loading/Loading';
+import BatchStockDetailsHistory from '@/components/modals/BatchStockDetailsHistory';
+import Receipt from '@/components/modals/Receipt'; 
 import { se } from 'date-fns/locale';
 
 interface StockDetailGroup {
@@ -54,7 +56,7 @@ interface OrderDetail {
   customer_name: string;
   employee_fullname: string;
   product_name: string;
-  sku: String | null;
+  sku: string | null;
   product_size: String | null;
   product_color: String | null;
   quantity: number;
@@ -134,15 +136,7 @@ const HistoryPage: React.FC = () => {
     setSelectedOrderID(order_id);
     fetchOrderDetails(order_id); // Fetch order details when an order is clicked
     setIsOrderModalOpen(true); // Open Order Modal
-  };
-
-  const calculateDiscountInPesos = (totalAmount: number, discountPercent: number) => {
-    return (totalAmount * (discountPercent / 100)).toFixed(2);
-  };
-  const handlePrint = () => {
-    window.print();
-  };
-  
+  };  
 
   const stockMetadata = stockDetailsIndividual.length > 0 ? stockDetailsIndividual[0] : null;
   const orderMetadata = orderDetails.length > 0 ? orderDetails[0] : null;
@@ -171,127 +165,23 @@ const HistoryPage: React.FC = () => {
         {/* Modal for Stock Details */}
         <Modal show={isStockModalOpen && selectedBatchID !== null} onClose={() => setIsStockModalOpen(false)}>
           {selectedBatchID && stockMetadata && (
-            <div className={`${styles.modalContent} ${styles.modalContentMedium}`}>
-              <div className={styles.modalContentScrollable}>
-                <h2 className={styles.modalHeading}>Stock Details</h2>
-                <p>
-                  <strong>Batch ID:</strong> {selectedBatchID}
-                </p>
-                <p>
-                  <strong>Date & Time:</strong> {new Date(stockMetadata.date).toLocaleDateString()}
-                </p>
-                <p>
-                  <strong>Time:</strong> {new Date(stockMetadata.date).toLocaleTimeString()}
-                </p>
-                <p>
-                  <strong>Source Branch:</strong> {stockMetadata.source_branch_name || 'N/A'}
-                </p>
-                <p>
-                  <strong>Destination Branch:</strong> {stockMetadata.destination_branch_name || 'N/A'}
-                </p>
-                <p>
-                  <strong>Employee:</strong> {stockMetadata.employee_fullname || 'N/A'}
-                </p>
-                <p>
-                  <strong>Note:</strong> {stockMetadata.note || 'N/A'}
-                </p>
-
-                <br />
-                <div className={styles.modalInputHeaderContainer}>
-                  <span className={styles.modalInputLabel}>Qty.</span>
-                </div>
-                {stockDetailsIndividual.map((detail, index) => (
-                  <div key={index} className={styles.modalItem}>
-                    <div>
-                      <p className={styles.modalPrimary}>{detail.product_name}</p>
-                      <p className={styles.modalSecondary}>
-                        SKU: {detail.product_sku} | Size: {detail.product_size} | Color:{' '}
-                        {detail.product_color}
-                      </p>
-                    </div>
-                    <div>
-                      <input
-                        type="number"
-                        name="quantity"
-                        value={detail.quantity}
-                        disabled
-                        className={styles.modalInputFixed}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <BatchStockDetailsHistory
+              stockDetailsIndividual={stockDetailsIndividual}
+              stockMetadata={stockMetadata}
+            />
           )}
         </Modal>
 
         {/* Modal for Order Details */}
         <Modal show={isOrderModalOpen && selectedOrderID !== null} onClose={() => setIsOrderModalOpen(false)}>
-          {selectedOrderID && orderMetadata && (
-            <div className={`${styles.modalContent} ${styles.modalContentMedium}`}>
-              <div className={styles.modalContentScrollable}>
-
-                <h2 className={styles.receiptSubHeading}>Divine Jewel</h2>
-
-                <div className={styles.companyDetails}>
-                  <h2>{orderMetadata.branch_name}</h2>
-                  <h2>{orderMetadata.branch_address}</h2>
-                </div>
-
-                <br />
-
-                <p><strong>Order ID:</strong> {selectedOrderID}</p>
-                <p><strong>Date and Time: </strong>{new Date(orderMetadata.order_date).toLocaleString('en-US', { timeZone: 'Asia/Manila' })}</p>
-                <p><strong>Employee Name:</strong> {orderMetadata.employee_fullname}</p>
-                <p><strong>Customer Name:</strong> {orderMetadata.customer_name || 'N/A'}</p>
-
-                <table className={styles.receiptTable}>
-                  <thead>
-                    <tr>
-                      <th>Item</th>
-                      <th>Qty.</th>
-                      <th>Price</th>
-                      <th>Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {orderDetails.map((detail, index) => (
-                      <tr key={index}>
-                        <td className={styles.itemDescription}>{detail.sku} - {detail.product_name} - {detail.product_size}, {detail.product_color}</td>
-                        <td>{detail.quantity}</td>
-                        <td>{Number(detail.price).toFixed(2)}</td>
-                        <td>{Number(detail.total_price).toFixed(2)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                <div className={styles.receiptSummary}>
-                  <p><strong>Sub Total:</strong> {calculateTotalAmount(orderDetails).toFixed(2)}</p>
-                  <p><strong>Discount ({orderMetadata.discount_percent}% off):</strong> -{calculateDiscountInPesos(calculateTotalAmount(orderDetails), orderMetadata.discount_percent)}</p>
-                  <br />
-                  <p><strong>Total:</strong> {orderMetadata.discounted_amount}</p>
-                  <p><strong>MOP:</strong> {orderMetadata.mop === 'E-Wallet' ? (orderMetadata.e_wallet_provider || 'N/A') : orderMetadata.mop}</p>
-                  {orderMetadata.mop && orderMetadata.mop.toLowerCase() === 'e-wallet' && (
-                    <p><strong>Reference Number:</strong> {orderMetadata.reference_number || 'N/A'}</p>
-                  )}
-                  <p><strong>Amount Tendered:</strong> {orderMetadata.amount_tendered}</p>
-                  <p><strong>Change:</strong> {orderMetadata.amount_change}</p>
-                </div>
-                
-                <br />
-                <h2 className={styles.receiptSubHeading}>Thank You!</h2>
-                <br />
-
-                {/* Print Button */}
-                <div className={styles.printButtonContainer}>
-                  <button onClick={handlePrint} className={styles.printButton}>Print Receipt</button>
-                </div>
-
-              </div>
-            </div>
-          )}
-        </Modal>
+        {selectedOrderID && orderMetadata && (
+          <Receipt
+            orderDetails={orderDetails}
+            orderMetadata={orderMetadata}
+          />
+        )}
+      </Modal>
+      
       </div>
     </Layout>
   );
