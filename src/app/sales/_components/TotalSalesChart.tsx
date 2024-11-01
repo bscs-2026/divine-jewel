@@ -33,11 +33,10 @@ const barChartConfig = {
 interface TotalSalesChartProps {
   activeChart: keyof typeof barChartConfig;
   setActiveChart: (chart: keyof typeof barChartConfig) => void;
-  barChartConfig: ChartConfig;
 }
   
 
-const TotalSalesChart: React.FC<TotalSalesChartProps> = ({ activeChart, setActiveChart, barChartConfig }) => {
+const TotalSalesChart: React.FC<TotalSalesChartProps> = ({ activeChart, setActiveChart }) => {
   const total = React.useMemo(
     () => ({
       sales: chartData.reduce((acc, curr) => acc + curr.sales, 0),
