@@ -360,18 +360,19 @@ body.no-scroll {
   }
   
   .printButton {
-    padding: 10px 20px;
-    font-size: 1em;
-    color: white;
-    background-color: #4CAF50; /* Customize the color as needed */
-    border: none;
-    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    color: #575757;
+    font-size: 14px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    background-color: #FCB6D7;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.3s ease, transform 0.2s ease;
   }
   
   .printButton:hover {
-    background-color: #45a049; /* Darken on hover */
+    background-color: #FCB6D7;
+    transform: translateY(-2px); /* Darken on hover */
   }
 
   .header {
@@ -384,3 +385,19 @@ body.no-scroll {
     height: auto;
     margin: 0 auto;
   }
+
+  .modalMediumButton {
+    padding: 0.5rem 1rem;
+    border-radius: 0.75rem;
+    color: #575757;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #FCB6D7;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.modalMediumButton:hover {
+    background-color: #FCB6D7;
+    transform: translateY(-2px);
+}

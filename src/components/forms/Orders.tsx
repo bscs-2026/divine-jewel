@@ -254,10 +254,6 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
 
                 {/* Customer Name and Current Order */}
                 <div className={styles.orderCustomerContainer}>
-                    {/* <div className={styles.orderLeft}>
-                        <div className={styles.heading2}>Current Order</div>
-                    </div> */}
-                    {/* <div className={styles.verticalLineShort}></div> */}
                     <div className={styles.customerRight}>
                         <input
                             type="text"
