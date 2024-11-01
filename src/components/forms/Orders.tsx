@@ -185,7 +185,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
 
             const data = await response.json();
             console.log('Server response:', data);
-            
+
             if (response.ok) {
                 setSuccessOrderPrompt(true);
                 const order_id = data.order_id; 
@@ -230,6 +230,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         setReferenceNumber('');
         setTenderedAmount(0);
         setCustomerName('');
+        setDiscountPercentage(0);
         // setSuccessMessage(null);
     };
 
