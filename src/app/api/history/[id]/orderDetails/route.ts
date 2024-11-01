@@ -16,6 +16,8 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
         o.id AS order_id,
         o.date AS order_date,
         o.customer_name,
+        o.discount_pct AS discount_percent,
+        o.discounted_amount,
         CONCAT(e.first_name, ' ', e.last_name) AS employee_fullname,
         b.name AS branch_name,
         b.address_line AS branch_address,

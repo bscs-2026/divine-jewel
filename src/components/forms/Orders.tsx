@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { AddBox, IndeterminateCheckBox, ArrowDropUp, ArrowDropDown, Add } from '@mui/icons-material';
 import styles from '../styles/Form.module.css';
@@ -6,6 +6,8 @@ import { SuccessfulPrompt } from "@/components/prompts/Prompt";
 import ReturnOrder from './ReturnOrder';
 import { formatDate } from '../../lib/helpers';
 import CircularIndeterminate from '@/components/loading/Loading';
+import Modal from '../../components/modals/Modal'; // Adjust the import path as needed
+import Receipt from '../modals/Receipt'; // Adjust the import path as needed
 
 
 const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) => {
@@ -31,6 +33,32 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
     const [currentTime, setCurrentTime] = useState<string>('');
     const [discountPercentage, setDiscountPercentage] = useState(0);
     const [discountedAmount, setDiscountedAmount] = useState(0);
+    const [orderDetails, setOrderDetails] = useState<OrderDetail[]>([]);
+    const [orderMetadata, setOrderMetadata] = useState<OrderDetail | null>(null);
+    const [showReceipt, setShowReceipt] = useState(false);
+
+    interface OrderDetail {
+        order_id: number;
+        order_date: string;
+        branch_name: string;
+        branch_address: string;
+        customer_name: string;
+        employee_fullname: string;
+        product_name: string;
+        sku: string | null;
+        product_size: string | null;
+        product_color: string | null;
+        quantity: number;
+        price: number | string;
+        total_price: number | string;
+        mop: string;
+        discount_percent: number;
+        discounted_amount: number;
+        amount_tendered: number;
+        amount_change: number;
+        e_wallet_provider: string | null;
+        reference_number: string | null;
+      }
 
 
     useEffect(() => {
@@ -74,11 +102,6 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         setSelectedProducts(updatedProducts);
     };
 
-    const handlePaymentMethodChange = (method) => {
-        setSelectedPaymentMethod(method);
-        setTenderedAmount(0);
-    };
-
     const handleTenderedAmountChange = (event) => {
         setTenderedAmount(parseFloat(event.target.value) || 0);
     };
@@ -89,10 +112,40 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         setReferenceNumber(event.target.value);
     };
 
-    const totalAmountBeforeDiscount = selectedProducts.reduce((total, product) => {
-        const quantity = productQuantities[product.product_id] || 1;
-        return total + (parseFloat(product.price) * quantity || 0);
-    }, 0);
+    const totalAmountBeforeDiscount = useMemo(() => {
+        return selectedProducts.reduce((total, product) => {
+            const quantity = productQuantities[product.product_id] || 1;
+            return total + (parseFloat(product.price) * quantity || 0);
+        }, 0);
+    }, [selectedProducts, productQuantities]);
+
+    useEffect(() => {
+        const discount = (totalAmountBeforeDiscount * discountPercentage) / 100;
+        setDiscountedAmount(totalAmountBeforeDiscount - discount);
+    }, [discountPercentage, totalAmountBeforeDiscount]);
+
+    useEffect(() => {
+        if (selectedPaymentMethod === 'E-Wallet') {
+            if (discountPercentage > 0) {
+                setTenderedAmount(discountedAmount);
+            } else {
+                setTenderedAmount(totalAmountBeforeDiscount);
+            }
+        }
+    }, [selectedPaymentMethod, discountPercentage, discountedAmount, totalAmountBeforeDiscount]);
+
+    const handlePaymentMethodChange = (method) => {
+        setSelectedPaymentMethod(method);
+        if (method === 'E-Wallet') {
+            if (discountPercentage > 0) {
+                setTenderedAmount(discountedAmount);
+            } else {
+                setTenderedAmount(totalAmountBeforeDiscount);
+            }
+        } else {
+            setTenderedAmount(0);
+        }
+    };
 
     const handlePlaceOrder = async () => {
         setIsLoading(true);
@@ -131,8 +184,13 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
             });
 
             const data = await response.json();
+            console.log('Server response:', data);
+
             if (response.ok) {
                 setSuccessOrderPrompt(true);
+                const order_id = data.order_id; 
+                // const order_id = 95; //testing
+                fetchOrderDetails(order_id); // Fetch order details
             } else {
                 console.error('Failed to place order:', data.error);
             }
@@ -142,6 +200,22 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
             setIsLoading(false);
         }
     };
+
+      // Define fetchOrderDetails function
+    const fetchOrderDetails = async (order_id: number) => {
+        setShowReceipt(true);
+        try {
+            const response = await fetch(`/api/history/${order_id}/orderDetails`);
+            const data = await response.json();
+            setOrderDetails(data.orderDetails);
+            if (data.orderDetails.length > 0) {
+                setOrderMetadata(data.orderDetails[0]); // Use the first item as metadata
+            }
+        } catch (error) {
+            console.error('Error fetching order details:', error);
+        }
+    };
+
 
     const change = tenderedAmount > discountedAmount ? tenderedAmount - discountedAmount : 0;
 
@@ -156,6 +230,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         setReferenceNumber('');
         setTenderedAmount(0);
         setCustomerName('');
+        setDiscountPercentage(0);
         // setSuccessMessage(null);
     };
 
@@ -179,10 +254,6 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
 
                 {/* Customer Name and Current Order */}
                 <div className={styles.orderCustomerContainer}>
-                    {/* <div className={styles.orderLeft}>
-                        <div className={styles.heading2}>Current Order</div>
-                    </div> */}
-                    {/* <div className={styles.verticalLineShort}></div> */}
                     <div className={styles.customerRight}>
                         <input
                             type="text"
@@ -251,13 +322,10 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 <button className={`${styles.paymentButton} ${selectedPaymentMethod === 'E-Wallet' ? styles.activePaymentButton : ''}`} onClick={() => handlePaymentMethodChange('E-Wallet')}>
                     E-Wallet
                 </button>
-                {/* <button className={`${styles.paymentButton} ${selectedPaymentMethod === 'Bank Transfer' ? styles.activePaymentButton : ''}`} onClick={() => handlePaymentMethodChange('Bank Transfer')}>
-                    Bank Transfer
-                </button> */}
             </div>
 
             <div className={styles.payRow}>
-                <label>Total Amount:</label>
+                <label>SubTotal Amount:</label>  {/*Total Amount in db Before Discount*/}
                 <strong>{"₱ " + totalAmountBeforeDiscount.toFixed(2)}</strong>
             </div>
 
@@ -271,12 +339,10 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 />
             </div>
 
-            {discountPercentage > 0 && (
-                <div className={styles.payRow}>
-                    <label>Discounted Amount:</label>
-                    <strong>{"₱ " + discountedAmount.toFixed(2)}</strong>
-                </div>
-            )}
+            <div className={styles.payRow}>
+                <label>Total Amount:</label> {/*Discounted Amount in db */}
+                <strong>{"₱ " + discountedAmount.toFixed(2)}</strong>
+            </div>
 
             {selectedPaymentMethod === 'Cash' && (
                 <div className={styles.tenderAmount}>
@@ -317,6 +383,8 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                             className={styles.tenderedInput}
                             value={tenderedAmount === 0 ? '' : tenderedAmount}
                             onChange={handleTenderedAmountChange}
+                            readOnly
+
                         />
 
                     </div>
@@ -406,6 +474,20 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 isVisible={successOrderPrompt}
                 onClose={() => setSuccessOrderPrompt(false)}
             />
+
+            {/* Render the Receipt component inside a Modal when showReceipt is true */}
+            {showReceipt && (
+                <Modal show={showReceipt} onClose={() => setShowReceipt(false)}>
+                    {orderMetadata && (
+                        <Receipt
+                            orderDetails={orderDetails}
+                            orderMetadata={orderMetadata}
+                        />
+                    )}
+                </Modal>
+            )}
+
+            
         </div>
     );
 };

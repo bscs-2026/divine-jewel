@@ -10,11 +10,16 @@ export async function GET() {
           o.id AS order_id,
           o.date,
           o.total_amount,
-          CONCAT(e.first_name, ' ', e.last_name) AS employee_name
+          o.discount_pct,
+          o.discounted_amount,
+          CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
+          b.name AS branch_name
       FROM 
           orders o
       LEFT JOIN 
           employees e ON o.employee_id = e.id
+      LEFT JOIN 
+          branches b ON o.branch_code = b.id
       WHERE 
           o.id IS NOT NULL
       ORDER BY 
