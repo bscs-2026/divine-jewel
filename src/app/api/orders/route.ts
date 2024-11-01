@@ -41,7 +41,9 @@ export async function POST(request: NextRequest) {
             ]
         );
 
+        // Retrieve the newly generated `order_id`
         const orderId = orderResult.insertId;
+        console.log('Generated order_id:', orderId);
 
         for (const item of order_items) {
             const { product_id, sku, quantity, unit_price } = item;
@@ -95,7 +97,10 @@ export async function POST(request: NextRequest) {
         console.log('Order, payment, stock updated, and order_details status set to paid successfully');
 
         return NextResponse.json(
-            { message: 'Order, details, payment, stock updated, and status paid successfully' },
+            {
+                message: 'Order, details, payment, stock updated, and status paid successfully',
+                order_id: orderId // Include the `order_id` in the response
+            },
             { status: 201 }
         );
     } catch (error: any) {
