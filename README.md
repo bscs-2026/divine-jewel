@@ -5,17 +5,33 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 First, setup all the dependencies
 1. Docker
 2. Database
-3. Create .env config file
+3. Create .env.development config file
 ```
-cp -rp .env.example .env
+cp -rp .env.example .env.development
 ```
-Change the values of .env file based on your database access 
+Change the values of .env.development file based on your database access 
 
 Finally, run the development server:
 
 ```bash
-docker-compose build 
-docker-compose up -d
+Run for development:
+docker-compose build --no-cache && docker-compose up -d
+or
+docker-compose build && docker-compose up -d
+
+Build for production:
+NODE_ENV=production docker-compose up --build
+```
+
+## Debug Docker
+```
+# check the container logs to see any specific error messages:
+docker-compose logs -f web
+
+# If not running, try running the container interactively to debug:
+docker run -it --entrypoint sh divine-jewel-web
+npm install
+npm run dev
 ```
 
 Open [http://localhost:8000](http://localhost:8000) with your browser to see the result.

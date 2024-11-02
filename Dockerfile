@@ -4,27 +4,66 @@ FROM node:22-alpine
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the package.json and package-lock.json files
+# Copy package files for installing dependencies
 COPY package*.json ./
 
-COPY .env ./
+# Copy environment files into the container
+COPY .env.production ./
+COPY .env.development ./
 
-# # Copy the rest of the application code
+# Copy the rest of the application code
 COPY . .
 
-# Install dependencies
-RUN rm -rf node_modules package-lock.json
-RUN npm cache clean --force
-RUN npm install
+# Use a build argument to determine which .env file to copy based on NODE_ENV
+RUN if [ "$NODE_ENV" = "production" ]; then \
+        echo "Copying production .env file" && \
+        cp .env.production .env; \
+    else \
+        echo "Copying development .env file" && \
+        cp .env.development .env; \
+    fi
 
-# Build the Next.js app
-# production
-# RUN npm run build
+
+# Install dependencies
+RUN npm cache clean --force && rm -rf node_modules package-lock.json && npm install
+# Use the official Node.js image as the base image
+FROM node:22-alpine
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy package files for installing dependencies
+COPY package*.json ./
+
+# Copy the rest of the application code
+COPY . .
+
+# Set a build argument for NODE_ENV with a default value of development, else use the value passed in e.g. NODE_ENV=production
+ARG NODE_ENV=development
+
+# Print the NODE_ENV value
+RUN echo "NODE_ENV is set to: $NODE_ENV"
+
+# Copy environment file into the container
+COPY .env.$NODE_ENV ./.env
+
+# Install dependencies
+RUN npm cache clean --force && rm -rf node_modules package-lock.json && npm install
+
+# Build the Next.js app if NODE_ENV is production
+RUN if [ "$NODE_ENV" = "production" ]; then npm run build; fi
 
 # Expose the port the app runs on
 EXPOSE 3000
 
-# Command to run the Next.js app
-# production
-# CMD ["npm", "start"]
-CMD ["npm", "run", "dev"]
+# Command to run the Next.js app based on NODE_ENV
+CMD ["sh", "-c", "if [ \"$NODE_ENV\" = \"production\" ]; then npm start; else npm run dev; fi"]
+
+# Build the Next.js app if NODE_ENV is production
+RUN if [ "$NODE_ENV" = "production" ]; then npm run build; fi
+
+# Expose the port the app runs on
+EXPOSE 3000
+
+# Command to run the Next.js app based on NODE_ENV
+CMD ["sh", "-c", "if [ \"$NODE_ENV\" = \"production\" ]; then npm start; else npm run dev; fi"]
