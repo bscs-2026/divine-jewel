@@ -1,24 +1,27 @@
 // src/components/Layout.tsx
 
+import dynamic from 'next/dynamic';
 import React, { useState, useEffect } from 'react';
-import LeftSidebar from './layout/LeftSidebar';
 import styles from './styles/Layout.module.css';
+
+// Dynamically import LeftSidebar for client-side only
+const LeftSidebar = dynamic(() => import('./layout/LeftSidebar'), { ssr: false });
 
 interface LayoutProps {
   children: React.ReactNode;
   rightSidebarContent?: React.ReactNode;
-  defaultTitle?: string; // Optional prop for default title
+  defaultTitle?: string;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children, rightSidebarContent, defaultTitle = 'Dashboard' }) => {
-  const [pageTitle, setPageTitle] = useState<string>(defaultTitle); // Set the initial title to defaultTitle
+  const [pageTitle, setPageTitle] = useState<string>(defaultTitle);
 
   const handleTitleChange = (title: string) => {
     setPageTitle(title);
   };
 
   useEffect(() => {
-    setPageTitle(defaultTitle); // Update title if defaultTitle changes
+    setPageTitle(defaultTitle);
   }, [defaultTitle]);
 
   return (
@@ -27,17 +30,12 @@ const Layout: React.FC<LayoutProps> = ({ children, rightSidebarContent, defaultT
         <LeftSidebar onSelectTitle={handleTitleChange} />
       </div>
       <div className={styles.centerContent}>
-        <h1>{pageTitle}</h1> {/* Display the page title */}
+        <h1>{pageTitle}</h1>
         {children}
       </div>
-      {rightSidebarContent && (
-        <div className={styles.rightSidebar}>
-          {rightSidebarContent}
-        </div>
-      )}
+      {rightSidebarContent && <div className={styles.rightSidebar}>{rightSidebarContent}</div>}
     </div>
   );
 };
-  
 
 export default Layout;

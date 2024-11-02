@@ -1,16 +1,36 @@
-// src/components/LeftSidebar.tsx
+// src/components/layout/LeftSidebar.tsx
 
+// This component ensures it runs only on the client side using a React component structure.
 import React from 'react';
+import { useRouter } from 'next/navigation'; // Use `next/navigation` for App Router
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartLine, faMoneyCheck, faHistory, faBox, faBoxes, faWarehouse, faUsers } from '@fortawesome/free-solid-svg-icons';
 import styles from '../styles/Layout.module.css';
 
 interface LeftSidebarProps {
-  onSelectTitle: (title: string) => void;  // Callback to update the title in Layout
+  onSelectTitle: (title: string) => void;
 }
 
 const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
+  const router = useRouter(); // Call `useRouter` directly for client-side navigation
+
+  const handleLogout = async () => {
+    try {
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+      });
+
+      if (response.ok) {
+        router.push('/login'); // Navigate to login after successful logout
+      } else {
+        console.error('Failed to log out');
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
   return (
     <div className={styles.leftSidebar}>
       <div>
@@ -27,7 +47,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
         </div>
         <ul className={`${styles.navList}`}>
           <li className={styles.navItem} onClick={() => onSelectTitle('Sales')}>
-            <Link href="/sales">
+            <Link href="/dashboard">
               <FontAwesomeIcon icon={faChartLine} className={styles.icon} />
               Sales
             </Link>
@@ -70,11 +90,9 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
           </li>
         </ul>
       </div>
-      <Link href="/">
-        <button className={`${styles.logoutButton} mt-auto mx-auto`}>
-          Logout
-        </button>
-      </Link>
+      <button className={`${styles.logoutButton} mt-auto mx-auto`} onClick={handleLogout}>
+        Logout
+      </button>
     </div>
   );
 };

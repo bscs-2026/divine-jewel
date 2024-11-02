@@ -1,8 +1,5 @@
-// lib/db.ts
+// src/lib/db.ts
 import mysql from 'mysql2/promise';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 let cachedPool: any = global.mysqlPool;
 
@@ -39,3 +36,4 @@ export async function getConnection() {
   await connection.beginTransaction();
   return connection;
 }
+

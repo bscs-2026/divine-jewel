@@ -1,3 +1,5 @@
+// src/app/orders/page.tsx
+
 'use client';
 import { useState, useEffect } from 'react';
 import Layout from '../../components/PageLayout';
@@ -29,6 +31,12 @@ interface Branch {
   branch_address: string;
 }
 
+// Helper function to get a cookie by name
+const getCookieValue = (name: string) => {
+  const matches = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return matches ? decodeURIComponent(matches[1]) : null;
+};
+
 export default function TransactionsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -40,10 +48,23 @@ export default function TransactionsPage() {
   const [successOrderPrompt, setSuccessOrderPrompt] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-
   useEffect(() => {
     fetchData();
-  }, [selectedBranch, selectedCategory]);
+  }, []); // Only run on component mount
+
+  useEffect(() => {
+    const branchNameFromCookie = getCookieValue('branch_name');
+    const branchIdFromCookie = getCookieValue('branch_id');
+
+    if (branchNameFromCookie && branches.length > 0) {
+      const matchingBranch = branches.find(
+        branch => branch.branch_name === branchNameFromCookie || branch.branch_code.toString() === branchIdFromCookie
+      );
+      if (matchingBranch && selectedBranch?.branch_code !== matchingBranch.branch_code) {
+        setSelectedBranch(matchingBranch);
+      }
+    }
+  }, [branches]); // Run only when `branches` data is populated
 
   const fetchData = async () => {
     setLoading(true);
@@ -59,13 +80,15 @@ export default function TransactionsPage() {
 
         // Extract unique categories and branches from the data
         const uniqueCategories = Array.from(new Set(productsData.map((product: Product) => product.category_name)));
-        const uniqueBranches = Array.from(new Set(
-          productsData.map((product: Product) => ({
-            branch_code: product.branch_code,
-            branch_name: product.branch_name,
-            branch_address: product.branch_address,
-          }))
-        ));
+        const uniqueBranches = Array.from(
+          new Set(
+            productsData.map((product: Product) => ({
+              branch_code: product.branch_code,
+              branch_name: product.branch_name,
+              branch_address: product.branch_address,
+            }))
+          )
+        );
 
         setProducts(productsData);
         setCategories(uniqueCategories);
@@ -102,7 +125,32 @@ export default function TransactionsPage() {
   const handleBranchChange = (branch: Branch | null) => {
     setSelectedBranch(branch);
     setSelectedCategory(null);
+  
+    if (branch) {
+      // Read the original expiry timestamp from a cookie
+      const originalExpiry = getCookieValue('branch_id_expiry');
+  
+      if (originalExpiry) {
+        // Calculate remaining `max-age` in seconds
+        const remainingTime = Math.max(0, Math.floor((parseInt(originalExpiry) - Date.now()) / 1000));
+  
+        // Update the cookies with the remaining `max-age`
+        document.cookie = `branch_id=${branch.branch_code}; path=/; max-age=${remainingTime}; SameSite=Lax`;
+        document.cookie = `branch_name=${branch.branch_name}; path=/; max-age=${remainingTime}; SameSite=Lax`;
+      } else {
+        // Fallback to setting a new 7-day `max-age` if the original expiry is not found
+        document.cookie = `branch_id=${branch.branch_code}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+        document.cookie = `branch_name=${branch.branch_name}; path=/; max-age=${7 * 24 * 60 * 60}; SameSite=Lax`;
+      }
+    }
   };
+  
+  // Helper function to get a cookie by name
+  const getCookieValue = (name: string) => {
+    const matches = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+    return matches ? decodeURIComponent(matches[1]) : null;
+  };
+  
 
   const handleCategoryChange = (category: string | null) => {
     setSelectedCategory(category);
@@ -146,10 +194,8 @@ export default function TransactionsPage() {
         />
       }
     >
-      {loading && (
-        <CircularIndeterminate />
-      )}
-      
+      {loading && <CircularIndeterminate />}
+
       <BranchFilter
         branches={branches}
         selectedBranch={selectedBranch}
@@ -174,7 +220,6 @@ export default function TransactionsPage() {
         isVisible={successOrderPrompt}
         onClose={() => setSuccessOrderPrompt(false)}
       />
-
     </Layout>
   );
 }
