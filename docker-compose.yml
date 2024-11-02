@@ -2,12 +2,15 @@ version: '3.8'
 
 services:
   web:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NODE_ENV: ${NODE_ENV:-development}  # Pass NODE_ENV as a build argument with a default value
     ports:
       - "8000:3000"
     volumes:
       - .:/app
-      # - /app/node_modules
     environment:
-      NODE_ENV: development
+      NODE_ENV: ${NODE_ENV:-development}  # Set NODE_ENV for runtime
       TZ: Asia/Manila
