@@ -2,12 +2,16 @@ version: '3.8'
 
 services:
   web:
-    build: .
+    build:
+      context: .
+      args:
+        NODE_ENV: ${NODE_ENV:-development}
     ports:
       - "8000:3000"
     volumes:
       - .:/app
+      # Uncomment the line below if you want to ensure the node_modules directory is not overwritten
       # - /app/node_modules
     environment:
-      NODE_ENV: development
+      NODE_ENV: ${NODE_ENV:-development}
       TZ: Asia/Manila

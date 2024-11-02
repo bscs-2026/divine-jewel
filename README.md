@@ -14,8 +14,19 @@ Change the values of .env file based on your database access
 Finally, run the development server:
 
 ```bash
-docker-compose build 
+docker-compose build --no-cache
 docker-compose up -d
+```
+
+## Debug Docker
+```
+# check the container logs to see any specific error messages:
+docker-compose logs -f web
+
+# If not running, try running the container interactively to debug:
+docker run -it --entrypoint sh divine-jewel-web
+npm install
+npm run dev
 ```
 
 Open [http://localhost:8000](http://localhost:8000) with your browser to see the result.
