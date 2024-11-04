@@ -96,9 +96,9 @@ const ProductList: React.FC<ProductListProps> = ({ products, onProductSelect, is
                     </tr>
                 </thead>
                 <tbody>
-                    {sortedProducts.map((product) => (
+                    {sortedProducts.map((product, index) => (
                         <tr
-                            key={product.id}
+                            key={product.id ? product.id : `product-${index}`}
                             className={`${styles.tableRow} ${(!product.stock || product.stock <= 0) ? styles.disabledRow : ''}`}
                             onClick={() => handleRowClick(product)}
                         >
@@ -115,6 +115,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, onProductSelect, is
                         </tr>
                     ))}
                 </tbody>
+
             </table>
         </div>
     );

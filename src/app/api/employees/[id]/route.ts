@@ -1,11 +1,24 @@
+// src/app/api/employees/[id]/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '../../../../lib/db';
+import { hashPassword } from '../../../../lib/passwordHelper';
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     try {
         const { id } = params;
-        const { first_name, last_name, address, birth_date, email_address, contact_number, employee_type, role_id, username, password, } = await request.json();
-        // const { first_name, last_name, email_address, contact_number, employee_type, role_id, username, password, status, is_archive} = await request.json();
+        const {
+            first_name,
+            last_name,
+            address,
+            birth_date,
+            email_address,
+            contact_number,
+            employee_type,
+            role_id,
+            username,
+            password,
+        } = await request.json();
 
         if (!id) {
             return NextResponse.json({ error: 'ID is required' }, { status: 400 });
@@ -13,8 +26,28 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
         console.log('Updating employee in database...');
 
-        const result = await query('UPDATE `employees` SET first_name = ?, last_name = ?, address = ?, birth_date = ?, email_address = ?, contact_number = ?, employee_type = ?, role_id = ?, username = ?, password = ? WHERE id = ?', 
-            [first_name, last_name, address, birth_date, email_address, contact_number, employee_type, role_id, username, password, id]);
+        let hashedPassword = password;
+        // Check if a new password is provided and hash it using the helper function
+        if (password) {
+            hashedPassword = await hashPassword(password);
+        }
+
+        const result = await query(
+            'UPDATE `employees` SET first_name = ?, last_name = ?, address = ?, birth_date = ?, email_address = ?, contact_number = ?, employee_type = ?, role_id = ?, username = ?, password = ? WHERE id = ?',
+            [
+                first_name,
+                last_name,
+                address,
+                birth_date,
+                email_address,
+                contact_number,
+                employee_type,
+                role_id,
+                username,
+                hashedPassword,
+                id,
+            ]
+        );
 
         console.log('Updated employee:', result);
         return NextResponse.json({ message: 'Employee updated successfully' }, { status: 200 });
