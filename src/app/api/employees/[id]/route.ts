@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '../../../../lib/db';
-import { hashPassword } from '../../../../lib/sessionHelper';
+import { hashPassword } from '../../../../lib/passwordHelper';
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     try {
