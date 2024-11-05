@@ -6,6 +6,8 @@ import React, { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import styles from '../../components/styles/PublicForm.module.css';
+import CircularIndeterminate from '@/components/loading/Loading';
+import Image from "next/image";
 
 interface Branch {
   id: number;
@@ -106,11 +108,23 @@ export default function LoginPage() {
 
   return (
     <div className={styles.loginContainer}>
-      {loading ? (
-        <div className={styles.loadingOverlay}>Logging in...</div>
-      ) : (
+      {loading && (
+        <CircularIndeterminate />
+      )}
+
+      <div className={styles.coverPhoto}>
+        <img
+          // src="/img/divine-jewel-logo.png"
+          src="/img/login-bg2.png"
+          alt="Logo"
+          // width={700}
+          // height={600}
+        />
+      </div>
+
         <form onSubmit={handleSubmit} className={styles.form}>
           <h2 className={styles.heading}>Login</h2>
+
           <input
             type="text"
             name="username"
@@ -120,6 +134,7 @@ export default function LoginPage() {
             required
             className={styles.input}
           />
+
           <input
             type="password"
             name="password"
@@ -129,6 +144,7 @@ export default function LoginPage() {
             required
             className={styles.input}
           />
+
           <select
             id="branch"
             name="branch"
@@ -144,11 +160,11 @@ export default function LoginPage() {
               </option>
             ))}
           </select>
+
           <button type="submit" className={styles.button} disabled={isButtonDisabled}>
             Login
           </button>
         </form>
-      )}
     </div>
   );
 }
