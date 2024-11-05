@@ -17,6 +17,7 @@ interface Product {
   color: string;
   price: number;
   quantity: number;
+  is_archived?: boolean;
 }
 
 interface ProductFormProps {
@@ -68,17 +69,28 @@ const ProductForm: React.FC<ProductFormProps> = ({
     }
   }, [currentProduct, editingProduct, setSelectedCategory]);
 
+  const generateSKU = (categoryName: string) => {
+    const prefix = categoryName.slice(0, 3).toUpperCase();
+    const randomNumbers = Math.floor(10000 + Math.random() * 90000).toString(); // Generates a 5-digit number
+    return `${prefix}-${randomNumbers}`;
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
+
+    if (name === "category_id") {
+      const selectedCategory = categories.find(category => category.id === Number(value));
+      setSelectedCategory(value ? Number(value) : null);
+      setValidationErrors(prev => ({ ...prev, category: '' }));
+
+      if (selectedCategory) {
+        setProductSKU(generateSKU(selectedCategory.name));
+      }
+    }
 
     if (name === "SKU") {
       setProductSKU(value);
       setValidationErrors(prev => ({ ...prev, SKU: '' }));
-    }
-
-    if (name === "category_id") {
-      setSelectedCategory(value ? Number(value) : null);
-      setValidationErrors(prev => ({ ...prev, category: '' }));
     }
 
     if (name === "name") {
@@ -194,18 +206,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
         </h2>
 
         <form onSubmit={handleFormSubmit}>
-          <label className={styles.modalInputLabel}>
-            SKU
-          </label>
-          <input
-            type="text"
-            name="SKU"
-            placeholder={validationErrors.SKU || "SKU"}
-            value={productSKU}
-            onChange={handleInputChange}
-            maxLength={15}
-            className={`${styles.modalInput} ${validationErrors.SKU ? styles.inputError : ''}`}
-          />
 
           <label className={styles.modalInputLabel}>
             Category
@@ -225,6 +225,20 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </select>
 
           <label className={styles.modalInputLabel}>
+            SKU
+          </label>
+          <input
+            type="text"
+            name="SKU"
+            placeholder={validationErrors.SKU || "SKU"}
+            value={productSKU}
+            onChange={handleInputChange}
+            maxLength={15}
+            className={`${styles.modalInput} ${validationErrors.SKU ? styles.inputError : ''}`}
+            readOnly
+          />
+
+          <label className={styles.modalInputLabel}>
             Name
           </label>
           <input
@@ -239,14 +253,21 @@ const ProductForm: React.FC<ProductFormProps> = ({
           <label className={styles.modalInputLabel}>
             Size
           </label>
-          <input
-            type="text"
+          <select
             name="size"
-            placeholder={validationErrors.size || "Size"}
             value={productSize}
             onChange={handleInputChange}
-            className={`${styles.modalInput} ${validationErrors.size ? styles.inputError : ''}`}
-          />
+            className={`${styles.modalSelect} ${validationErrors.size ? styles.inputError : ''}`}
+          >
+            <option value="">{validationErrors.size || "Select Size"}</option>
+            <option value="XXS">XXS</option>
+            <option value="XS">XS</option>
+            <option value="S">S</option>
+            <option value="M">M</option>
+            <option value="L">L</option>
+            <option value="XL">XL</option>
+            <option value="N/A">N/A</option>
+          </select>
 
           <label className={styles.modalInputLabel}>
             Color
