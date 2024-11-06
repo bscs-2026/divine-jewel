@@ -1,35 +1,42 @@
 .loginContainer {
     display: flex;
-    justify-content: center;
     align-items: center;
     height: 100vh;
-    max-width: 650px;
-    margin: auto;
-    padding: 40px 20px;
-    border-radius: 1rem;
-    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
-    background-color: #FFE7EF;
+    max-width: 100%;
+    background-color: #ffffff;
 }
 
-  
+  .coverPhoto {
+    background: linear-gradient(to bottom, #ffffff, #FCB6D7);
+    width: 60%;
+    height: 100%;
+    display: flex; /* Add this line */
+    justify-content: center; /* Add this line */
+    align-items: center; /* Add this line */
+  }
+
+
   .form {
     display: flex;
     flex-direction: column;
-    width: 100%;
+    width: 40%;
+    padding: 100px 100px;
   }
   
   .heading {
     margin-bottom: 20px;
     font-size: 24px;
     text-align: center;
+    color: #575757;
   }
   
   .input,
   .select {
     margin-bottom: 15px;
     padding: 10px;
-    border: 1px solid #ccc;
+    border: 1px solid #575757;
     border-radius: 0.75rem;
+    font-size: 13px;
   }
   
   .button {
@@ -57,7 +64,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #FFE7EF;
+    background-color: #ffffff;
     display: flex;
     justify-content: center;
     align-items: center;

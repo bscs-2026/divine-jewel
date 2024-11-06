@@ -2,20 +2,24 @@
 
 // This component ensures it runs only on the client side using a React component structure.
 import React from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation'; // Use `next/navigation` for App Router
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartLine, faMoneyCheck, faHistory, faBox, faBoxes, faWarehouse, faUsers } from '@fortawesome/free-solid-svg-icons';
 import styles from '../styles/Layout.module.css';
+import CircularIndeterminate from '@/components/loading/Loading';
 
 interface LeftSidebarProps {
   onSelectTitle: (title: string) => void;
 }
 
 const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter(); // Call `useRouter` directly for client-side navigation
 
   const handleLogout = async () => {
+    setLoading(true);
     try {
       const response = await fetch('/api/auth/logout', {
         method: 'POST',
@@ -28,6 +32,8 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
       }
     } catch (error) {
       console.error('Error during logout:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -93,6 +99,9 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
       <button className={`${styles.logoutButton} mt-auto mx-auto`} onClick={handleLogout}>
         Logout
       </button>
+      {loading && (
+        <CircularIndeterminate />
+      )}
     </div>
   );
 };

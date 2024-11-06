@@ -1,11 +1,10 @@
-// src/app/login/page.tsx
-
 'use client';
 
 import React, { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import Cookies from 'js-cookie';
 import styles from '../../components/styles/PublicForm.module.css';
+import CircularIndeterminate from '@/components/loading/Loading';
+import Image from "next/image";
 
 interface Branch {
   id: number;
@@ -23,32 +22,24 @@ export default function LoginPage() {
 
   useEffect(() => {
     async function clearSession() {
-      const sessionToken = Cookies.get('sessionToken');
-  
-      if (sessionToken) {
-        try {
-          const response = await fetch('/api/auth/logout', { method: 'POST' });
-          if (response.ok) {
-            Cookies.remove('sessionToken');
-            Cookies.remove('user_id');
-            Cookies.remove('username');
-            Cookies.remove('role_id');
-            Cookies.remove('branch_id');
-            Cookies.remove('branch_name');
-            console.log('Session cleared');
-          } else {
-            console.error('Failed to clear session on /login');
-          }
-        } catch (error) {
-          console.error('Error clearing session:', error);
+      try {
+        const response = await fetch('/api/auth/logout', {
+          method: 'POST',
+          credentials: 'include',
+        });
+        if (response.ok) {
+          console.log('Session cleared via /api/auth/logout');
+        // } else {
+        //     console.error('Failed to clear session on /login');
+        //
         }
-      } else {
-        console.log('No session token found. No need to clear the session.');
+      } catch (error) {
+        console.error('Error clearing session:', error);
       }
     }
-  
+
     clearSession();
-  }, []);  
+  }, []);
 
   useEffect(() => {
     async function fetchBranches() {
@@ -80,6 +71,7 @@ export default function LoginPage() {
     try {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password, branch: selectedBranch }),
       });
@@ -106,49 +98,60 @@ export default function LoginPage() {
 
   return (
     <div className={styles.loginContainer}>
-      {loading ? (
-        <div className={styles.loadingOverlay}>Logging in...</div>
-      ) : (
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <h2 className={styles.heading}>Login</h2>
-          <input
-            type="text"
-            name="username"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            className={styles.input}
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className={styles.input}
-          />
-          <select
-            id="branch"
-            name="branch"
-            value={selectedBranch}
-            onChange={(e) => setSelectedBranch(e.target.value)}
-            required
-            className={styles.select}
-          >
-            <option value="">Select a branch</option>
-            {branches.map((branch) => (
-              <option key={branch.id} value={branch.name}>
-                {branch.name}
-              </option>
-            ))}
-          </select>
-          <button type="submit" className={styles.button} disabled={isButtonDisabled}>
-            Login
-          </button>
-        </form>
+      {loading && (
+        <CircularIndeterminate />
       )}
+
+      <div className={styles.coverPhoto}>
+        <img
+          src="/img/login-bg2.png"
+          alt="Logo"
+        />
+      </div>
+
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <h2 className={styles.heading}>Login</h2>
+
+        <input
+          type="text"
+          name="username"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+          className={styles.input}
+        />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className={styles.input}
+        />
+
+        <select
+          id="branch"
+          name="branch"
+          value={selectedBranch}
+          onChange={(e) => setSelectedBranch(e.target.value)}
+          required
+          className={styles.select}
+        >
+          <option value="">Select a branch</option>
+          {branches.map((branch) => (
+            <option key={branch.id} value={branch.name}>
+              {branch.name}
+            </option>
+          ))}
+        </select>
+
+        <button type="submit" className={styles.button} disabled={isButtonDisabled}>
+          Login
+        </button>
+      </form>
     </div>
   );
 }
