@@ -1,4 +1,5 @@
 import React from 'react';
+import Search from '@/components/filters/SearchFilter';
 import styles from '../styles/Layout2.module.css';
 import formStyles from '../styles/Form.module.css';
 
@@ -13,6 +14,8 @@ interface CategoryTabsProps {
   setFilterCategory: (id: number | string | null) => void;
   toggleManageCategories: () => void;
   handleAddProduct: () => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
 const CategoryTabs: React.FC<CategoryTabsProps> = ({
@@ -21,16 +24,20 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
   setFilterCategory,
   toggleManageCategories,
   handleAddProduct,
+  searchQuery,
+  setSearchQuery,
 }) => {
+
   const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
-    setFilterCategory(value === 'null' ? null : parseInt(value));
+    setFilterCategory(value === 'null' ? null : value === 'Archive' ? 'Archive' : parseInt(value));
   };
 
   return (
     <div className={styles.tabsContainer}>
       <div className={styles.leftTabs}>
-        <label className={formStyles.heading} htmlFor="category-filter">
+        <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        <label className={formStyles.heading2} htmlFor="category-filter">
           Select Category:
         </label>
         <select
@@ -51,18 +58,16 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
 
       <div className={styles.rightButtonGroup}>
         <button
-          className={`${styles.tabsContainerItem} ${
-            filterCategory === 'manage' ? styles.active : styles.inactive
-          }`}
+          className={`${styles.tabsContainerItem} ${filterCategory === 'manage' ? styles.active : styles.inactive
+            }`}
           onClick={toggleManageCategories}
         >
           Manage Categories
         </button>
 
         <button
-          className={`${styles.tabsContainerItem} ${
-            filterCategory === 'add' ? styles.active : styles.inactive
-          }`}
+          className={`${styles.tabsContainerItem} ${filterCategory === 'add' ? styles.active : styles.inactive
+            }`}
           onClick={handleAddProduct}
         >
           Add Product

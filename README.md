@@ -48,3 +48,30 @@ To learn more about Next.js, take a look at the following resources:
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/).
+
+## Database: products table cleanup
+
+-- Step 1: Delete from `stocks` where the product is archived
+```
+DELETE FROM stocks
+WHERE product_id IN (SELECT id FROM products WHERE is_archive = 1);
+```
+
+-- Step 2: Delete from `stock_details` where the product is archived
+```
+DELETE FROM stock_details
+WHERE product_id IN (SELECT id FROM products WHERE is_archive = 1);
+```
+
+-- Step 3: Delete from `order_details` where the product is archived
+```
+DELETE FROM order_details
+WHERE product_id IN (SELECT id FROM products WHERE is_archive = 1);
+```
+
+-- Step 4: Delete the archived `products` from the products table
+```
+DELETE FROM products
+WHERE is_archive = 1;
+```
+

@@ -1,4 +1,7 @@
+// src/components/tabs/BranchTabs.tsx
+
 import React from 'react';
+import Search from '@/components/filters/SearchFilter';
 import styles from '../styles/Layout2.module.css';
 import formStyles from '../styles/Form.module.css';
 
@@ -16,6 +19,8 @@ interface BranchTabsProps {
   handleAddStocks: () => void;
   handleTransferStocks: () => void;
   selectedStocks: { id: number; [key: string]: any }[];
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
 }
 
 const BranchTabs: React.FC<BranchTabsProps> = ({
@@ -26,6 +31,8 @@ const BranchTabs: React.FC<BranchTabsProps> = ({
   handleAddStocks,
   handleTransferStocks,
   selectedStocks,
+  searchQuery,
+  setSearchQuery,
 }) => {
   const isStocksSelected = selectedStocks.length > 0;
 
@@ -37,7 +44,9 @@ const BranchTabs: React.FC<BranchTabsProps> = ({
   return (
     <div className={styles.tabsContainer}>
       <div className={styles.leftTabs}>
-        <label className={formStyles.heading} htmlFor="branch-filter">
+        <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+
+        <label className={formStyles.heading2} htmlFor="branch-filter">
           Select Branch:
         </label>
         <select

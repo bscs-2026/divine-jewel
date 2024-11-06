@@ -1,24 +1,8 @@
+// src/components/forms/ProductForm.tsx
+
 import React, { useState, useEffect } from 'react';
-import styles2 from '../styles/Button.module.css';
 import styles from '../styles/Modal.module.css';
-
-interface Category {
-  id: number;
-  name: string;
-  description: string;
-}
-
-interface Product {
-  id: number;
-  SKU: string;
-  category_id: number;
-  name: string;
-  size: string;
-  color: string;
-  price: number;
-  quantity: number;
-  is_archived?: boolean;
-}
+import { Product, Category } from '../../types';
 
 interface ProductFormProps {
   categories: Category[];
@@ -42,7 +26,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
   handleCancelEdit,
   addProduct,
   saveProduct,
-  onClose
+  onClose,
 }) => {
   const [productSKU, setProductSKU] = useState<string>('');
   const [productName, setProductName] = useState<string>('');
@@ -50,15 +34,21 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const [productColor, setProductColor] = useState<string>('');
   const [productPrice, setProductPrice] = useState<string>('');
   const [validationErrors, setValidationErrors] = useState<{ [field: string]: string }>({});
+  const [originalCategory, setOriginalCategory] = useState<number | null>(null);
+  const [originalSKU, setOriginalSKU] = useState<string>('');
+  const [categorySelected, setCategorySelected] = useState<boolean>(false);
 
   useEffect(() => {
     if (editingProduct && currentProduct) {
-      setProductSKU(currentProduct.SKU);
+      setProductSKU(currentProduct.SKU || '');
       setProductName(currentProduct.name);
       setProductSize(currentProduct.size);
       setProductColor(currentProduct.color);
       setProductPrice(currentProduct.price.toString());
       setSelectedCategory(currentProduct.category_id);
+      setOriginalCategory(currentProduct.category_id);
+      setOriginalSKU(currentProduct.SKU || '');
+      setCategorySelected(false);
     } else {
       setProductSKU('');
       setProductName('');
@@ -66,31 +56,60 @@ const ProductForm: React.FC<ProductFormProps> = ({
       setProductColor('');
       setProductPrice('');
       setSelectedCategory(null);
+      setOriginalCategory(null);
+      setOriginalSKU('');
+      setCategorySelected(false);
     }
   }, [currentProduct, editingProduct, setSelectedCategory]);
 
-  const generateSKU = (categoryName: string) => {
-    const prefix = categoryName.slice(0, 3).toUpperCase();
-    const randomNumbers = Math.floor(10000 + Math.random() * 90000).toString(); // Generates a 5-digit number
-    return `${prefix}-${randomNumbers}`;
+  const fetchLastSKU = async (categoryId: number) => {
+    try {
+      const response = await fetch(`/api/products/category/last-sku?categoryId=${categoryId}`);
+      const data = await response.json();
+      return data.lastSKU;
+    } catch (error) {
+      console.error("Error fetching last SKU:", error);
+      return null;
+    }
   };
+
+  const generateSKU = async (categoryId: number, categoryName: string) => {
+    const lastSKU = await fetchLastSKU(categoryId);
+    const lastSkuNumber = lastSKU ? parseInt(lastSKU.split('-')[1]) : 0;
+    const newSkuNumber = (lastSkuNumber + 1).toString().padStart(5, '0');
+    const prefix = categoryName.slice(0, 3).toUpperCase();
+    return `${prefix}-${newSkuNumber}`;
+  };
+
+  useEffect(() => {
+    const updateSKU = async () => {
+      if (categorySelected && selectedCategory !== null) {
+        const selectedCategoryDetails = categories.find(cat => cat.id === selectedCategory);
+        if (!selectedCategoryDetails) return;
+
+        if (!editingProduct) {
+          const newSKU = await generateSKU(selectedCategoryDetails.id, selectedCategoryDetails.name);
+          setProductSKU(newSKU);
+        } else if (editingProduct && selectedCategory === originalCategory) {
+          setProductSKU(originalSKU);
+        } else {
+          const newSKU = await generateSKU(selectedCategoryDetails.id, selectedCategoryDetails.name);
+          setProductSKU(newSKU);
+        }
+      }
+    };
+
+    updateSKU();
+  }, [selectedCategory, editingProduct, categorySelected, categories]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
     if (name === "category_id") {
-      const selectedCategory = categories.find(category => category.id === Number(value));
-      setSelectedCategory(value ? Number(value) : null);
+      const selectedCategoryId = value ? Number(value) : null;
+      setSelectedCategory(selectedCategoryId);
+      setCategorySelected(true);
       setValidationErrors(prev => ({ ...prev, category: '' }));
-
-      if (selectedCategory) {
-        setProductSKU(generateSKU(selectedCategory.name));
-      }
-    }
-
-    if (name === "SKU") {
-      setProductSKU(value);
-      setValidationErrors(prev => ({ ...prev, SKU: '' }));
     }
 
     if (name === "name") {
@@ -118,11 +137,9 @@ const ProductForm: React.FC<ProductFormProps> = ({
 
   const handleFormSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-
     let formIsValid = true;
     let errors: { [field: string]: string } = {};
 
-    // Validate SKU length (between 1 and 15 characters)
     if (!productSKU) {
       errors.SKU = "SKU is required";
       formIsValid = false;
@@ -131,31 +148,26 @@ const ProductForm: React.FC<ProductFormProps> = ({
       formIsValid = false;
     }
 
-    // Validate category
     if (selectedCategory === null) {
       errors.category = "Category is required";
       formIsValid = false;
     }
 
-    // Validate name
     if (!productName) {
       errors.name = "Product name is required";
       formIsValid = false;
     }
 
-    // Validate size
     if (!productSize) {
       errors.size = "Size is required";
       formIsValid = false;
     }
 
-    // Validate color
     if (!productColor) {
       errors.color = "Color is required";
       formIsValid = false;
     }
 
-    // Validate price
     if (productPrice === '') {
       errors.price = "Price is required";
       formIsValid = false;
@@ -173,7 +185,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     const updatedProduct: Product = {
       id: currentProduct ? currentProduct.id : Date.now(),
       SKU: productSKU,
-      category_id: selectedCategory || 0,
+      category_id: Number(selectedCategory),
       name: productName,
       price: parseFloat(productPrice),
       quantity: currentProduct ? currentProduct.quantity : 1,
@@ -187,7 +199,6 @@ const ProductForm: React.FC<ProductFormProps> = ({
       addProduct(updatedProduct);
     }
 
-    // Clear form after saving
     setProductSKU('');
     setProductName('');
     setProductSize('');
@@ -195,6 +206,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
     setProductPrice('');
     setSelectedCategory(null);
     setValidationErrors({});
+    setCategorySelected(false);
     onClose();
   };
 
@@ -205,14 +217,14 @@ const ProductForm: React.FC<ProductFormProps> = ({
           {editingProduct ? 'Edit Product' : 'Add Product'}
         </h2>
 
+        {/* Main Form */}
         <form onSubmit={handleFormSubmit}>
-
           <label className={styles.modalInputLabel}>
             Category
           </label>
           <select
             name="category_id"
-            value={selectedCategory ?? ''}
+            value={selectedCategory || ''}
             onChange={handleInputChange}
             className={`${styles.modalSelect} ${validationErrors.category ? styles.inputError : ''}`}
           >
@@ -231,11 +243,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
             type="text"
             name="SKU"
             placeholder={validationErrors.SKU || "SKU"}
-            value={productSKU}
-            onChange={handleInputChange}
-            maxLength={15}
-            className={`${styles.modalInput} ${validationErrors.SKU ? styles.inputError : ''}`}
+            value={productSKU || ''}
             readOnly
+            maxLength={15}
+            className={`${styles.modalInput} ${validationErrors.SKU ? styles.inputError : ''} ${editingProduct ? styles.readOnlyInput : ''}`}
           />
 
           <label className={styles.modalInputLabel}>
@@ -245,7 +256,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             type="text"
             name="name"
             placeholder={validationErrors.name || "Product Name"}
-            value={productName}
+            value={productName || ''}
             onChange={handleInputChange}
             className={`${styles.modalInput} ${validationErrors.name ? styles.inputError : ''}`}
           />
@@ -255,7 +266,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
           </label>
           <select
             name="size"
-            value={productSize}
+            value={productSize || ''}
             onChange={handleInputChange}
             className={`${styles.modalSelect} ${validationErrors.size ? styles.inputError : ''}`}
           >
@@ -276,7 +287,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             type="text"
             name="color"
             placeholder={validationErrors.color || "Color"}
-            value={productColor}
+            value={productColor || ''}
             onChange={handleInputChange}
             className={`${styles.modalInput} ${validationErrors.color ? styles.inputError : ''}`}
           />
@@ -288,7 +299,7 @@ const ProductForm: React.FC<ProductFormProps> = ({
             type="number"
             name="price"
             placeholder={validationErrors.price || "Price"}
-            value={productPrice}
+            value={productPrice || ''}
             onChange={handleInputChange}
             className={`${styles.modalInput} ${validationErrors.price ? styles.inputError : ''}`}
             min="0"

@@ -5,11 +5,9 @@ import OrdersTable from '../../components/tables/TransactionHistory';
 import StockDetailsTable from '../../components/tables/StockDetailsHistory';
 import HistoryTabs from '../../components/tabs/HistoryTabs';
 import Modal from '../../components/modals/Modal';
-import styles from '@/components/styles/Modal.module.css';
 import CircularIndeterminate from '@/components/loading/Loading';
 import BatchStockDetailsHistory from '@/components/modals/BatchStockDetailsHistory';
 import Receipt from '@/components/modals/Receipt'; 
-import { se } from 'date-fns/locale';
 
 interface StockDetailGroup {
   id: number;

@@ -1,5 +1,7 @@
+// src/components/tables/StockDetailsHistory.tsx
+
 import React, { useMemo, useState } from 'react';
-import { ArrowUpward, ArrowDownward, Info, InfoOutlined } from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward, InfoOutlined } from '@mui/icons-material';
 import styles from '../styles/Table.module.css';
 
 interface StockDetailGroup {
@@ -31,7 +33,7 @@ const StockDetailsTable: React.FC<StockDetailsTableProps> = ({ stockDetails, onV
       { Header: 'Source', accessor: 'source_branch_name' as keyof StockDetailGroup, align: 'left' },
       { Header: 'Destination', accessor: 'destination_branch_name' as keyof StockDetailGroup, align: 'left' },
       { Header: 'Employee', accessor: 'employee_fullname' as keyof StockDetailGroup, align: 'left' },
-      { Header: '', accessor: 'batch_id' as keyof StockDetailGroup, align: 'center' },
+      { Header: '', accessor: 'info' as keyof StockDetailGroup, align: 'center' },
     ],
     []
   );
@@ -77,15 +79,15 @@ const StockDetailsTable: React.FC<StockDetailsTableProps> = ({ stockDetails, onV
       <table className={styles.table}>
         <thead>
           <tr>
-            {columns.map((column) => (
+            {columns.map((column, index) => (
               <th
-                key={column.accessor as string}
-                onClick={() => column.accessor !== 'batch_id' && handleSort(column.accessor)}
+                key={`column-${index}`}
+                onClick={() => column.accessor !== 'info' && handleSort(column.accessor)}
                 className={`${styles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign}`}
               >
                 <div className={styles.sortContent}>
                   {column.Header}
-                  {column.accessor !== 'batch_id' && renderSortIcon(column.accessor)}
+                  {column.accessor !== 'info' && renderSortIcon(column.accessor)}
                 </div>
               </th>
             ))}
@@ -93,20 +95,21 @@ const StockDetailsTable: React.FC<StockDetailsTableProps> = ({ stockDetails, onV
         </thead>
         <tbody>
           {sortedStockDetails.map((detail) => (
-            <tr 
-            key={detail.batch_id} className={styles.tableRow}
-            onClick={() => onViewAction(detail.batch_id)}
-             >
+            <tr
+              key={detail.id}
+              className={styles.tableRow}
+              onClick={() => onViewAction(detail.batch_id)}
+            >
               <td className={styles.td}>{detail.batch_id}</td>
               <td className={styles.td}>
-                {new Date(detail.date).toLocaleDateString()}    {new Date(detail.date).toLocaleTimeString()}
+                {new Date(detail.date).toLocaleDateString()} {new Date(detail.date).toLocaleTimeString()}
               </td>
               <td className={styles.td}>{detail.action}</td>
               <td className={styles.td}>{detail.source_branch_name || 'N/A'}</td>
               <td className={styles.td}>{detail.destination_branch_name || 'N/A'}</td>
               <td className={styles.td}>{detail.employee_fullname}</td>
               <td className={styles.td} style={{ textAlign: 'center' }}>
-                <InfoOutlined className={styles.viewButton} onClick={() => onViewAction(detail.batch_id)} />         
+                <InfoOutlined className={styles.viewButton} onClick={() => onViewAction(detail.batch_id)} />
               </td>
             </tr>
           ))}
