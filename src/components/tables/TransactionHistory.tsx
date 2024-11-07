@@ -77,9 +77,9 @@ const OrdersTable: React.FC<OrdersTableProps> = ({ orders, onViewAction }) => {
             <table className={styles.table}>
                 <thead>
                     <tr>
-                        {columns.map((column) => (
+                        {columns.map((column, colIndex) => (
                             <th
-                                key={column.accessor as string}
+                                key={`column-${colIndex}`}
                                 onClick={() => column.accessor !== 'order_id' && handleSort(column.accessor)}
                                 className={`${styles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign}`}
                             >
@@ -92,8 +92,12 @@ const OrdersTable: React.FC<OrdersTableProps> = ({ orders, onViewAction }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {sortedOrders.map((order) => (
-                        <tr key={order.order_id} className={styles.tableRow} onClick={() => onViewAction(order.order_id)}>
+                    {sortedOrders.map((order, index) => (
+                        <tr
+                            key={`order-row-${order.order_id}-${index}`}
+                            className={styles.tableRow}
+                            onClick={() => onViewAction(order.order_id)}
+                        >
                             <td className={styles.td}>{order.order_id}</td>
                             <td className={styles.td}>
                                 {new Date(order.date).toLocaleDateString()}  {new Date(order.date).toLocaleTimeString()}
