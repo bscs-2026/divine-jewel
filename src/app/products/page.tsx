@@ -1,15 +1,16 @@
 // src/app/products/page.tsx
+
 'use client';
 
 import { useEffect, useState } from 'react';
-import Layout from '../../components/layout/Layout';
-import ProductTable from '../../components/tables/ProductTable';
-import CategoryTabs from '../../components/tabs/CategoryTabs';
-import ProductForm from '../../components/forms/ProductForm';
-import ManageCategories from '../../components/forms/ManageCategories';
-import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
+import Layout from '@/components/layout/Layout';
+import ProductTable from '@/components/tables/ProductTable';
+import CategoryTabs from '@/components/tabs/CategoryTabs';
+import ProductForm from '@/components/forms/ProductForm';
+import ManageCategories from '@/components/forms/ManageCategories';
+import { DeletePrompt, SuccessfulPrompt } from '@/components/prompts/Prompt';
 import CircularIndeterminate from '@/components/loading/Loading';
-import Modal from '../../components/modals/Modal';
+import Modal from '@/components/modals/Modal';
 
 interface Product {
   id: number;
@@ -36,7 +37,7 @@ export default function ProductsPage() {
   const [editingProduct, setEditingProduct] = useState<boolean>(false);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [filterCategory, setFilterCategory] = useState<number | string | null>(null);
-  const [showManageCategories, setShowManageCategories] = useState(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -59,8 +60,8 @@ export default function ProductsPage() {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => {
     setIsModalOpen(false);
-    setCurrentProduct(null); // Reset current product when closing modal
-    setEditingProduct(false); // Reset editing mode
+    setCurrentProduct(null);
+    setEditingProduct(false);
   };
 
   const fetchProducts = async () => {
@@ -114,7 +115,7 @@ export default function ProductsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const deleteCategory = async (id: number) => {
     setLoading(true);
@@ -134,8 +135,7 @@ export default function ProductsPage() {
     } finally {
       setLoading(false);
     }
-  }
-
+  };
 
   const editCategory = async (category: Category) => {
     setLoading(true);
@@ -159,7 +159,7 @@ export default function ProductsPage() {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const addProduct = async (product: Product) => {
     setLoading(true);
@@ -185,7 +185,6 @@ export default function ProductsPage() {
     } finally {
       setLoading(false);
     }
-    // closeModal();
   };
 
   const editProduct = (productId: number) => {
@@ -304,22 +303,22 @@ export default function ProductsPage() {
     }
   };
 
+  // Filter products based on search query and selected category or archived status
   const activeProducts = products.filter(product => !product.is_archive);
   const archivedProducts = products.filter(product => product.is_archive);
 
   const filteredProducts = filterCategory === 'Archive'
-    ? archivedProducts
+    ? products.filter(product => product.is_archive && product.name.toLowerCase().includes(searchQuery.toLowerCase()))
     : filterCategory
-      ? activeProducts.filter(product => product.category_id === filterCategory)
-      : activeProducts;
-
-  // if (loading) return <CircularIndeterminate />;
+      ? products.filter(product =>
+          product.category_id === filterCategory && !product.is_archive && product.name.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : products.filter(product => !product.is_archive && product.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    
 
   return (
     <Layout defaultTitle="Products">
-    {loading && (
-        <CircularIndeterminate />
-    )}
+      {loading && <CircularIndeterminate />}
 
       <CategoryTabs
         categories={categories}
@@ -327,6 +326,8 @@ export default function ProductsPage() {
         setFilterCategory={setFilterCategory}
         toggleManageCategories={toggleManageCategories}
         handleAddProduct={openModal}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
       />
       <ProductTable
         products={filteredProducts}
@@ -336,7 +337,7 @@ export default function ProductsPage() {
         filterCategory={filterCategory}
       />
 
-      <Modal show={isModalOpen} onClose={closeModal}>       
+      <Modal show={isModalOpen} onClose={closeModal}>
         <ProductForm
           categories={categories}
           currentProduct={currentProduct}
@@ -394,7 +395,6 @@ export default function ProductsPage() {
         isVisible={successDeleteCategory}
         onClose={() => setSuccessDeleteCategory(false)}
       />
-
     </Layout>
   );
 }

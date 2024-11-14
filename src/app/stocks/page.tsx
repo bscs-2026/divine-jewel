@@ -1,16 +1,16 @@
+// src/app/stocks/page.tsx
+
 'use client';
 import { useEffect, useState } from 'react';
-import Layout from '../../components/layout/Layout';
-import StockTable from '../../components/tables/StockTable';
-import StockForm from '../../components/forms/StockForm';
-import BranchTabs from '../../components/tabs/BranchTabs';
-import ManageBranches from '../../components/forms/ManageBranches';
-import Modal from '../../components/modals/Modal';
-import DeleteConfirmationModal from '../../components/modals/DeleteConfirmationModal';
+import Layout from '@/components/layout/Layout';
+import StockTable from '@/components/tables/StockTable';
+import StockForm from '@/components/forms/StockForm';
+import BranchTabs from '@/components/tabs/BranchTabs';
+import ManageBranches from '@/components/forms/ManageBranches';
+import Modal from '@/components/modals/Modal';
+import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
 import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
 import CircularIndeterminate from '@/components/loading/Loading';
-import { fi } from 'date-fns/locale';
-
 
 interface Stock {
     id: number;
@@ -57,6 +57,7 @@ export default function StocksPage() {
     const [selectedStocks, setSelectedStocks] = useState<Stock[]>([]);
     const [isTransfer, setIsTransfer] = useState(false);
     const [filterBranch, setFilterBranch] = useState<number | string | null>(null);
+    const [searchQuery, setSearchQuery] = useState<string>('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isManageBranchesModalOpen, setIsManageBranchesModalOpen] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -98,7 +99,7 @@ export default function StocksPage() {
                 return {
                     ...stock,
                     branch_name: branch ? branch.name : 'Unknown',
-                    category_name: stock.category_name || 'Unknown',  // Ensure category_name is present
+                    category_name: stock.category_name || 'Unknown',
                 };
             });
 
@@ -117,6 +118,10 @@ export default function StocksPage() {
         }
     };
 
+    const closeManageBranchesModal = () => {
+        setIsManageBranchesModalOpen(false);
+    };
+
     const handleAddStocks = () => {
         setIsTransfer(false);
         setIsModalOpen(true);
@@ -127,7 +132,7 @@ export default function StocksPage() {
         setIsModalOpen(true);
     };
 
-    const addStock = async (stock: Stock, batch_id: string) => { // Accept batch_id as a parameter
+    const addStock = async (stock: Stock, batch_id: string) => {
         if (!stock.product_id || !stock.branch_code || isNaN(stock.quantity)) {
             console.error('Invalid stock data');
             return { ok: false, message: 'Invalid stock data' };
@@ -149,20 +154,21 @@ export default function StocksPage() {
                 body: JSON.stringify({
                     branch_code: stock.branch_code,
                     quantity: stock.quantity,
-                    batch_id // Include batch_id here 
+                    batch_id
                 }),
             });
 
             if (!response.ok) {
                 throw new Error('Failed to update stock');
             }
+            
             await fetchData();
             setSuccessAddStockPrompt(true);
             return { ok: true };
         } catch (error: any) {
             setError(error.message);
             return { ok: false, message: error.message };
-        }finally {
+        } finally {
             setLoading(false);
         }
     };
@@ -198,7 +204,7 @@ export default function StocksPage() {
                     destination_branch: stockDetails.destination_branch,
                     quantity: stockDetails.quantity,
                     note: stockDetails.note,
-                    batch_id: stockDetails.batch_id, // Include batch_id here
+                    batch_id: stockDetails.batch_id,
                 }),
             });
 
@@ -217,10 +223,6 @@ export default function StocksPage() {
         }
     };
 
-    const closeManageBranchesModal = () => {
-        setIsManageBranchesModalOpen(false);
-    };
-
     const addBranch = async (branch: Branch) => {
         try {
             setLoading(true);
@@ -234,7 +236,6 @@ export default function StocksPage() {
                     address_line: branch.address_line,
                 }),
             });
-
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || 'Failed to add branch');
@@ -248,7 +249,6 @@ export default function StocksPage() {
             setLoading(false);
         }
     };
-
 
     const editBranch = async (branch: Branch) => {
         try {
@@ -303,14 +303,13 @@ export default function StocksPage() {
     const filteredStocks = stocks.filter(
         (stock) =>
             activeProductIds.includes(stock.product_id) &&
-            (!filterBranch || stock.branch_code === filterBranch)
+            (!filterBranch || stock.branch_code === filterBranch) &&
+            stock.product_name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
         <Layout defaultTitle="Stocks">
-            {loading && (
-                <CircularIndeterminate />
-            )}
+            {loading && <CircularIndeterminate />}
 
             <BranchTabs
                 branches={branches}
@@ -320,6 +319,8 @@ export default function StocksPage() {
                 handleAddStocks={handleAddStocks}
                 handleTransferStocks={handleTransferStocks}
                 selectedStocks={selectedStocks}
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
             />
 
             <StockTable
@@ -351,12 +352,6 @@ export default function StocksPage() {
                 />
             </Modal>
 
-            {/* <DeleteConfirmationModal
-                show={showDeleteModal}
-                onClose={() => setShowDeleteModal(false)}
-                onConfirm={confirmDeleteBranch}
-            /> */}
-
             <SuccessfulPrompt
                 message="Stock added successfully"
                 isVisible={successAddStockPrompt}
@@ -382,9 +377,6 @@ export default function StocksPage() {
                 isVisible={successDeleteBranchPrompt}
                 onClose={() => setSuccessDeleteBranchPrompt(false)}
             />
-
-
-
         </Layout>
     );
 }
