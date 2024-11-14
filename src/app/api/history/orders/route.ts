@@ -9,9 +9,10 @@ export async function GET() {
       SELECT 
           o.id AS order_id,
           o.date,
-          o.total_amount,
+          o.subtotal_amount,
           o.discount_pct,
-          o.discounted_amount,
+          o.applied_credits,
+          o.total_amount,
           CONCAT(e.first_name, ' ', e.last_name) AS employee_name,
           b.name AS branch_name
       FROM 

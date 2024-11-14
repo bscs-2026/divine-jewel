@@ -17,7 +17,7 @@
 .heading2 {
   color: #575757;
   font-weight: bold;
-  font-size: 0.75rem;
+  font-size: 1rem;
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
 }
@@ -259,14 +259,16 @@
 
 /* Payment Section */
 
-.paymentMethods {
+.paymentContainer {
   display: flex;
-  justify-content: center;
-  align-items: left;
-  justify-content: left;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  margin-top: 1rem;
+  justify-content: space-between; /* Align left and right */
+  align-items: center;            /* Center items vertically */
+  margin: 1rem 0 2rem;            /* Top and bottom margin */
+}
+
+.paymentMethods, .paymentRebates {
+  display: flex;
+  gap: 1rem;                      /* Space between items within each section */
 }
 
 .paymentButton {
@@ -317,7 +319,7 @@
   color: #333;
 }
 
-.discountInput, .tenderedInput, .selectWallet {
+.discountInput, .tenderedInput, .selectWallet, .creditIdInput {
   width: 110px;
   padding: 0.5rem;
   font-size: 13px;
@@ -457,4 +459,48 @@
 .tabButtons:hover {
   background-color: #FFE7EF;
   cursor: pointer;
+}
+
+/* .toggleContainer {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.toggleButton {
+  padding: 10px 20px;
+  font-size: 16px;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toggleButton:hover {
+  background-color: #e0e0e0;
+  border-color: #999;
+}
+
+.toggleButton.active {
+  background-color: #4CAF50;
+  color: #fff;
+  border-color: #4CAF50;
+} */
+
+.closeIcon {
+  color: #A7A7A7;
+  margin-right: 10px;
+  font-size: 1rem;
+}
+
+.errorTextCreditID {
+  display: flex;
+  color: #ff7081;
+  font-size: 0.875rem;
+  margin-top: 5px;
+  text-align: right;
+  justify-content: flex-end;
 }

@@ -39,9 +39,10 @@ interface Order {
   order_id: number;
   date: string;
   employee_name: string;
-  total_amount: string;
+  subtotal_amount: string;
   discount_pct: string;
-  discounted_amount: string;
+  applied_credits: string;
+  total_amount: string;
   branch_name: string;
 
 }
@@ -58,11 +59,12 @@ interface OrderDetail {
   product_size: String | null;
   product_color: String | null;
   quantity: number;
-  price: number | string; // Updated to handle possible string type
-  total_price: number | string; // Updated to handle possible string type
+  price: number | string;
+  total_price: number | string;
   mop: string;
   discount_percent: number;
-  discounted_amount: number;
+  applied_credits: number;
+  total_amount: number;
   amount_tendered: number;
   amount_change: number;
   e_wallet_provider: string | null;
@@ -132,8 +134,8 @@ const HistoryPage: React.FC = () => {
 
   const handleViewOrderAction = (order_id: number) => {
     setSelectedOrderID(order_id);
-    fetchOrderDetails(order_id); // Fetch order details when an order is clicked
-    setIsOrderModalOpen(true); // Open Order Modal
+    fetchOrderDetails(order_id);
+    setIsOrderModalOpen(true);
   };  
 
   const stockMetadata = stockDetailsIndividual.length > 0 ? stockDetailsIndividual[0] : null;

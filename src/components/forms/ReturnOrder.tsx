@@ -23,6 +23,7 @@ const employeeFullname = 'Divine Villanueva';
 const ReturnOrder: React.FC<ReturnOrderProps> = ({ isOpen, onClose }) => {
     const [orderId, setOrderId] = useState<string>('');
     const [orderIdError, setOrderIdError] = useState<string | null>(null);
+    const [customerName, setCustomerName] = useState<string | null>(null); // New field for customer name
     const [returnItems, setReturnItems] = useState<ReturnItem[]>([
         { productCode: '', quantity: 1, reason: '' },
     ]);
@@ -42,6 +43,7 @@ const ReturnOrder: React.FC<ReturnOrderProps> = ({ isOpen, onClose }) => {
 
     const resetForm = () => {
         setOrderId('');
+        setCustomerName(''); // Reset customer name
         setOrderIdError(null);
         setReturnItems([{ productCode: '', quantity: 1, reason: '' }]);
         setValidationErrors({});
@@ -117,12 +119,13 @@ const ReturnOrder: React.FC<ReturnOrderProps> = ({ isOpen, onClose }) => {
                     orderId: parseInt(orderId),
                     returnItems,
                     employeeId: 1, // Placeholder for the employee ID
+                    customerName: customerName || null, // Send customerName as null if not provided
                 }),
             });
 
             if (response.ok) {
                 setShowSuccessPrompt(true);
-                console.log('Return Order Submitted:', { orderId, returnItems });
+                console.log('Return Order Submitted:', { orderId, returnItems, customerName });
                 setTimeout(() => {
                     setShowSuccessPrompt(false);
                     handleClose();
@@ -147,7 +150,7 @@ const ReturnOrder: React.FC<ReturnOrderProps> = ({ isOpen, onClose }) => {
                     <h2 className={styles.modalHeading}>Return Order</h2>
                     <p><strong>Date & Time:</strong> {currentTime}</p>
                     <p><strong>Employee:</strong> {employeeFullname}</p>
-                    < br/>
+                    <br />
 
                     <form onSubmit={handleSubmit}>
                         <div className={styles.modalItem}>
@@ -158,6 +161,17 @@ const ReturnOrder: React.FC<ReturnOrderProps> = ({ isOpen, onClose }) => {
                                 value={orderId}
                                 onChange={(e) => setOrderId(e.target.value)}
                                 placeholder={orderIdError || 'Enter Order ID'}
+                            />
+                        </div>
+
+                        <div className={styles.modalItem}>
+                            <label>Customer Name (Optional)</label>
+                            <input
+                                type="text"
+                                className={styles.modalInputFixed}
+                                value={customerName || ''}
+                                onChange={(e) => setCustomerName(e.target.value || null)}
+                                placeholder="Enter Customer Name"
                             />
                         </div>
 
@@ -210,7 +224,7 @@ const ReturnOrder: React.FC<ReturnOrderProps> = ({ isOpen, onClose }) => {
 
                         <div className={styles.modalMediumButtonContainer}>
                             <button type="submit" className={styles.modalMediumButton}>
-                                Submit Return
+                                Submit
                             </button>
                         </div>
                     </form>
