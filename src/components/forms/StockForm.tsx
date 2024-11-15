@@ -40,8 +40,10 @@ interface StockFormProps {
     products: Product[];
     branches: Branch[];
     selectedStocks: Stock[];
+    addStock: (stock: Stock, batch_id: string, note: string) => Promise<{ ok: boolean, message?: string }>;
+    isStockOut: boolean;
+    stockOut: (stock: Stock, batch_id: string, note: string, stockOutReason: string) => Promise<{ ok: boolean, message?: string }>;
     isTransfer: boolean;
-    addStock: (stock: Stock, batch_id: string) => Promise<{ ok: boolean, message?: string }>;
     transferStock: (stockDetails: StockDetails) => Promise<{ ok: boolean, message?: string }>;
     onClose: () => void;
 }
@@ -50,8 +52,10 @@ const StockForm: React.FC<StockFormProps> = ({
     products,
     branches,
     selectedStocks,
-    isTransfer,
     addStock,
+    isStockOut,
+    stockOut,
+    isTransfer,
     transferStock,
     onClose
 }) => {
@@ -65,17 +69,18 @@ const StockForm: React.FC<StockFormProps> = ({
     );
 
     const [destinationBranch, setDestinationBranch] = useState("");
-    const [transferNote, setTransferNote] = useState("");
+    const [stockOutReason, setStockOutReason] = useState(""); // Single stock-out reason
+    const [note, setNote] = useState("");
     const [lastAction, setLastAction] = useState<boolean | null>(null);
     const [errors, setErrors] = useState<string[]>([]);
     const [successMessage, setSuccessMessage] = useState("");
-    const [batchID, setBatchID] = useState<string>(""); // State to store the generated batch ID
+    const [batchID, setBatchID] = useState<string>("");
     const [currentTime, setCurrentTime] = useState<string>("");
-    const employeeFullname = 'Divine Villanueva'; //hardcoded for now
+    const employeeFullname = 'Divine Villanueva';
 
     useEffect(() => {
-        const newBatchID = generateBatchID(); // Generate the batch ID
-        setBatchID(newBatchID); // Set the batch ID to state so it can be displayed
+        const newBatchID = generateBatchID();
+        setBatchID(newBatchID);
     }, []);
 
     useEffect(() => {
@@ -85,21 +90,20 @@ const StockForm: React.FC<StockFormProps> = ({
                 timeZone: 'Asia/Manila',
                 hour: '2-digit',
                 minute: '2-digit',
-                // second: '2-digit',
                 hour12: true
             }));
         };
-        updateTime(); // Initialize with the current time
-        const intervalId = setInterval(updateTime, 1000); // Update time every second
+        updateTime();
+        const intervalId = setInterval(updateTime, 1000);
 
-        return () => clearInterval(intervalId); // Clean up the interval on component unmount
+        return () => clearInterval(intervalId);
     }, []);
 
     useEffect(() => {
         setFormDataList(
             selectedStocks.map((stock) => ({
-                product_id: stock.product_id ? stock.product_id.toString() : "",
-                branch_code: stock.branch_code ? stock.branch_code.toString() : "",
+                product_id: stock.product_id.toString(),
+                branch_code: stock.branch_code.toString(),
                 quantity: "",
                 note: "",
             }))
@@ -110,14 +114,15 @@ const StockForm: React.FC<StockFormProps> = ({
         if (lastAction !== null && lastAction !== isTransfer) {
             setFormDataList(
                 selectedStocks.map((stock) => ({
-                    product_id: stock.product_id ? stock.product_id.toString() : "",
-                    branch_code: stock.branch_code ? stock.branch_code.toString() : "",
+                    product_id: stock.product_id.toString(),
+                    branch_code: stock.branch_code.toString(),
                     quantity: "",
                     note: "",
                 }))
             );
             setDestinationBranch("");
-            setTransferNote("");
+            setStockOutReason(""); // Reset stock-out reason when action changes
+            setNote("");
         }
         setLastAction(isTransfer);
     }, [isTransfer, selectedStocks, lastAction]);
@@ -156,20 +161,20 @@ const StockForm: React.FC<StockFormProps> = ({
         setDestinationBranch(e.target.value);
     };
 
+    const handleStockOutReasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setStockOutReason(e.target.value);
+    };
+
     const handleNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setTransferNote(e.target.value);
+        setNote(e.target.value);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        let formIsValid = true;
-        let apiSuccess = false;
-
         await Promise.all(formDataList.map(async (formData, index) => {
             if (!formData.product_id || !formData.branch_code || isNaN(parseInt(formData.quantity))) {
                 alert("Please fill all required fields correctly.");
-                formIsValid = false;
                 return;
             }
 
@@ -178,21 +183,34 @@ const StockForm: React.FC<StockFormProps> = ({
                 if (isTransfer) {
                     if (!destinationBranch) {
                         alert("Please select a destination branch for the transfer.");
-                        formIsValid = false;
                         return;
                     }
                     const stockDetails = {
-                        batch_id: batchID, // Use the generated batch ID
+                        batch_id: batchID,
                         product_id: parseInt(formData.product_id),
                         source_branch: parseInt(formData.branch_code),
                         destination_branch: parseInt(destinationBranch),
                         quantity: parseInt(formData.quantity),
-                        note: transferNote || '',
+                        note: note || '',
                     };
                     response = await transferStock(stockDetails);
                     if (response.ok) {
                         setSuccessMessage("Stock successfully transferred!");
-                        apiSuccess = true;
+                    }
+                } else if (isStockOut) {
+                    if (!stockOutReason) {
+                        alert("Please select a reason for stock out.");
+                        return;
+                    }
+                    const stock = {
+                        ...selectedStocks[index],
+                        product_id: parseInt(formData.product_id),
+                        branch_code: parseInt(formData.branch_code),
+                        quantity: parseInt(formData.quantity),
+                    };
+                    response = await stockOut(stock, batchID, note, stockOutReason);
+                    if (response.ok) {
+                        setSuccessMessage("Stock successfully marked as out!");
                     }
                 } else {
                     const stock = {
@@ -201,25 +219,22 @@ const StockForm: React.FC<StockFormProps> = ({
                         branch_code: parseInt(formData.branch_code),
                         quantity: parseInt(formData.quantity),
                     };
-                    response = await addStock(stock, batchID); // Pass batch_id when adding stock
+                    response = await addStock(stock, batchID, note);
                     if (response.ok) {
                         setSuccessMessage("Stock successfully added!");
-                        apiSuccess = true;
                     }
                 }
             } catch (error) {
                 console.error("An error occurred during the API request", error);
-                formIsValid = false;
             }
         }));
-
     };
 
     return (
         <div className={`${styles.modalContent} ${styles.modalContentMedium}`}>
             <div className={styles.modalContentScrollable}>
                 <h2 className={styles.modalHeading}>
-                    {isTransfer ? 'Transfer Stocks' : 'Add Stocks'}
+                    {isTransfer ? 'Transfer Stocks' : isStockOut ? 'Stock Out' : 'Add Stocks'}
                 </h2>
 
                 {/* Display Batch ID */}
@@ -251,37 +266,51 @@ const StockForm: React.FC<StockFormProps> = ({
                                     </option>
                                 ))}
                             </select>
-
-
-                            <input
-                                type="text"
-                                name="transfer_note"
-                                placeholder="Note (Optional)"
-                                value={transferNote}
-                                onChange={handleNoteChange}
-                                className={styles.modalInput}
-                            />
                         </div>
-
                     )}
+
+                    {isStockOut && (
+                        <div>
+                            <label className={styles.modalInputLabel}>Stock Out Reason:</label>
+                            <select
+                                value={stockOutReason}
+                                onChange={handleStockOutReasonChange}
+                                required
+                                className={styles.modalSelect}
+                            >
+                                <option value="" disabled>Select reason</option>
+                                <option value="Damaged">Damaged</option>
+                                <option value="Misentry">Misentry</option>
+                                <option value="Lost">Lost</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                    )}
+
+                    <input
+                        type="text"
+                        name="note"
+                        placeholder="Note (Optional)"
+                        value={note}
+                        onChange={handleNoteChange}
+                        className={styles.modalInput}
+                    />
                     <br />
 
                     <div className={styles.modalItem}>
                         <h3 style={{ width: '330px' }}>Product Details</h3>
                         <h3 style={{ width: '150px' }}>Current Qty.</h3>
-                        {isTransfer ? (
-                            <h3 style={{ width: '100px' }}>Transfer</h3>
-                        ) : (
-                            <h3 style={{ width: '100px' }}>Add</h3>
-                        )}
+                        <h3 style={{ width: '100px' }}>{isTransfer ? 'Transfer' : isStockOut ? 'Stock Out' : 'Add'}</h3>
                     </div>
 
                     {formDataList.map((formData, index) => (
                         <div key={index} className={styles.modalItem}>
                             <div style={{ width: '350px' }}>
                                 <p className={styles.modalPrimary}>{selectedStocks[index]?.product_name}</p>
-                                <p className={styles.modalSecondary}> {selectedStocks[index]?.product_SKU} |  {selectedStocks[index]?.product_size} | {selectedStocks[index]?.product_color}</p>
-                                <p className={styles.modalSecondary}> {selectedStocks[index]?.branch_name}</p>
+                                <p className={styles.modalSecondary}>
+                                    {selectedStocks[index]?.product_SKU} | {selectedStocks[index]?.product_size} | {selectedStocks[index]?.product_color}
+                                </p>
+                                <p className={styles.modalSecondary}>{selectedStocks[index]?.branch_name}</p>
                             </div>
 
                             <div style={{ width: '150px' }}>
@@ -309,17 +338,15 @@ const StockForm: React.FC<StockFormProps> = ({
                         <button
                             type="button"
                             className={`${styles.modalMediumButton} ${styles.modalBackButton}`}
-                            // onClick={() => onClose()}
                             onClick={() => onClose(false)}
                         >
                             <ArrowBack className={styles.modalBackButtonIcon} /> Back
-                            {/* <span className={styles.modalTooltipText}>Back to select more</span> */}
                         </button>
                         <button
                             type="submit"
                             className={`${styles.modalMediumButton}`}
                         >
-                            {isTransfer ? 'Transfer Stock' : 'Add Stock'}
+                            {isTransfer ? 'Transfer Stock' : isStockOut ? 'Stock Out' : 'Add Stock'}
                         </button>
                     </div>
                 </form>

@@ -17,7 +17,9 @@ interface BranchTabsProps {
   setFilterBranch: (id: number | string | null) => void;
   toggleManageBranches: () => void;
   handleAddStocks: () => void;
+  handleStockOut: () => void;
   handleTransferStocks: () => void;
+  handleMarkDamaged: () => void;
   selectedStocks: { id: number; [key: string]: any }[];
   searchQuery: string;
   setSearchQuery: (query: string) => void;
@@ -29,7 +31,9 @@ const BranchTabs: React.FC<BranchTabsProps> = ({
   setFilterBranch,
   toggleManageBranches,
   handleAddStocks,
+  handleStockOut,
   handleTransferStocks,
+  handleMarkDamaged,
   selectedStocks,
   searchQuery,
   setSearchQuery,
@@ -88,10 +92,30 @@ const BranchTabs: React.FC<BranchTabsProps> = ({
           className={`${styles.tabsContainerItem} ${
             isStocksSelected ? styles.active : styles.inactive
           }`}
+          onClick={handleStockOut}
+          disabled={!isStocksSelected}
+        >
+          Stock Out
+        </button>
+
+        <button
+          className={`${styles.tabsContainerItem} ${
+            isStocksSelected ? styles.active : styles.inactive
+          }`}
           onClick={handleTransferStocks}
           disabled={!isStocksSelected}
         >
           Transfer Stock
+        </button>
+
+        <button
+          className={`${styles.tabsContainerItem} ${
+            isStocksSelected ? styles.active : styles.inactive
+          }`}
+          onClick={handleMarkDamaged}
+          disabled={!isStocksSelected}
+        >
+          Mark as Damaged
         </button>
       </div>
     </div>
