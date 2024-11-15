@@ -44,6 +44,8 @@ interface StockFormProps {
     isStockOut: boolean;
     stockOut: (stock: Stock, batch_id: string, note: string, stockOutReason: string) => Promise<{ ok: boolean, message?: string }>;
     isTransfer: boolean;
+    markDamaged: (stock: Stock, batch_id: string, note: string) => Promise<{ ok: boolean, message?: string }>;
+    isMarkDamaged: boolean;
     transferStock: (stockDetails: StockDetails) => Promise<{ ok: boolean, message?: string }>;
     onClose: () => void;
 }
@@ -55,6 +57,8 @@ const StockForm: React.FC<StockFormProps> = ({
     addStock,
     isStockOut,
     stockOut,
+    isMarkDamaged,
+    markDamaged,
     isTransfer,
     transferStock,
     onClose
@@ -212,6 +216,17 @@ const StockForm: React.FC<StockFormProps> = ({
                     if (response.ok) {
                         setSuccessMessage("Stock successfully marked as out!");
                     }
+                } else if (isMarkDamaged) {
+                    const stock = {
+                        ...selectedStocks[index],
+                        product_id: parseInt(formData.product_id),
+                        branch_code: parseInt(formData.branch_code),
+                        quantity: parseInt(formData.quantity),
+                    };
+                    response = await markDamaged(stock, batchID, note);
+                    if (response.ok) {
+                        setSuccessMessage("Stock successfully marked as damaged!");
+                    }
                 } else {
                     const stock = {
                         ...selectedStocks[index],
@@ -234,7 +249,7 @@ const StockForm: React.FC<StockFormProps> = ({
         <div className={`${styles.modalContent} ${styles.modalContentMedium}`}>
             <div className={styles.modalContentScrollable}>
                 <h2 className={styles.modalHeading}>
-                    {isTransfer ? 'Transfer Stocks' : isStockOut ? 'Stock Out' : 'Add Stocks'}
+                    {isTransfer ? 'Transfer Stocks' : isStockOut ? 'Stock Out' : isMarkDamaged ? 'Mark as Damaged' : 'Add Stocks'}
                 </h2>
 
                 {/* Display Batch ID */}
@@ -300,7 +315,7 @@ const StockForm: React.FC<StockFormProps> = ({
                     <div className={styles.modalItem}>
                         <h3 style={{ width: '330px' }}>Product Details</h3>
                         <h3 style={{ width: '150px' }}>Current Qty.</h3>
-                        <h3 style={{ width: '100px' }}>{isTransfer ? 'Transfer' : isStockOut ? 'Stock Out' : 'Add'}</h3>
+                        <h3 style={{ width: '100px' }}>{isTransfer ? 'Transfer' : isStockOut ? 'Stock Out' : isMarkDamaged ? 'Damaged Qty.' : 'Add'}</h3>
                     </div>
 
                     {formDataList.map((formData, index) => (
@@ -346,7 +361,7 @@ const StockForm: React.FC<StockFormProps> = ({
                             type="submit"
                             className={`${styles.modalMediumButton}`}
                         >
-                            {isTransfer ? 'Transfer Stock' : isStockOut ? 'Stock Out' : 'Add Stock'}
+                            {isTransfer ? 'Transfer Stock' : isStockOut ? 'Stock Out' : isMarkDamaged ? 'Mark as Damaged' : 'Add Stock'}
                         </button>
                     </div>
                 </form>
