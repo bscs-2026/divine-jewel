@@ -22,6 +22,8 @@ export async function POST(req: NextRequest) {
     response.cookies.delete('role_id');
     response.cookies.delete('branch_id');
     response.cookies.delete('branch_name');
+    response.cookies.delete('first_name');
+    response.cookies.delete('last_name');
 
     return response;
   } catch (error) {

@@ -21,6 +21,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Username, password, and branch are required.' }, { status: 400 });
     }
 
+    // Retrieve user information, including first_name and last_name
     const userResults: any = await query('SELECT * FROM employees WHERE username = ?', [username]);
     const branchResults: any = await query('SELECT * FROM branches WHERE name = ?', [branch]);
 
@@ -28,8 +29,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid username, password, or branch.' }, { status: 401 });
     }
 
-    const user : {id: string, username: string, role_id: string} = userResults[0];
-    const branchData : {id: string, name: string} = branchResults[0];
+    const user: { id: string, username: string, role_id: string, first_name: string, last_name: string } = userResults[0];
+    const branchData: { id: string, name: string } = branchResults[0];
     const passwordMatch = await comparePassword(password, user.password);
 
     if (!passwordMatch) {
@@ -37,8 +38,13 @@ export async function POST(req: NextRequest) {
     }
 
     // Create JWT payload
-    const payload = { id: user.id, username: user.username, role_id: user.role_id, branch_id: branchData.id };
-    const token= jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+    const payload = { 
+      id: user.id, 
+      username: user.username, 
+      role_id: user.role_id, 
+      branch_id: branchData.id 
+    };
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 
     // Invalidate old sessions for the user
     await query('DELETE FROM sessions WHERE user_id = ?', [user.id]);
@@ -49,7 +55,7 @@ export async function POST(req: NextRequest) {
       [user.id, token, new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), branchData.id]
     );
 
-    // Set JWT and branch in the session cookie
+    // Set JWT and other session data in the response cookies
     const response = NextResponse.json({ success: true, userId: user.id }, { status: 200 });
     const cookieOptions = {
       maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
@@ -58,14 +64,17 @@ export async function POST(req: NextRequest) {
       sameSite: 'lax',
     };
 
+    // Set session cookies for user data
     response.cookies.set('sessionToken', token as string, cookieOptions as Partial<ResponseCookie>);
 
-    const cookieOptionsWithHttp  = {...cookieOptions, httpOnly: false} as Partial<ResponseCookie>;
+    const cookieOptionsWithHttp = { ...cookieOptions, httpOnly: false } as Partial<ResponseCookie>;
     response.cookies.set('user_id', user.id, cookieOptionsWithHttp);
     response.cookies.set('username', user.username, cookieOptionsWithHttp);
     response.cookies.set('role_id', user.role_id, cookieOptionsWithHttp);
     response.cookies.set('branch_id', branchData.id, cookieOptionsWithHttp);
     response.cookies.set('branch_name', branchData.name, cookieOptionsWithHttp);
+    response.cookies.set('first_name', user.first_name, cookieOptionsWithHttp);
+    response.cookies.set('last_name', user.last_name, cookieOptionsWithHttp);
 
     return response;
   } catch (error) {

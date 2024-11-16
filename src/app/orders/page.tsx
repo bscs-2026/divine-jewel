@@ -2,11 +2,11 @@
 
 'use client';
 import { useState, useEffect } from 'react';
-import Layout from '../../components/PageLayout';
-import CategoryTabs from '../../components/tabs/ProductCategoryOnTrans';
-import ProductStocksTable from '../../components/tables/ProductListOnTrans';
-import BranchFilter from '../../components/filters/StoreBranchOnTrans';
-import OrderForm from '../../components/forms/Orders';
+import Layout from '@/components/PageLayout';
+import CategoryTabs from '@/components/tabs/ProductCategoryOnTrans';
+import ProductStocksTable from '@/components/tables/ProductListOnTrans';
+import BranchFilter from '@/components/filters/StoreBranchOnTrans';
+import OrderForm from '@/components/forms/Orders';
 import { SuccessfulPrompt } from '@/components/prompts/Prompt';
 import CircularIndeterminate from '@/components/loading/Loading';
 

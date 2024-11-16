@@ -260,9 +260,9 @@ body.no-scroll {
 
 .deleteModal {
     position: fixed;
-    top: 2%; /* Adjust this value to move the modal closer or further from the top */
+    top: 2%;
     left: 50%;
-    transform: translateX(-50%); /* Only translate horizontally to center */
+    transform: translateX(-50%);
     background-color: #ffffff;
     /* border: 2px solid #575757; */
     padding: 20px;
@@ -272,8 +272,6 @@ body.no-scroll {
     text-align: center;
     border-radius: 8px;
 }
-
-
 
 .iconButtonContainer {
     display: flex;
@@ -307,59 +305,82 @@ body.no-scroll {
 
 /* Modal.module.css */
 
+.infoContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.infoRow {
+    display: grid;
+    grid-template-columns: 108px auto;
+    align-items: center;
+    column-gap: 8px;
+}
+
+.label {
+    text-align: right;
+    font-weight: normal;
+}
+
+.value {
+    text-align: left;
+}
+
 .receiptTable {
     width: 100%;
     border-collapse: collapse;
     margin-top: 1em;
-  }
-  
-  .receiptTable th,
-  .receiptTable td {
+}
+
+.receiptTable th,
+.receiptTable td {
     padding-left: 5px;
     border-bottom: 1px solid #ddd;
-  }
-  
-  .receiptTable th {
-    text-align: left;
-  }
+}
 
-  .receiptTable td {
-    text-align: right;
-  }
-  
-  .receiptTable .itemDescription {
+.receiptTable th {
     text-align: left;
-  }
-  
-  .receiptSummary {
+}
+
+.receiptTable td {
+    text-align: right;
+}
+
+.receiptTable .itemDescription {
+    text-align: left;
+    padding-top: 1rem;
+}
+
+.receiptSummary {
     margin-top: 1em;
-  }
-  
-  .receiptSummary p {
+}
+
+.receiptSummary p {
     display: flex;
     justify-content: space-between;
     margin: 4px 0;
-  }
-  
-  .receiptSubHeading {
+}
+
+.receiptSubHeading {
     text-align: center;
     margin: 0;
     font-size: 1rem;
-  }
-  
-  .companyDetails h2 {
+}
+
+.companyDetails h2 {
     text-align: center;
     margin: 0;
     font-size: 14px;
-  }
-  
-  .printButtonContainer {
+}
+
+.printButtonContainer {
     display: flex;
     justify-content: center;
     margin-top: 1em;
-  }
-  
-  .printButton {
+}
+
+.printButton {
     padding: 0.5rem 1rem;
     border-radius: 0.75rem;
     color: #575757;
@@ -368,27 +389,71 @@ body.no-scroll {
     background-color: #FCB6D7;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
     transition: background-color 0.3s ease, transform 0.2s ease;
-  }
-  
-  .printButton:hover {
-    background-color: #FCB6D7;
-    transform: translateY(-2px); /* Darken on hover */
-  }
+}
 
-  .header {
+.printButton:hover {
+    background-color: #FCB6D7;
+    transform: translateY(-2px);
+}
+
+.header {
     text-align: center;
-  }
-  
-  .logo {
+}
+
+.logo {
     width: 50%;
     max-width: 150px;
     height: auto;
     margin: 0 auto;
-  }
+}
 
-  .readOnlyInput {
+.readOnlyInput {
     background-color: #f0f0f0;
     color: #a0a0a0;
     cursor: not-allowed;
-  }
-  
+}
+
+.receiptTable .priceHeader {
+    text-align: right;
+}
+
+.receiptHeader {
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 1em 0;
+    color: #575757;
+}
+
+.cashierInfo,
+.receiptNotice,
+.receiptOfficial {
+    color: #575757;
+    margin: 0.5em 0;
+}
+
+.cashierInfo {
+    text-align: left;
+    font-size: 0.75rem;
+}
+
+.receiptOfficial {
+    text-align: center;
+    font-size: 1rem;
+    /* font-weight: 500; */
+}
+
+.receiptNotice {
+    text-align: center;
+    font-size: 0.75rem;
+    /* font-weight: 500; */
+}
+
+.itemDetails {
+    font-size: 0.75em;
+    color: #575757;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    display: block;
+}
+
