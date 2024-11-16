@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
     console.log('Adding product to stocks...');
     // Insert stock record for the product, default quantity is 0, branch code 1 (main branch), and SKU
     await query(
-      'INSERT INTO `stocks` (product_id, SKU, quantity, branch_code) VALUES (?, ?, ?, ?)',
-      [productId, SKU, 0, 1]
+      'INSERT INTO `stocks` (product_id, SKU, quantity, damaged, branch_code) VALUES (?, ?, ?, ?, ?)',
+      [productId, SKU, 0, 0,1]
     );
     console.log('Added stocks for product:', productId);
 

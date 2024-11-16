@@ -7,6 +7,7 @@ interface Stock {
   product_id: number;
   branch_code: number;
   quantity: number;
+  damaged: number;
   product_name: string;
   branch_name: string | undefined;
   product_SKU: string;
@@ -40,6 +41,7 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
       { Header: 'Branch', accessor: 'branch_name' as keyof Stock, align: 'left' },
       // { Header: 'Address', accessor: 'branch_address' as keyof Stock, align: 'left' },
       { Header: 'Quantity', accessor: 'quantity' as keyof Stock, align: 'right' },
+      { Header: 'Damaged', accessor: 'damaged' as keyof Stock, align: 'right' },
       { Header: 'Last Updated', accessor: 'last_updated' as keyof Stock, align: 'right' },
     ],
     []
@@ -162,6 +164,7 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
               <td className={styles.td}>{stock.product_color || 'Unknown'}</td>
               <td className={styles.td}>{stock.branch_name || 'Unknown'}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>{stock.quantity}</td>
+              <td className={`${styles.td} ${styles.rightAlign}`}>{stock.damaged}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>
                 {new Date(stock.last_updated).toLocaleDateString()} {/* Format date */}
                 {/* <br /> */}

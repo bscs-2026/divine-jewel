@@ -11,12 +11,15 @@ import Modal from '@/components/modals/Modal';
 import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
 import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
 import CircularIndeterminate from '@/components/loading/Loading';
+import { se } from 'date-fns/locale';
+import { set } from 'date-fns';
 
 interface Stock {
     id: number;
     product_id: number;
     branch_code: number;
     quantity: number;
+    damaged: number;
     product_name: string;
     product_SKU: string;
     category_name: string;
@@ -56,6 +59,8 @@ export default function StocksPage() {
     const [branches, setBranches] = useState<Branch[]>([]);
     const [selectedStocks, setSelectedStocks] = useState<Stock[]>([]);
     const [isTransfer, setIsTransfer] = useState(false);
+    const [isStockOut, setIsStockOut] = useState(false);
+    const [isMarkDamaged, setIsMarkDamaged] = useState(false);
     const [filterBranch, setFilterBranch] = useState<number | string | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -64,6 +69,8 @@ export default function StocksPage() {
     const [branchToDelete, setBranchToDelete] = useState<number | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [successAddStockPrompt, setSuccessAddStockPrompt] = useState(false);
+    const [successStockOutPrompt, setSuccessStockOutPrompt] = useState<boolean>(false);
+    const [successMarkDamagedPrompt, setSuccessMarkDamagedPrompt] = useState<boolean>(false);
     const [successTransferStockPrompt, setSuccessTransferStockPrompt] = useState<boolean>(false);
     const [successAddBranchPrompt, setSuccessAddBranchPrompt] = useState<boolean>(false);
     const [successEditBranchPrompt, setSuccessEditBranchPrompt] = useState<boolean>(false);
@@ -124,15 +131,35 @@ export default function StocksPage() {
 
     const handleAddStocks = () => {
         setIsTransfer(false);
+        setIsStockOut(false);
+        setIsMarkDamaged(false);
+        setIsModalOpen(true);
+
+    };
+
+    const handleStockOut = () => {
+        setIsStockOut(true); 
+        setIsTransfer(false);
+        setIsMarkDamaged(false);
         setIsModalOpen(true);
     };
 
     const handleTransferStocks = () => {
         setIsTransfer(true);
+        setIsStockOut(false);
+        setIsMarkDamaged(false);
         setIsModalOpen(true);
     };
 
-    const addStock = async (stock: Stock, batch_id: string) => {
+    const handleMarkDamaged = () => {
+        setIsMarkDamaged(true);
+        setIsTransfer(false);
+        setIsStockOut(false);
+        setIsModalOpen(true);
+    }
+
+
+    const addStock = async (stock: Stock, batch_id: string, note: string) => {
         if (!stock.product_id || !stock.branch_code || isNaN(stock.quantity)) {
             console.error('Invalid stock data');
             return { ok: false, message: 'Invalid stock data' };
@@ -146,7 +173,7 @@ export default function StocksPage() {
                 )
             );
 
-            const response = await fetch(`/api/stocks/${stock.product_id}`, {
+            const response = await fetch(`/api/stocks/${stock.product_id}/stockIn`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -154,7 +181,9 @@ export default function StocksPage() {
                 body: JSON.stringify({
                     branch_code: stock.branch_code,
                     quantity: stock.quantity,
-                    batch_id
+                    batch_id,
+                    note,
+                    
                 }),
             });
 
@@ -172,6 +201,79 @@ export default function StocksPage() {
             setLoading(false);
         }
     };
+
+    const stockOut = async (stock: Stock, batch_id: string, note: string, stock_out_reason: string) => {
+        if (!stock.product_id || !stock.branch_code || isNaN(stock.quantity)) {
+            console.error('Invalid stock data');
+            return { ok: false, message: 'Invalid stock data' };
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(`/api/stocks/${stock.product_id}/stockOut`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    branch_code: stock.branch_code,
+                    quantity: stock.quantity,
+                    batch_id,
+                    note,
+                    stock_out_reason
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update stock');
+            }
+
+            await fetchData();
+            setSuccessStockOutPrompt(true);
+            return { ok: true };
+        } catch (error: any) {
+            setError(error.message);
+            return { ok: false, message: error.message };
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const markDamaged = async (stock: Stock, batch_id: string, note: string) => {
+        if (!stock.product_id || !stock.branch_code || isNaN(stock.quantity)) {
+            console.error('Invalid stock data');
+            return { ok: false, message: 'Invalid stock data' };
+        }
+
+        try {
+            setLoading(true);
+            const response = await fetch(`/api/stocks/${stock.product_id}/damaged`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    branch_code: stock.branch_code,
+                    quantity: stock.quantity,
+                    batch_id,
+                    note
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to update stock');
+            }
+
+            await fetchData();
+            setSuccessMarkDamagedPrompt(true);
+            return { ok: true };
+        } catch (error: any) {
+            setError(error.message);
+            return { ok: false, message: error.message };
+        } finally {
+            setLoading(false);
+        }
+    }
 
     const transferStock = async (stockDetails: StockDetails) => {
         if (!stockDetails.batch_id || !stockDetails.product_id || !stockDetails.source_branch || !stockDetails.destination_branch || isNaN(stockDetails.quantity)) {
@@ -317,6 +419,8 @@ export default function StocksPage() {
                 setFilterBranch={setFilterBranch}
                 toggleManageBranches={() => setIsManageBranchesModalOpen(!isManageBranchesModalOpen)}
                 handleAddStocks={handleAddStocks}
+                handleStockOut={handleStockOut}
+                handleMarkDamaged={handleMarkDamaged}
                 handleTransferStocks={handleTransferStocks}
                 selectedStocks={selectedStocks}
                 searchQuery={searchQuery}
@@ -335,8 +439,12 @@ export default function StocksPage() {
                         products={products}
                         branches={branches}
                         addStock={addStock}
+                        stockOut={stockOut}
+                        markDamaged={markDamaged}
                         transferStock={transferStock}
                         selectedStocks={selectedStocks}
+                        isStockOut={isStockOut}
+                        isMarkDamaged={isMarkDamaged}
                         isTransfer={isTransfer}
                         onClose={(reset) => closeModal(reset)}
                     />
@@ -356,6 +464,16 @@ export default function StocksPage() {
                 message="Stock added successfully"
                 isVisible={successAddStockPrompt}
                 onClose={() => setSuccessAddStockPrompt(false)}
+            />
+            <SuccessfulPrompt
+                message="Stock out processed successfully"
+                isVisible={successStockOutPrompt}
+                onClose={() => setSuccessStockOutPrompt(false)}
+            />
+            <SuccessfulPrompt
+                message="Stock marked as damaged successfully"
+                isVisible={successMarkDamagedPrompt}
+                onClose={() => setSuccessMarkDamagedPrompt(false)}
             />
             <SuccessfulPrompt
                 message="Stock transferred successfully"
