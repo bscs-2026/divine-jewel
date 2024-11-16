@@ -8,6 +8,7 @@ interface Stock {
     product_id: number;
     branch_code: number;
     quantity: number;
+    damaged: number;
     product_name: string;
     branch_name: string | undefined;
     product_SKU: string;
@@ -134,9 +135,22 @@ const StockForm: React.FC<StockFormProps> = ({
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
         const { name, value } = e.target;
         const inputValue = parseInt(value);
-        const availableStock = selectedStocks[index].quantity;
+        // Check available quantity based on the selected reason
+        const availableStock = stockOutReason === "Damaged"
+            ? selectedStocks[index].damaged // Use damaged quantity
+            : selectedStocks[index].quantity; // Use current quantity
+
 
         if (isTransfer && name === "quantity" && inputValue > availableStock) {
+            setErrors((prev) => {
+                const updatedErrors = [...prev];
+                updatedErrors[index] = `Available stock is ${availableStock}.`;
+                return updatedErrors;
+            });
+            return;
+        }
+
+        if (isStockOut && name === "quantity" && inputValue > availableStock) {
             setErrors((prev) => {
                 const updatedErrors = [...prev];
                 updatedErrors[index] = `Available stock is ${availableStock}.`;
@@ -314,7 +328,9 @@ const StockForm: React.FC<StockFormProps> = ({
 
                     <div className={styles.modalItem}>
                         <h3 style={{ width: '330px' }}>Product Details</h3>
-                        <h3 style={{ width: '150px' }}>Current Qty.</h3>
+                        <h3 style={{ width: '150px' }}>
+                            {stockOutReason === "Damaged" ? "Damaged Qty." : "Current Qty."}
+                        </h3>
                         <h3 style={{ width: '100px' }}>{isTransfer ? 'Transfer' : isStockOut ? 'Stock Out' : isMarkDamaged ? 'Damaged Qty.' : 'Add'}</h3>
                     </div>
 
@@ -329,7 +345,11 @@ const StockForm: React.FC<StockFormProps> = ({
                             </div>
 
                             <div style={{ width: '150px' }}>
-                                <p className={styles.modalPrimary}>{selectedStocks[index].quantity}</p>
+                                <p className={styles.modalPrimary}>
+                                    {stockOutReason === "Damaged"
+                                        ? selectedStocks[index].damaged
+                                        : selectedStocks[index].quantity}
+                                </p>
                             </div>
 
                             <div style={{ width: '100px' }}>
@@ -341,8 +361,17 @@ const StockForm: React.FC<StockFormProps> = ({
                                     required
                                     className={styles.modalStockInputFixed}
                                     min="1"
-                                    {...(isTransfer ? { max: selectedStocks[index].quantity } : {})}
+                                    max={
+                                        isTransfer
+                                            ? selectedStocks[index].quantity
+                                            : isStockOut
+                                            ? stockOutReason === "Damaged"
+                                                ? selectedStocks[index].damaged // Use damaged quantity for "Damaged" stock out reason
+                                                : selectedStocks[index].quantity // Use current quantity for other stock out reasons
+                                            : selectedStocks[index].quantity // Default max for add stock
+                                    }
                                     placeholder={' qty.'}
+                                    
                                 />
                                 {errors[index] && <p className={styles.modalErrorText}>{errors[index]}</p>}
                             </div>
