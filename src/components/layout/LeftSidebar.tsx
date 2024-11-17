@@ -52,10 +52,10 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
           <p className={`${styles.greeting} text-black`}>Hello, Divine!</p>
         </div>
         <ul className={`${styles.navList}`}>
-          <li className={styles.navItem} onClick={() => onSelectTitle('Sales')}>
+          <li className={styles.navItem} onClick={() => onSelectTitle('Dashboard')}>
             <Link href="/dashboard">
               <FontAwesomeIcon icon={faChartLine} className={styles.icon} />
-              Sales
+              Dashboard
             </Link>
           </li>
           <li className={styles.navItem} onClick={() => onSelectTitle('Orders')}>
