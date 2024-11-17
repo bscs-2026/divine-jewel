@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { BarChart, CartesianGrid, XAxis, Bar } from 'recharts';
 import {
@@ -6,107 +7,143 @@ import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
-  } from "@/components/ui/chart"
+} from "@/components/ui/chart"
 
-const chartConfig = {
-  views: {
-    label: "Page Views",
+const barChartConfig = {
+  sales: {
+    label: "Sales",
+    color: "#FCB6D7",
   },
-  desktop: {
-    label: "Transactions",
-    color: "hsl(var(--chart-1))",
-  },
-} satisfies ChartConfig;
+} satisfies ChartConfig
 
 interface TotalSalesChartProps {
-  activeChart: keyof typeof chartConfig;
-  setActiveChart: (chart: keyof typeof chartConfig) => void;
-  total: { [key: string]: number };
-  chartData: { date: string; [key: string]: number }[];
+  yearData: YearsData[];
+  sales: Sales[];
+  activeChart: keyof typeof barChartConfig;
+  setActiveChart: (chart: keyof typeof barChartConfig) => void;
+}
+  
+interface Sales {
+  order_date: string;
+  order_count: number;
 }
 
-const TotalSalesChart: React.FC<TotalSalesChartProps> = ({ activeChart, setActiveChart, total, chartData }) => {
+interface YearsData {
+  year: string;
+  yearly_orders: number;
+}
+
+const TotalSalesChart: FC<TotalSalesChartProps> = ({ activeChart, setActiveChart, sales, yearData }) => {
+
+  const chartData = sales.map((sale) => ({
+    date: sale.order_date,
+    sales: sale.order_count,
+  }));
+
   return (
     <Card>
-      <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-          <CardTitle>Total Sales</CardTitle>
-          <CardDescription>
-            Showing total visitors for the last 3 months
-          </CardDescription>
-        </div>
-        <div className="flex">
-          {["desktop"].map((key) => {
-            const chart = key as keyof typeof chartConfig;
-            return (
-              <button
-                key={chart}
-                data-active={activeChart === chart}
-                className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6"
-                onClick={() => setActiveChart(chart)}
-              >
-                <span className="text-xs text-muted-foreground">
-                  {chartConfig[chart].label}
-                </span>
-                <span className="text-lg font-bold leading-none sm:text-3xl">
-                  {total[key as keyof typeof total].toLocaleString()}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </CardHeader>
-      <CardContent className="px-2 sm:p-6">
-        <ChartContainer
-          config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
-        >
-          <BarChart
-            accessibilityLayer
-            data={chartData}
-            margin={{
-              left: 12,
-              right: 12,
-            }}
+  <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row ">
+    <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
+      <CardTitle>Total Sales</CardTitle>
+      <CardDescription>
+        Showing the count of sales for the selected month.
+      </CardDescription>
+    </div>
+    <div className="flex">
+      {["sales"].map((key) => {
+        const chart = key as keyof typeof barChartConfig;
+        return (
+          <button
+            key={chart}
+            data-active={activeChart === chart}
+            className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6"
+            onClick={() => setActiveChart(chart)}
           >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="date"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              minTickGap={32}
-              tickFormatter={(value) => {
-                const date = new Date(value);
-                return date.toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                });
-              }}
-            />
-            <ChartTooltip
-              content={
-                <ChartTooltipContent
-                  className="w-[150px]"
-                  nameKey="views"
-                  labelFormatter={(value) => {
-                    return new Date(value).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    });
-                  }}
-                />
-              }
-            />
-            <Bar
-              dataKey={activeChart}
-              fill={`var(--color-${activeChart})`}
-            />
-          </BarChart>
-        </ChartContainer>
-      </CardContent>
-    </Card>
+            <span className="text-xs text-muted-foreground">
+              Count of sales this Month
+            </span>
+            <span className="text-lg font-bold leading-none sm:text-3xl ml-auto">
+              {chartData.reduce((acc, item) => acc + item.sales, 0)}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+    <div className="flex">
+    {["sales"].map((key) => {
+  const chart = key as keyof typeof barChartConfig;
+  return (
+    <button
+      key={chart}
+      data-active={activeChart === chart}
+      className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6 "
+      onClick={() => setActiveChart(chart)}
+    >
+      <span className="text-xs text-muted-foreground">
+        Count of sales this Year
+      </span>
+      <span className="text-lg font-bold leading-none sm:text-3xl ml-auto">
+        {yearData.reduce((acc, item) => acc + item.yearly_orders, 0)}
+      </span>
+    </button>
+  );
+})}
+    </div>
+  </CardHeader>
+  <CardContent className="px-2 sm:p-6">
+    {chartData.length === 0 ? (
+      <div className="flex justify-center items-center h-[250px] text-gray-500">
+        <span>No Data Available on this Date.</span>
+      </div>
+    ) : (
+      <ChartContainer
+        config={barChartConfig}
+        className="aspect-auto h-[250px] w-full"
+      >
+        <BarChart
+          accessibilityLayer
+          data={chartData}
+          margin={{
+            left: 12,
+            right: 12,
+          }}
+        >
+          <CartesianGrid vertical={false} />
+          <XAxis
+            dataKey="date"
+            tickLine={false}
+            axisLine={false}
+            tickMargin={8}
+            minTickGap={32}
+            tickFormatter={(value) => {
+              const date = new Date(value);
+              return date.toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+              });
+            }}
+          />
+          <ChartTooltip
+            content={
+              <ChartTooltipContent
+                className="w-[150px]"
+                nameKey="views"
+                labelFormatter={(value) => {
+                  return new Date(value).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  });
+                }}
+              />
+            }
+          />
+          <Bar dataKey="sales" fill={`var(--color-${activeChart})`} />
+        </BarChart>
+      </ChartContainer>
+    )}
+  </CardContent>
+</Card>
   );
 };
 
