@@ -5,33 +5,42 @@ import { ColumnDef } from "@tanstack/react-table"
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 
-export type Sales = {
-    id: string
-    name: string
-    category: string
-    quantitySold: number
-    totalSales: number
+interface TopProducts {
+  product_name: string;
+  category_name: string;
+  total_quantity_sold: number;
+  total_sales: number;
 }
 
-export const columns: ColumnDef<Sales>[] = [
+
+export const columns: ColumnDef<TopProducts>[] = [
   {
-    accessorKey: "id",
-    header: "ID",
+    accessorKey: "product_name",
+    header: () => <div className="font-bold">Name</div>,
+    
   },
   {
-    accessorKey: "name",
-    header: "Name",
+    accessorKey: "category_name",
+    header: () => <div className="font-bold">Category</div>,
   },
   {
-    accessorKey: "category",
-    header: "Category",
+    accessorKey: "total_quantity_sold",
+    header: () => <div className="font-bold text-right pr-2">Quantity Sold</div>,
+    cell: ({ row }) => {
+      const count = row.getValue("total_quantity_sold") as number;
+      return <div className="text-right pr-2">{count}</div>;
+    },
   },
   {
-    accessorKey: "quantitySold",
-    header: "Quantity Sold",
-  },
-  {
-    accessorKey: "totalSales",
-    header: "Total Sales",
+    accessorKey: "total_sales",
+    header: () => <div className="font-bold text-right pr-2">Total Sales</div>,
+    cell: ({ row }) => {
+      const amount = parseFloat(row.getValue("total_sales"));
+      const formatted = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "PHP",
+      }).format(amount);
+      return <div className="text-right pr-2">{formatted}</div>;
+    },
   },
 ]
