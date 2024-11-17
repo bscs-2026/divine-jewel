@@ -65,10 +65,14 @@ export function DataTable<TData, TValue>({
                   </TableCell>
                 ))}
 <<<<<<< HEAD
+<<<<<<< HEAD
               </TableRow> 
 =======
               </TableRow>
 >>>>>>> 9ec0840 (resolve conflict)
+=======
+              </TableRow> 
+>>>>>>> 8d4ee7a (created sales page)
             ))
           ) : (
             <TableRow>
