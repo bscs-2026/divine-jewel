@@ -766,13 +766,13 @@ const barChartConfig = {
   },
   desktop: {
     label: "Transactions",
-    color: "hsl(var(--chart-1))",
+    color: "#FCB6D7",
   },
 } satisfies ChartConfig
 
 const horizontalBarChartConfig = {
   desktop: {
-    label: "Desktop",
+    label: "Sales",
     color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig
@@ -1590,7 +1590,7 @@ export default function Home() {
         <div className="flex flex-row gap-2 mb-4">
           <div className="flex flex-col bg-white h-auto w-1/3 rounded-2xl shadow-md border border-gray-200 ">
             <div className="m-4 font-extrabold text-xl">Active Locations</div>
-            <div className="m-4">
+            <div className="mx-4">
               <Table>
                 <TableCaption>A list of your Active Locations.</TableCaption>
                 <TableHeader>

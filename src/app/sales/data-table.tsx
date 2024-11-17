@@ -67,6 +67,7 @@ export function DataTable<TData, TValue>({
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
               </TableRow> 
 =======
               </TableRow>
@@ -77,6 +78,9 @@ export function DataTable<TData, TValue>({
 =======
               </TableRow>
 >>>>>>> 4f42e46 (changes)
+=======
+              </TableRow> 
+>>>>>>> 7c54cf1 (created sales page)
             ))
           ) : (
             <TableRow>

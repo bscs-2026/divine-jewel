@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 'use client';
 
 import React, { useState, useEffect, FormEvent } from 'react';
@@ -154,6 +155,8 @@ export default function LoginPage() {
         </button>
       </form>
 =======
+=======
+>>>>>>> 7c54cf1 (created sales page)
 "use client";
 
 import { useState, FormEvent } from "react";
@@ -275,7 +278,10 @@ export default function Page() {
           </div>
         </div>
       </div>
+<<<<<<< HEAD
 >>>>>>> 8d4ee7a (created sales page)
+=======
+>>>>>>> 7c54cf1 (created sales page)
     </div>
   );
 }
