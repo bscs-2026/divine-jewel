@@ -48,7 +48,7 @@ RUN echo "NODE_ENV is set to: $NODE_ENV"
 COPY .env.$NODE_ENV ./.env
 
 # Install dependencies
-RUN npm cache clean --force && rm -rf node_modules package-lock.json && npm install
+RUN npm cache clean --force && rm -rf node_modules package-lock.json && npm install next && npm install
 
 # Build the Next.js app if NODE_ENV is production
 RUN if [ "$NODE_ENV" = "production" ]; then npm run build; fi
