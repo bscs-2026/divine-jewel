@@ -91,7 +91,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-
 import {
   ChartConfig,
   ChartContainer,
@@ -256,6 +255,7 @@ import {
 } from "@/components/ui/popover"
 import { Sales, columns } from './columns';
 import { DataTable } from './data-table';
+import TotalSalesChart from './_components/TotalSalesChart';
 
 const timePeriod = [
   {
@@ -486,11 +486,8 @@ const pieChartConfig = {
 } satisfies ChartConfig
 
 const barChartConfig = {
-  views: {
-    label: "Page Views",
-  },
-  desktop: {
-    label: "Transactions",
+  sales: {
+    label: "Sales",
     color: "#FCB6D7",
   },
 } satisfies ChartConfig
@@ -508,14 +505,7 @@ export default function Home() {
   const [value, setValue] = useState("overall");
   const [selectedStore, setSelectedStore] = useState("all");
   // for Interactive Bar Chart
-  const [activeChart, setActiveChart] = React.useState<keyof typeof barChartConfig>("desktop");
-
-  const total = React.useMemo(
-    () => ({
-      desktop: chartData.reduce((acc, curr) => acc + curr.desktop, 0),
-    }),
-    []
-  )
+  const [activeChart, setActiveChart] = React.useState<keyof typeof barChartConfig>("sales");
 
   return (
     <MainLayout defaultTitle="Sales">
@@ -1065,6 +1055,7 @@ export default function Home() {
       </div>
       <div className="flex flex-col gap-2 mx-8 ">
         <div className="bg-gray-100 w-full rounded-2xl">
+<<<<<<< HEAD
           <Card>
             <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row ">
               <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
@@ -1228,6 +1219,13 @@ export default function Home() {
               </ChartContainer>
             </CardContent>
           </Card>
+=======
+          <TotalSalesChart 
+            activeChart={activeChart} 
+            setActiveChart={setActiveChart} 
+            barChartConfig={barChartConfig}
+          />
+>>>>>>> e3eab2c (transferred Sales Bar Chart from page.tsx  to TotalSalesChart.tsx component)
         </div>
         <div className="bg-white h-[430px] shadow-md w-full rounded-2xl flex flex-col border border-gray-200">
           <div className="flex flex-row">
