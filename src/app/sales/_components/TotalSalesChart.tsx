@@ -6,6 +6,7 @@ import {
     ChartContainer,
     ChartTooltip,
     ChartTooltipContent,
+<<<<<<< HEAD
 } from "@/components/ui/chart"
 
 const chartData = [
@@ -57,6 +58,40 @@ const TotalSalesChart: React.FC<TotalSalesChartProps> = ({ activeChart, setActiv
         {/* <div className="flex">
           {["sales"].map((key) => {
             const chart = key as keyof typeof barChartConfig;
+=======
+  } from "@/components/ui/chart"
+
+const chartConfig = {
+  views: {
+    label: "Page Views",
+  },
+  desktop: {
+    label: "Transactions",
+    color: "hsl(var(--chart-1))",
+  },
+} satisfies ChartConfig;
+
+interface TotalSalesChartProps {
+  activeChart: keyof typeof chartConfig;
+  setActiveChart: (chart: keyof typeof chartConfig) => void;
+  total: { [key: string]: number };
+  chartData: { date: string; [key: string]: number }[];
+}
+
+const TotalSalesChart: React.FC<TotalSalesChartProps> = ({ activeChart, setActiveChart, total, chartData }) => {
+  return (
+    <Card>
+      <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
+        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
+          <CardTitle>Total Sales</CardTitle>
+          <CardDescription>
+            Showing total visitors for the last 3 months
+          </CardDescription>
+        </div>
+        <div className="flex">
+          {["desktop"].map((key) => {
+            const chart = key as keyof typeof chartConfig;
+>>>>>>> 01076dc (sales subsystem UI)
             return (
               <button
                 key={chart}
@@ -65,7 +100,11 @@ const TotalSalesChart: React.FC<TotalSalesChartProps> = ({ activeChart, setActiv
                 onClick={() => setActiveChart(chart)}
               >
                 <span className="text-xs text-muted-foreground">
+<<<<<<< HEAD
                   {barChartConfig[chart].label}
+=======
+                  {chartConfig[chart].label}
+>>>>>>> 01076dc (sales subsystem UI)
                 </span>
                 <span className="text-lg font-bold leading-none sm:text-3xl">
                   {total[key as keyof typeof total].toLocaleString()}
@@ -73,11 +112,19 @@ const TotalSalesChart: React.FC<TotalSalesChartProps> = ({ activeChart, setActiv
               </button>
             );
           })}
+<<<<<<< HEAD
         </div> */}
       </CardHeader>
       <CardContent className="px-2 sm:p-6">
         <ChartContainer
           config={barChartConfig}
+=======
+        </div>
+      </CardHeader>
+      <CardContent className="px-2 sm:p-6">
+        <ChartContainer
+          config={chartConfig}
+>>>>>>> 01076dc (sales subsystem UI)
           className="aspect-auto h-[250px] w-full"
         >
           <BarChart
@@ -99,7 +146,11 @@ const TotalSalesChart: React.FC<TotalSalesChartProps> = ({ activeChart, setActiv
                 const date = new Date(value);
                 return date.toLocaleDateString("en-US", {
                   month: "short",
+<<<<<<< HEAD
                   year: "numeric",
+=======
+                  day: "numeric",
+>>>>>>> 01076dc (sales subsystem UI)
                 });
               }}
             />
@@ -118,7 +169,14 @@ const TotalSalesChart: React.FC<TotalSalesChartProps> = ({ activeChart, setActiv
                 />
               }
             />
+<<<<<<< HEAD
             <Bar dataKey={activeChart} fill={`var(--color-${activeChart})`} />
+=======
+            <Bar
+              dataKey={activeChart}
+              fill={`var(--color-${activeChart})`}
+            />
+>>>>>>> 01076dc (sales subsystem UI)
           </BarChart>
         </ChartContainer>
       </CardContent>
