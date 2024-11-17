@@ -23,17 +23,9 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { columns } from './columns';
-import { DataTable } from './data-table';
 import TotalSalesChart from './_components/TotalSalesChart';
 import TopProducts from './_components/TopProducts';
 import LocationSales from './_components/LocationSales';
-import { Calendar } from '@/components/ui/calendar';
 import { months } from '@/lib/constants';
 
 interface Sales {
@@ -51,6 +43,7 @@ interface Branches {
   address_line: string;
   branch_code: number;
   order_count: number;
+  inCharge: string;
 }
 
 const barChartConfig = {
