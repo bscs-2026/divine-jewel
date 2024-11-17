@@ -2,6 +2,9 @@
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 15af650 (save all changes)
 import { useState, useEffect } from 'react';
 import * as React from "react";
 import { format } from "date-fns"
@@ -12,6 +15,7 @@ import { Bar, BarChart, CartesianGrid, XAxis, Pie, PieChart, YAxis } from "recha
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import MainLayout from '@/components/MainLayout';
+<<<<<<< HEAD
 import {
   Select,
   SelectContent,
@@ -84,6 +88,8 @@ import {
 
 =======
 >>>>>>> 4f42e46 (changes)
+=======
+>>>>>>> 15af650 (save all changes)
 import {
   Select,
   SelectContent,
@@ -253,52 +259,30 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Sales, columns } from './columns';
+import { columns } from './columns';
 import { DataTable } from './data-table';
 import TotalSalesChart from './_components/TotalSalesChart';
 import TopProducts from './_components/TopProducts';
 import LocationSales from './_components/LocationSales';
+import { Calendar } from '@/components/ui/calendar';
+import { months } from '@/lib/constants';
 
-const timePeriod = [
-  {
-    value: "overall",
-    label: "Overall",
-  },
-  {
-    value: "annually",
-    label: "Annually",
-  },
-  {
-    value: "monthly",
-    label: "Monthly",
-  },
-  {
-    value: "weekly",
-    label: "Weekly",
-  },
-  {
-    value: "daily",
-    label: "Daily",
-  },
-];
+interface Sales {
+  order_date: string;
+  order_count: number;
+}
 
-const salesPerLocation = [
-  { location: "ADDU", desktop: 186 },
-  { location: "SPC", desktop: 305 },
-  { location: "Gaisano Mall", desktop: 237 },
-  { location: "SM - Ecoland", desktop: 73 },
-  { location: "MCM", desktop: 209 },
-  { location: "SM - GenSan", desktop: 214 },
-]
+interface YearsData {
+  year: string;
+  yearly_orders: number;
+}
 
-const activeLocations = [
-  { location: "ADDU", inCharge: "Divine Villanueva"},
-  { location: "SPC", inCharge: "Adolfo Cedric"},
-  { location: "Gaisano Mall", inCharge: "Pretty Faith"},
-  { location: "SM - Ecoland", inCharge: "John Paul"},
-  { location: "MCM", inCharge: "Lewis Leclerc"},
-  { location: "SM - GenSan", inCharge: "Max Piquet"},
-]
+interface Branches {
+  branch_name: string;
+  address_line: string;
+  branch_code: number;
+  order_count: number;
+}
 
 const barChartConfig = {
   sales: {
@@ -307,23 +291,89 @@ const barChartConfig = {
   },
 } satisfies ChartConfig
 
-const horizontalBarChartConfig = {
-  desktop: {
-    label: "Sales",
-    color: "hsl(var(--chart-1))",
-  },
-} satisfies ChartConfig
-
-
 export default function Home() {
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState("overall");
-  const [selectedStore, setSelectedStore] = useState("all");
-  // for Interactive Bar Chart
-  const [activeChart, setActiveChart] = React.useState<keyof typeof barChartConfig>("sales");
+  const currentYear = new Date().getFullYear().toString();
+  const currentMonth = months[new Date().getMonth()].name;
+
+  const [yearlyOrders, setYearlyOrders] = useState<YearsData[]>([]);
+  const [years, setYears] = useState<YearsData[]>([]);
+  const [year, setYear] = useState<string>(currentYear);
+  const [month, setMonth] = useState<string>(currentMonth);
+  const [sales, setSales] = useState<Sales[]>([]);
+  const [branches, setBranches] = useState<Branches[]>([]);
+  const [activeChart, setActiveChart] = useState<keyof typeof barChartConfig>("sales");
+
+  useEffect(() => {
+    fetchBranchesData();
+    fetchYears();
+  }, []);
+
+  useEffect(() => {
+    fetchSales();
+    fetchYearlyOrders();
+  }, [year, month]);
+
+  const fetchYearlyOrders = async () => {
+    const url = `/api/sales/yearlyOrders?year=${year}`;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Failed to fetch yearly orders data");
+      }
+      const data = await response.json();
+      setYearlyOrders(data.YearlyOrders);
+      console.log("Total Order:", data.YearlyOrders);
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
+
+  const fetchSales = async () => {
+    const monthValue = months.find(m => m.name === month)?.value;
+    const date = `${year}-${monthValue}`;
+    const url = `/api/sales?date=${date}`;
+    console.log(date);
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Failed to fetch sales data");
+      }
+      const data = await response.json();
+      setSales(data.Orders);
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
+  
+  const fetchBranchesData = async () => {
+    try {
+      const response = await fetch("/api/sales/branches");
+      if (!response.ok) {
+        throw new Error("Failed to fetch branches data");
+      }
+      const data = await response.json();
+      setBranches(data.branches);
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  }
+
+  const fetchYears = async () => {
+    try {
+      const response = await fetch('/api/sales/years');
+      if (!response.ok) {
+        throw new Error('Failed to fetch years');
+      }
+      const data = await response.json();
+      setYears(data.Years);
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
 
   return (
     <MainLayout defaultTitle="Sales">
+<<<<<<< HEAD
 <<<<<<< HEAD
       <div className="flex flex-col mx-8">
         <div className="mb-4">
@@ -603,12 +653,51 @@ export default function Home() {
       <div className="flex flex-col mx-8">
         <div className="mb-4">
 >>>>>>> 4f42e46 (changes)
+=======
+      <div className="mb-4 mx-7 flex flex-row gap-2">
+        <div className="flex flex-row gap-2 m-1">
+          <div>
+            <Select value={year} onValueChange={setYear}>
+              <SelectTrigger className="w-[180px] h-[40px] ">
+                <SelectValue placeholder="Year">{year}</SelectValue>
+              </SelectTrigger>
+              <SelectContent>
+                {years.map((year, index) => {
+                  return (
+                    <SelectItem key={index} value={year.year}>
+                      {year.year}
+                    </SelectItem>
+                  )
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Select value={month} onValueChange={setMonth}>
+              <SelectTrigger className="w-[180px] h-[40px]">
+                <SelectValue placeholder="Month" />
+              </SelectTrigger>
+              <SelectContent>
+                {months.map((month) => {
+                  return (
+                    <SelectItem key={month.value} value={month.name}>
+                      {month.name}
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        {/* <div>
+>>>>>>> 15af650 (save all changes)
           <Popover open={open} onOpenChange={setOpen}>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 role="combobox"
                 aria-expanded={open}
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
                 className="w-[250px] h-[48px] justify-between bg-[#FCB6D7] rounded-xl hover:bg-[#FCE4EC]"
@@ -618,6 +707,9 @@ export default function Home() {
 =======
                 className="w-[200px] h-[48px] justify-between bg-[#FCE4EC] rounded-xl hover:bg-[#FCB6D7]"
 >>>>>>> 4f42e46 (changes)
+=======
+                className="w-[250px] h-[48px] justify-between bg-[#FCB6D7] rounded-xl hover:bg-[#FCE4EC]"
+>>>>>>> 15af650 (save all changes)
               >
                 {value
                   ? timePeriod.find((period) => period.value === value)?.label
@@ -636,6 +728,7 @@ export default function Home() {
                         onSelect={(currentValue) => {
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
                           const newValue =
                             currentValue === value ? "" : currentValue;
                           setValue(newValue);
@@ -645,6 +738,11 @@ export default function Home() {
 =======
                           setValue(currentValue === value ? "" : currentValue);
 >>>>>>> 4f42e46 (changes)
+=======
+                          const newValue =
+                            currentValue === value ? "" : currentValue;
+                          setValue(newValue);
+>>>>>>> 15af650 (save all changes)
                           setOpen(false);
                         }}
                       >
@@ -664,6 +762,9 @@ export default function Home() {
           </Popover>
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 15af650 (save all changes)
         </div> */}
         {/* <div>
           <Popover>
@@ -689,6 +790,7 @@ export default function Home() {
             </PopoverContent>
           </Popover>
         </div> */}
+<<<<<<< HEAD
       </div>
       <div className="flex flex-col gap-2 mx-8 ">
         <div className="bg-gray-100 w-full rounded-2xl">
@@ -1038,14 +1140,26 @@ export default function Home() {
           <TotalSalesChart 
             activeChart={activeChart} 
             setActiveChart={setActiveChart} 
+=======
+      </div>
+      <div className="flex flex-col gap-2 mx-8 ">
+        <div className="bg-gray-100 w-full rounded-2xl">
+          <TotalSalesChart
+            yearData={yearlyOrders}
+            sales={sales}
+            activeChart={activeChart}
+            setActiveChart={setActiveChart}
+>>>>>>> 15af650 (save all changes)
           />
 >>>>>>> e3eab2c (transferred Sales Bar Chart from page.tsx  to TotalSalesChart.tsx component)
         </div>
         <div>
-          <TopProducts />
+          <TopProducts 
+            branches={branches}
+          />
         </div>
         <div>
-          <LocationSales />
+          <LocationSales branches={branches} />
         </div>
       </div>
 >>>>>>> 9ec0840 (resolve conflict)

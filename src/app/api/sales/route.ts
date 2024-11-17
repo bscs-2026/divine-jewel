@@ -1,30 +1,55 @@
-import { NextRequest, NextResponse } from "next/server";
-import { query } from '../../../lib/db';
+// import { NextResponse } from 'next/server';
+// import { query } from '@/lib/db';
 
-export async function GET() {
-    try {
-        console.log('Fetching sale from database...');
-        const rows = await query('SELECT * FROM sales');
-        console.log('Fetched sale:', rows);
-        return NextResponse.json({ sales: rows }, { status: 200 });
-    } catch (error: any) {
-        console.error('An error occurred while fetching sale:', error);
-        return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
+// export async function GET(request: Request) {
+//     const { searchParams } = new URL(request.url);
+//     const date = searchParams.get('date');
+
+//     try {
+//         const data = await query(
+//             "SELECT id, DATE_FORMAT(date, '%Y-%m-%d') AS date, branch_code FROM orders WHERE DATE_FORMAT(date, '%Y-%m') = ?",
+//             [date]
+//         );
+//         console.log('Fetched orders:', data);
+//         return NextResponse.json({ Orders: data }, { status: 200 });
+//     } catch (error: any) {
+//         console.error('An error occurred while fetching orders:', error);
+//         return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
+//     }
+// }
+
+import { NextResponse } from 'next/server';
+import { query } from '@/lib/db';
+
+export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const date = searchParams.get('date');
+
+    if (!date) {
+        return NextResponse.json({ error: 'Date is required' }, { status: 400 });
     }
-}
 
-export async function POST(request: NextRequest) { 
-    const { product_id, product_sold, total_sales} = await request.json();
+    const [year, month] = date.split('-');
+
     try {
-        console.log('Adding sale to database...');
-        const result = await query(
-            'INSERT INTO `sales` (product_id, product_sold, total_sales) VALUES (?, ?, ?)',
-            [product_id, product_sold, total_sales]
+        const data = await query(
+            `SELECT 
+                DATE_FORMAT(date, '%Y-%m-%d') AS order_date,
+                COUNT(*) AS order_count
+            FROM 
+                orders
+            WHERE 
+                YEAR(date) = ? AND MONTH(date) = ?
+            GROUP BY 
+                order_date
+            ORDER BY 
+                order_date`,
+            [year, month]
         );
-        console.log('Added sales:', result);
-        return NextResponse.json({ message: 'Sale added successfully' }, { status: 201 });
+        console.log('Fetched orders:', data);
+        return NextResponse.json({ Orders: data }, { status: 200 });
     } catch (error: any) {
-        console.error('An error occurred while adding sale:', error);
+        console.error('An error occurred while fetching orders:', error);
         return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
     }
 }

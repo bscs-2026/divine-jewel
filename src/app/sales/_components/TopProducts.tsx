@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { FC, useEffect, useState } from 'react'
 import {
     Select,
     SelectContent,
@@ -21,46 +21,65 @@ import {
     ChartTooltipContent,
 } from "@/components/ui/chart"
 import { DataTable } from '../data-table'
-import { columns, Sales } from '../columns'
+import { columns } from '../columns'
 import { Pie, PieChart } from 'recharts'
 
-const sales: Sales[] = [
-    {
-      id: "728ed52f",
-      name: "Hello Kitty",
-      category: "Bracelets",
-      quantitySold: 10,
-      totalSales: 100,
-    },
-    {
-      id: "489e1d42",
-      name: "Pikachu",
-      category: "Earrings",
-      quantitySold: 5,
-      totalSales: 50,
-    },
-    {
-      id: "f7e9a3d3",
-      name: "Snoopy",
-      category: "Necklaces",
-      quantitySold: 3,
-      totalSales: 30,
-    },
-    {
-      id: "b4e0b1d4",
-      name: "Doraemon",
-      category: "Rings",
-      quantitySold: 2,
-      totalSales: 20,
-    },
-    {
-      id: "b4e0b1d4",
-      name: "Doraemon",
-      category: "Rings",
-      quantitySold: 2,
-      totalSales: 20,
-    },
-  ];
+// const sales: TopProducts[] = [
+//     {
+//       name: "Hello Kitty",
+//       category: "Bracelets",
+//       quantitySold: 10,
+//       totalSales: 100,
+//     },
+//     {
+//       name: "Pikachu",
+//       category: "Earrings",
+//       quantitySold: 5,
+//       totalSales: 50,
+//     },
+//     {
+//       name: "Snoopy",
+//       category: "Necklaces",
+//       quantitySold: 3,
+//       totalSales: 30,
+//     },
+//     {
+//       id: "b4e0b1d4",
+//       name: "Doraemon",
+//       category: "Rings",
+//       quantitySold: 2,
+//       totalSales: 20,
+//     },
+//     {
+//       id: "b4e0b1d4",
+//       name: "Doraemon",
+//       category: "Rings",
+//       quantitySold: 2,
+//       totalSales: 20,
+//     },
+//     {
+//       id: "f7e9a3d3",
+//       name: "Snoopy",
+//       category: "Necklaces",
+//       quantitySold: 3,
+//       totalSales: 30,
+//     },
+//     {
+//       id: "b4e0b1d4",
+//       name: "Doraemon",
+//       category: "Rings",
+//       quantitySold: 2,
+//       totalSales: 20,
+//     },
+//     {
+//       id: "b4e0b1d4",
+//       name: "Doraemon",
+//       category: "Rings",
+//       quantitySold: 2,
+//       totalSales: 20,
+//     },
+    
+//   ];
 
   const pieChartConfig = {
     visitors: {
@@ -96,32 +115,102 @@ const sales: Sales[] = [
     { browser: "other", visitors: 90, fill: "var(--color-other)" },
   ];
 
-const TopProducts = () => {
+  interface Category {
+    id: string;
+    name: string;
+    description: string;
+  }
+
+  interface Branches {
+    branch_name: string;
+    address_line: string;
+    branch_code: number;
+    order_count: number;
+  };
+
+  interface TopProducts {
+    product_name: string;
+    category_name: string;
+    total_quantity_sold: number;
+    total_sales: number;
+  }
+
+  interface BranchesSalesProps {
+    branches: Branches[];
+  };
+
+const TopProducts: FC<BranchesSalesProps> = ({ branches }) => {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [topProducts, setTopProducts] = useState<TopProducts[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>('allCategories');
+  const [selectedBranch, setSelectedBranch] = useState<string>('allBranches');
+
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    fetchTopProduct();
+  }, [selectedCategory, selectedBranch]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch('/api/products/category');
+      const data = await response.json();
+      setCategories(data.categories);
+    } catch (error: any) {
+      console.error(error.message)
+    }
+  };
+  
+  const fetchTopProduct = async () => {
+    try {
+      const response = await fetch(`/api/sales/topproducts?category=${selectedCategory}&branch=${selectedBranch}`);
+      const data = await response.json();
+      setTopProducts(data.TopProducts);
+    } catch (error: any) {
+      console.error(error.message)
+    }
+  }
+
+
   return (
     <div className="bg-white h-[430px] shadow-md w-full rounded-2xl flex flex-col border border-gray-200">
     <div className="flex flex-row">
       <div className="m-4 font-extrabold text-xl">Top Products</div>
       <div className='m-3'>
-      <Select>
+      <Select value={selectedBranch} onValueChange={setSelectedBranch} >
         <SelectTrigger className="w-[200px]">
-          <SelectValue placeholder="Location" />
+          <SelectValue placeholder="Branch" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="light">SPC</SelectItem>
-          <SelectItem value="dark">MCM</SelectItem>
-          <SelectItem value="system">ADDU</SelectItem>
+          <SelectItem value="allBranches">All Branches</SelectItem>
+          {branches.map((branch, index) => {
+            return (
+              <SelectItem key={index} value={branch.branch_code.toString()}>
+                {branch.branch_name}
+              </SelectItem>
+            )
+          }
+        )}
         </SelectContent>
       </Select>
       </div>
       <div className='m-3'>
-      <Select>
+      <Select value={selectedCategory} onValueChange={setSelectedCategory}>
         <SelectTrigger className="w-[200px]">
           <SelectValue placeholder="Category" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="light">Bracelet</SelectItem>
-          <SelectItem value="dark">Pins</SelectItem>
-          <SelectItem value="system">Necklaces</SelectItem>
+          <SelectItem value="allCategories">All Categories</SelectItem>
+          {categories.map((category, index) => {
+            return (
+              <SelectItem key={index} value = {category.name}>
+                {category.name}
+              </SelectItem>
+            )
+          })}
         </SelectContent>
       </Select>
       </div>
@@ -129,7 +218,7 @@ const TopProducts = () => {
     <div className="mx-4 gap-2 flex flex-row mb-2">
       <div className="w-2/3">
         <div className="bg-white rounded-xl h-[350px]">
-          <DataTable columns={columns} data={sales} />
+          <DataTable columns={columns} data={topProducts} />
         </div>
       </div>
       <div className="w-1/3">

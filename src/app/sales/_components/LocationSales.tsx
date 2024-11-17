@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FC, useEffect } from "react";
 import {
   Table,
   TableCaption,
@@ -17,13 +17,6 @@ import {
 } from "@/components/ui/chart";
 import { BarChart, XAxis, YAxis, Bar } from "recharts";
 
-const activeLocations = [
-  { location: "Location 1", inCharge: "Person A" },
-  { location: "Location 2", inCharge: "Person B" },
-  { location: "Location 3", inCharge: "Person C" },
-  // Add more locations as needed
-];
-
 const horizontalBarChartConfig = {
   sales: {
     label: "Sales",
@@ -32,68 +25,95 @@ const horizontalBarChartConfig = {
 } satisfies ChartConfig;
 
 const salesPerLocation = [
-  { location: "Location 1", sales: 1000 },
-  { location: "Location 2", sales: 2000 },
-  { location: "Location 3", sales: 3000 },
+  { branch: "Location 1", sales: 1000 },
+  { branch: "Location 2", sales: 2000 },
+  { branch: "Location 3", sales: 3000 },
   // Add more sales data as needed
 ];
 
-const LocationSales: React.FC = () => {
+interface Branches {
+  branch_name: string;
+  address_line: string;
+  branch_code: number;
+  order_count: number;
+}
+
+interface BranchesSalesProps {
+  branches: Branches[];
+}
+
+const LocationSales: FC<BranchesSalesProps> = ({ branches }) => {
+
+  const activeBranches =  branches.map((branch) => ({
+      branch: branch.branch_name,
+      location: branch.address_line,
+      sales: branch.order_count,
+    })
+  );
+
   return (
-    <div className="flex flex-row gap-2 mb-4">
-      <div className="flex flex-col bg-white h-auto w-1/3 rounded-2xl shadow-md border border-gray-200 ">
-        <div className="m-4 font-extrabold text-xl">Active Locations</div>
-        <div className="mx-4">
+    <div className="flex flex-row gap-2 mb-4 h-[530px]">
+      <div className="flex flex-col bg-white h-[522px] w-1/3 rounded-2xl shadow-md border border-gray-200 ">
+        <div className="m-4 font-extrabold text-xl">Active Branches</div>
+        <div className="mx-4 overflow-auto">
           <Table>
-            <TableCaption>A list of your Active Locations.</TableCaption>
+            {/* <TableCaption>A list of your Active Branches.</TableCaption> */}
             <TableHeader>
               <TableRow>
-                <TableHead className="">Location</TableHead>
-                <TableHead className="">In Charge</TableHead>
+                <TableHead className="text-md">Branch</TableHead>
+                <TableHead className="text-md" >Location</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {activeLocations.map((location, index) => (
-                <TableRow key={index}>
-                  <TableCell className="font-medium">
-                    {location.location}
-                  </TableCell>
-                  <TableCell className="">{location.inCharge}</TableCell>
+              {branches.map((branch, index) => (
+                <TableRow key = {index}>
+                  <TableCell className="font-medium">{branch.branch_name}</TableCell>
+                  <TableCell className="text-xs">{branch.address_line}</TableCell>
                 </TableRow>
               ))}
+              {/* {activeLocations.map((branch, index) => (
+                <TableRow key={index}>
+                  <TableCell className="font-medium">
+                    {branch.branch}
+                  </TableCell>
+                  <TableCell className="">{branch.location}</TableCell>
+                </TableRow>
+              ))} */}
             </TableBody>
           </Table>
         </div>
       </div>
-      <div className=" w-2/3">
-        <Card className="">
-          <CardHeader>
-            <CardTitle className="text-xl">Sales per Location</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={horizontalBarChartConfig}>
-              <BarChart
-                accessibilityLayer
-                data={salesPerLocation}
-                layout="vertical"
-              >
-                <XAxis type="number" dataKey="sales" hide />
-                <YAxis
-                  dataKey="location"
-                  type="category"
-                  tickLine={false}
-                  tickMargin={5}
-                  axisLine={false}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-                <Bar dataKey="sales" fill="#FCE4EC" radius={5} />
-              </BarChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
+      <div className=" w-2/3 ">
+        <div className="">
+          <Card className="">
+            <CardHeader>
+              <CardTitle className="text-xl font-bold text-gray-600">Sales per Branch</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={horizontalBarChartConfig}>
+                <BarChart
+                  accessibilityLayer
+                  data={activeBranches}
+                  layout="vertical"
+                >
+                  <XAxis type="number" dataKey="sales" hide />
+                  <YAxis
+                    dataKey="branch"
+                    type="category"
+                    tickLine={false}
+                    tickMargin={5}
+                    axisLine={false}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent hideLabel />}
+                  />
+                  <Bar dataKey="sales" fill="#FCE4EC" radius={5} />
+                </BarChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
