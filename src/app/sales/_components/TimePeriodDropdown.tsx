@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'; // Adjust the import paths as necessary
 import { BarChart, CartesianGrid, XAxis, Bar } from 'recharts'; 
@@ -120,6 +121,8 @@ const TotalSalesChart: React.FC<TotalSalesChartProps> = ({ timePeriod }) => {
 
 export default TotalSalesChart;
 =======
+=======
+>>>>>>> 82619f2 (sales subsystem UI)
 import React from 'react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
@@ -181,5 +184,9 @@ const TimePeriodDropdown: React.FC<TimePeriodDropdownProps> = ({ open, setOpen, 
   );
 };
 
+<<<<<<< HEAD
 export default TimePeriodDropdown;
 >>>>>>> 01076dc (sales subsystem UI)
+=======
+export default TimePeriodDropdown;
+>>>>>>> 82619f2 (sales subsystem UI)
