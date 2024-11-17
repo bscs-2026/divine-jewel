@@ -105,6 +105,9 @@ import {
 } from "@/components/ui/chart"
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> dfc1cd3 (commit)
 import TotalSalesChart from './_components/TotalSalesChart';
 import TopProducts from './_components/TopProducts';
 import LocationSales from './_components/LocationSales';
