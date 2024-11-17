@@ -22,6 +22,7 @@
     "@radix-ui/react-progress": "^1.1.0",
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 01076dc (sales subsystem UI)
     "@radix-ui/react-select": "^2.1.2",
@@ -34,12 +35,18 @@
     "@tanstack/react-table": "^8.20.5",
     "@types/recharts": "^1.8.29",
 >>>>>>> 9ec0840 (resolve conflict)
+=======
+    "@radix-ui/react-slot": "^1.1.0",
+    "@tanstack/react-table": "^8.20.5",
+    "@types/recharts": "^1.8.29",
+>>>>>>> 4f42e46 (changes)
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",
     "cors": "2.8.5",
     "date-fns": "^3.6.0",
     "dotenv": "16.4.5",
+<<<<<<< HEAD
 <<<<<<< HEAD
     "jose": "^5.9.6",
     "js-cookie": "^3.0.5",
@@ -52,12 +59,17 @@
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.2.0",
 =======
+=======
+>>>>>>> 4f42e46 (changes)
     "lucide-react": "^0.453.0",
     "mysql2": "3.11.0",
     "next": "14.2.4",
     "react": "18.3.1",
     "react-dom": "18.3.1",
+<<<<<<< HEAD
 >>>>>>> 9ec0840 (resolve conflict)
+=======
+>>>>>>> 4f42e46 (changes)
     "react-table": "^7.8.0",
     "recharts": "^2.13.0",
     "tailwind-merge": "^2.5.4",
