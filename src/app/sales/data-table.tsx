@@ -64,7 +64,11 @@ export function DataTable<TData, TValue>({
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
                 ))}
+<<<<<<< HEAD
               </TableRow> 
+=======
+              </TableRow>
+>>>>>>> 9ec0840 (resolve conflict)
             ))
           ) : (
             <TableRow>

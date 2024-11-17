@@ -19,7 +19,11 @@
 }
 
 body {
+<<<<<<< HEAD
   background-color: #ffffff;
+=======
+  background-color: #FFE7EF;
+>>>>>>> 9ec0840 (resolve conflict)
   font-family: 'Poppins', sans-serif;
 }
 
