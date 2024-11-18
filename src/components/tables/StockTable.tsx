@@ -139,10 +139,14 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
         {stockSummary ? (
           <thead>
             <tr>
-              <th>Product</th>
+              <th className={`${styles.th} ${styles.thLeftAlign}`}>
+                Product
+              </th>
               {branches.map((branch) => (
-                <th key={branch.id}>{branch.name}</th>
+                <th className={`${styles.th} ${styles.thLeftAlign}`}
+                  key={branch.id}>{branch.name}</th>
               ))}
+
             </tr>
           </thead>
         ) : (
@@ -176,10 +180,15 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
         <tbody>
           {stockSummary
             ? products.map((product) => (
-              <tr key={product.id}>
-                <td>{product.name}</td>
+              <tr
+                key={product.id}
+                className={styles.tableRow}
+                style={{ cursor: 'pointer' }}
+
+              >
+                <td className={styles.td}>{product.name}</td>
                 {branches.map((branch) => (
-                  <td key={branch.id}>
+                  <td key={branch.id} className={styles.td}>
                     {stockSummary[product.id]?.[branch.id] || 0}
                   </td>
                 ))}
