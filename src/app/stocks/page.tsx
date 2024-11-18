@@ -1,7 +1,7 @@
 // src/app/stocks/page.tsx
 
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Layout from '@/components/layout/Layout';
 import StockTable from '@/components/tables/StockTable';
 import StockForm from '@/components/forms/StockForm';
@@ -409,6 +409,21 @@ export default function StocksPage() {
             stock.product_name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const stockSummary = useMemo(() => {
+        if (filterBranch === null) {
+          const summary: { [key: number]: { [key: number]: number } } = {};
+          stocks.forEach((stock) => {
+            if (!summary[stock.product_id]) {
+              summary[stock.product_id] = {};
+            }
+            summary[stock.product_id][stock.branch_code] = stock.quantity;
+          });
+          return summary;
+        }
+        return null;
+      }, [filterBranch, stocks]);
+      
+
     return (
         <Layout defaultTitle="Stocks">
             {loading && <CircularIndeterminate />}
@@ -429,8 +444,11 @@ export default function StocksPage() {
 
             <StockTable
                 stocks={filteredStocks}
+                stockSummary={stockSummary}
                 selectedStocks={selectedStocks}
                 setSelectedStocks={setSelectedStocks}
+                products={products} //for product stock summary per branch
+                branches={branches} //for product stock summary per branch
             />
 
             <Modal show={isModalOpen} onClose={() => closeModal(true)}>
