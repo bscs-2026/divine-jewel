@@ -47,6 +47,10 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
     key: 'product_name',
     direction: 'asc',
   });
+  const [summarySortConfig, setSummarySortConfig] = useState<{ key: keyof Product | number; direction: 'asc' | 'desc' }>({
+    key: 'name',
+    direction: 'asc',
+  });
 
   // Define columns for the table
   const columns = useMemo(
@@ -63,6 +67,20 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
       { Header: 'Last Updated', accessor: 'last_updated' as keyof Stock, align: 'right' },
     ],
     []
+  );
+
+  // Define columns for Stock Summary table
+  const summaryColumns = useMemo(
+    () => [
+      { Header: 'Product', accessor: 'name' as keyof Product, align: 'left' },
+      { Header: 'SKU', accessor: 'SKU' as keyof Product, align: 'left' },
+      ...branches.map((branch) => ({
+        Header: branch.name,
+        accessor: branch.id as number, // Dynamic accessor for branch columns
+        align: 'right',
+      })),
+    ],
+    [branches]
   );
 
   // Handle sorting logic
@@ -87,6 +105,45 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
     }
     setSortConfig({ key, direction });
   };
+
+  // Sort Stock Summary table
+  const sortedStockSummary = useMemo(() => {
+    if (!stockSummary) return [];
+
+    const summaryData = products.map((product) => ({
+      ...product,
+      branches: branches.map((branch) => ({
+        branchId: branch.id,
+        quantity: stockSummary[product.id]?.[branch.id] || 0,
+      })),
+    }));
+
+    summaryData.sort((a, b) => {
+      const valueA =
+        typeof summarySortConfig.key === 'number'
+          ? a.branches.find((branch) => branch.branchId === summarySortConfig.key)?.quantity || 0
+          : a[summarySortConfig.key] || '';
+      const valueB =
+        typeof summarySortConfig.key === 'number'
+          ? b.branches.find((branch) => branch.branchId === summarySortConfig.key)?.quantity || 0
+          : b[summarySortConfig.key] || '';
+
+      if (valueA < valueB) return summarySortConfig.direction === 'asc' ? -1 : 1;
+      if (valueA > valueB) return summarySortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return summaryData;
+  }, [products, branches, stockSummary, summarySortConfig]);
+
+    // Handle sorting in Stock Summary table
+    const handleSummarySort = (key: keyof Product | number) => {
+      let direction: 'asc' | 'desc' = 'asc';
+      if (summarySortConfig.key === key && summarySortConfig.direction === 'asc') {
+        direction = 'desc';
+      }
+      setSummarySortConfig({ key, direction });
+    };
 
   // Handle individual row selection
   const handleRowSelect = (stock: Stock) => {
@@ -133,22 +190,43 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
     );
   };
 
+  // Render sort icons for Stock Summary table
+  const renderSummarySortIcon = (key: keyof Product | number) => {
+    const isActive = summarySortConfig.key === key;
+    return (
+      <span>
+        <ArrowUpward
+          className={`${styles.sortIcon} ${isActive && summarySortConfig.direction === 'asc' ? styles.active : ''}`}
+          style={{ fontSize: '16px' }}
+        />
+        <ArrowDownward
+          className={`${styles.sortIcon} ${isActive && summarySortConfig.direction === 'desc' ? styles.active : ''}`}
+          style={{ fontSize: '16px', marginLeft: '2px' }}
+        />
+      </span>
+    );
+  };
+
   return (
     <div className={styles.container}>
       <table className={styles.table}>
         {stockSummary ? (
           <thead>
-            <tr>
-              <th className={`${styles.th} ${styles.thLeftAlign}`}>
-                Product
+          <tr>
+            {summaryColumns.map((column) => (
+              <th
+                key={column.accessor as string}
+                onClick={() => handleSummarySort(column.accessor)}
+                className={`${styles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign}`}
+              >
+                <div className={styles.sortContent}>
+                  {column.Header}
+                  {renderSummarySortIcon(column.accessor)}
+                </div>
               </th>
-              {branches.map((branch) => (
-                <th className={`${styles.th} ${styles.thLeftAlign}`}
-                  key={branch.id}>{branch.name}</th>
-              ))}
-
-            </tr>
-          </thead>
+            ))}
+          </tr>
+        </thead>
         ) : (
           <thead>
             <tr>
@@ -179,17 +257,13 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
 
         <tbody>
           {stockSummary
-            ? products.map((product) => (
-              <tr
-                key={product.id}
-                className={styles.tableRow}
-                style={{ cursor: 'pointer' }}
-
-              >
+            ? sortedStockSummary.map((product) => (
+              <tr key={product.id} className={styles.tableRow}>
                 <td className={styles.td}>{product.name}</td>
-                {branches.map((branch) => (
-                  <td key={branch.id} className={styles.td}>
-                    {stockSummary[product.id]?.[branch.id] || 0}
+                <td className={styles.td}>{product.SKU || 'Unknown'}</td>
+                {product.branches.map((branch) => (
+                  <td key={branch.branchId} className={`${styles.td} ${styles.rightAlign}`}>
+                    {branch.quantity}
                   </td>
                 ))}
               </tr>
