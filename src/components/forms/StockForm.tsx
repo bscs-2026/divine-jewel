@@ -362,13 +362,11 @@ const StockForm: React.FC<StockFormProps> = ({
                                     className={styles.modalStockInputFixed}
                                     min="1"
                                     max={
-                                        isTransfer
-                                            ? selectedStocks[index].quantity
-                                            : isStockOut
+                                        (isTransfer || isStockOut) // Apply max only for transfer or stock out
                                             ? stockOutReason === "Damaged"
                                                 ? selectedStocks[index].damaged // Use damaged quantity for "Damaged" stock out reason
                                                 : selectedStocks[index].quantity // Use current quantity for other stock out reasons
-                                            : selectedStocks[index].quantity // Default max for add stock
+                                            : undefined // No max for add stock
                                     }
                                     placeholder={' qty.'}
                                     
