@@ -1,31 +1,4 @@
-# Use the official Node.js image as the base image
-FROM node:22-alpine
 
-# Set the working directory inside the container
-WORKDIR /app
-
-# Copy package files for installing dependencies
-COPY package*.json ./
-
-# Copy environment files into the container
-COPY .env.production ./
-COPY .env.development ./
-
-# Copy the rest of the application code
-COPY . .
-
-# Use a build argument to determine which .env file to copy based on NODE_ENV
-RUN if [ "$NODE_ENV" = "production" ]; then \
-        echo "Copying production .env file" && \
-        cp .env.production .env; \
-    else \
-        echo "Copying development .env file" && \
-        cp .env.development .env; \
-    fi
-
-
-# Install dependencies
-RUN npm cache clean --force && rm -rf node_modules package-lock.json && npm install
 # Use the official Node.js image as the base image
 FROM node:22-alpine
 
@@ -49,15 +22,6 @@ COPY .env.$NODE_ENV ./.env
 
 # Install dependencies
 RUN npm cache clean --force && rm -rf node_modules package-lock.json && npm install next && npm install
-
-# Build the Next.js app if NODE_ENV is production
-RUN if [ "$NODE_ENV" = "production" ]; then npm run build; fi
-
-# Expose the port the app runs on
-EXPOSE 3000
-
-# Command to run the Next.js app based on NODE_ENV
-CMD ["sh", "-c", "if [ \"$NODE_ENV\" = \"production\" ]; then npm start; else npm run dev; fi"]
 
 # Build the Next.js app if NODE_ENV is production
 RUN if [ "$NODE_ENV" = "production" ]; then npm run build; fi
