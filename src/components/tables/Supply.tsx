@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import styles from '../styles/Table.module.css';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
-import { formatDate } from '../../lib/helpers';
+import { formatDate } from '../../lib/dateTimeHelper';
 
 interface Supply {
   batch_id: string;

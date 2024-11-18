@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Layout from '../../components/layout/Layout';
-import SupplyTable from '../../components/tables/Supply';
-import SupplierTabs from '../../components/tabs/SupplierTabs';
-import SupplyForm from '../../components/forms/Supply';
-import ManageSuppliers from '../../components/forms/ManageSuppliers';
-import Modal from '../../components/modals/Modal';
-import SupplyBatchForm from '../../components/forms/SupplyBatch';
-import { generateBatchID } from '../../lib/helpers';
+import Layout from '@/components/layout/Layout';
+import SupplyTable from '@/components/tables/Supply';
+import SupplierTabs from '@/components/tabs/SupplierTabs';
+import SupplyForm from '@/components/forms/Supply';
+import ManageSuppliers from '@/components/forms/ManageSuppliers';
+import Modal from '@/components/modals/Modal';
+import SupplyBatchForm from '@/components/forms/SupplyBatch';
+import { generateBatchID } from '@/lib/generatorHelper';
 import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
 import CircularIndeterminate from '@/components/loading/Loading';
 

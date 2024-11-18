@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import styles from '../styles/Modal.module.css';
+import styles from '@/components/styles/Modal.module.css';
 import { ArrowBack } from '@mui/icons-material';
-import { generateBatchID } from '../../lib/helpers';
+import { generateBatchID } from '@/lib/generatorHelper';
 
 interface Stock {
     id: number;

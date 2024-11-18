@@ -17,3 +17,12 @@ export interface Product {
     description: string;
   }
   
+  export interface OrderDetail {
+    order_id: number;
+    order_date: string;
+    customer_name: string;
+    product_name: string;
+    product_size: string;
+    product_color: string;
+    quantity: number;
+  }

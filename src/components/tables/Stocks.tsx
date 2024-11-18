@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
-import styles from '../styles/Table.module.css';
+import styles from '@/components/styles/Table.module.css';
 
 interface Stock {
   id: number;
@@ -180,11 +180,9 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
       <span className={key === 'quantity' ? styles.sortIconsRight : styles.sortIconsLeft}>
         <ArrowUpward
           className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'asc' ? styles.active : ''}`}
-          style={{ fontSize: '16px' }}
         />
         <ArrowDownward
           className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'desc' ? styles.active : ''}`}
-          style={{ fontSize: '16px', marginLeft: '2px' }}
         />
       </span>
     );

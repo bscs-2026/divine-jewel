@@ -16,6 +16,7 @@ interface CategoryTabsProps {
   handleAddProduct: () => void;
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  placeholder?: string;
 }
 
 const CategoryTabs: React.FC<CategoryTabsProps> = ({
@@ -26,6 +27,7 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
   handleAddProduct,
   searchQuery,
   setSearchQuery,
+  placeholder
 }) => {
 
   const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -36,7 +38,7 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
   return (
     <div className={styles.tabsContainer}>
       <div className={styles.leftTabs}>
-        <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder={placeholder} />
         <label className={formStyles.heading2} htmlFor="category-filter">
           Select Category:
         </label>

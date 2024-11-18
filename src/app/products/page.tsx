@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import Layout from '@/components/layout/Layout';
-import ProductTable from '@/components/tables/ProductTable';
+import ProductTable from '@/components/tables/Products';
 import CategoryTabs from '@/components/tabs/CategoryTabs';
 import ProductForm from '@/components/forms/ProductForm';
 import ManageCategories from '@/components/forms/ManageCategories';
@@ -328,6 +328,7 @@ export default function ProductsPage() {
         handleAddProduct={openModal}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        placeholder="Search Product Name"
       />
       <ProductTable
         products={filteredProducts}

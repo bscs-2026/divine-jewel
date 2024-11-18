@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../styles/Modal.module.css';
-import { formatDateHumanReadable } from '../../lib/helpers';
+import { formatDateHumanReadable } from '../../lib/dateTimeHelper';
 
 interface SupplyBatch {
     id: number;

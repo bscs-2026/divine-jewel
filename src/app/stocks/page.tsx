@@ -3,7 +3,7 @@
 'use client';
 import { useEffect, useState, useMemo } from 'react';
 import Layout from '@/components/layout/Layout';
-import StockTable from '@/components/tables/StockTable';
+import StockTable from '@/components/tables/Stocks';
 import StockForm from '@/components/forms/StockForm';
 import BranchTabs from '@/components/tabs/BranchTabs';
 import ManageBranches from '@/components/forms/ManageBranches';
@@ -440,6 +440,7 @@ export default function StocksPage() {
                 selectedStocks={selectedStocks}
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
+                placeholder="Search Product Name"
             />
 
             <StockTable

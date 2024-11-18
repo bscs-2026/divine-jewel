@@ -2,25 +2,19 @@
 
 import { useEffect, useState } from 'react';
 import Layout from '@/components/layout/Layout';
-import CircularIndeterminate from '@/components/loading/Loading';
+import Spinner from '@/components/loading/Loading';
 import RecentOrders from '@/components/tables/OrdersOnReturnItems';
+import ReturnItems from '@/components/tabs/ReturnItems';
 import { getCookieValue } from '@/lib/clientCookieHelper';
 
 interface OrderDetail {
-  order_id: number; // Ensure this is unique
+  order_id: number;
   order_date: string;
-  branch_name: string;
   customer_name: string;
+  product_name: string;
+  product_size: string;
+  product_color: string;
   quantity: number;
-  total_unit_price: number | string;
-  total_unit_price_deducted: number | string;
-  mop: string;
-  discount_percent: number;
-  applied_credits: number;
-  amount_tendered: number;
-  amount_change: number;
-  e_wallet_provider: string | null;
-  reference_number: string | null;
 }
 
 export default function OrdersPage() {
@@ -28,6 +22,7 @@ export default function OrdersPage() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedOrders, setSelectedOrders] = useState<OrderDetail[]>([]);
 
   useEffect(() => {
     fetchOrders();
@@ -51,17 +46,27 @@ export default function OrdersPage() {
     }
   };
 
-  // Search by Order ID
   const filteredOrders = orders.filter(order =>
-    order.order_id.toString().includes(searchQuery) // Compare Order ID as a string
+    order.order_id.toString().toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
     <Layout defaultTitle="Return Items">
-      {loading && <CircularIndeterminate />}
-      {error && <p className="error">{error}</p>}
+      {loading && <Spinner />}
+      {error && <p>{error}</p>}
 
-      <RecentOrders Orderss={filteredOrders} />
+      <ReturnItems
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        placeholder="Search Order ID"
+        selectedOrders={selectedOrders} // Pass selected orders
+      />
+
+      <RecentOrders
+        Orderss={filteredOrders}
+        selectedOrders={selectedOrders}
+        setSelectedOrders={setSelectedOrders}
+      />
     </Layout>
   );
 }

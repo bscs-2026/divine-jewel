@@ -23,6 +23,7 @@ interface BranchTabsProps {
   selectedStocks: { id: number; [key: string]: any }[];
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  placeholder?: string;
 }
 
 const BranchTabs: React.FC<BranchTabsProps> = ({
@@ -37,6 +38,7 @@ const BranchTabs: React.FC<BranchTabsProps> = ({
   selectedStocks,
   searchQuery,
   setSearchQuery,
+  placeholder,
 }) => {
   const isStocksSelected = selectedStocks.length > 0;
 
@@ -48,7 +50,7 @@ const BranchTabs: React.FC<BranchTabsProps> = ({
   return (
     <div className={styles.tabsContainer}>
       <div className={styles.leftTabs}>
-        <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+        <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder={placeholder} />
 
         <label className={formStyles.heading2} htmlFor="branch-filter">
           Select Branch:

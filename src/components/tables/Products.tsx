@@ -82,11 +82,9 @@ const ProductTable: React.FC<ProductTableProps> = ({
       <span className={key === 'price' || key === 'stock' ? styles.sortIconsRight : styles.sortIconsLeft}>
         <ArrowUpward
           className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'asc' ? styles.active : ''}`}
-          style={{ fontSize: '16px' }}
         />
         <ArrowDownward
           className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'desc' ? styles.active : ''}`}
-          style={{ fontSize: '16px', marginLeft: '2px' }}
         />
       </span>
     );

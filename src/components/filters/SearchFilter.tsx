@@ -6,9 +6,10 @@ import styles from '../styles/Layout2.module.css';
 interface SearchProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  placeholder?: string;
 }
 
-export default function Search({ searchQuery, setSearchQuery }: SearchProps) {
+export default function Search({ searchQuery, setSearchQuery, placeholder = 'Search' }: SearchProps) {
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
@@ -16,10 +17,11 @@ export default function Search({ searchQuery, setSearchQuery }: SearchProps) {
   return (
     <input
       type="text"
-      placeholder="Search by product name"
+      placeholder={placeholder}
       value={searchQuery}
       onChange={handleSearchChange}
       className={styles.searchInput}
     />
   );
 }
+

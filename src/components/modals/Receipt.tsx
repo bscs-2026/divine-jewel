@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { formatDate } from '../../lib/helpers';
+import { formatDate } from '../../lib/dateTimeHelper';
 import styles from '@/components/styles/Modal.module.css';
 
 interface OrderDetail {
