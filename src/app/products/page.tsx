@@ -9,7 +9,7 @@ import ManageCategories from '@/components/forms/ManageCategories';
 import { DeletePrompt, SuccessfulPrompt } from '@/components/prompts/Prompt';
 import CircularIndeterminate from '@/components/loading/Loading';
 import Modal from '@/components/modals/Modal';
-import StockHistoryTable from '@/components/tables/StockHistoryTable';
+import ProductHistoryTable from '@/components/tables/ProductHistoryTable';
 
 interface Product {
   id: number;
@@ -51,7 +51,7 @@ export default function ProductsPage() {
 
   // New state variables for stock history modal
   const [isStockHistoryModalOpen, setIsStockHistoryModalOpen] = useState(false);
-  const [stockHistoryData, setStockHistoryData] = useState<any[]>([]);
+  const [productStockHistoryData, setproductStockHistoryData] = useState<any[]>([]);
 
   useEffect(() => {
     fetchProducts();
@@ -312,35 +312,31 @@ export default function ProductsPage() {
       setLoading(true);
 
       // Fetch data from the three APIs
-      const [stockHistoryRes, orderHistoryRes, returnHistoryRes] = await Promise.all([
+      const [stockHistoryRes, orderHistoryRes] = await Promise.all([
         fetch(`/api/products/${productId}/stockDetailsHistory`),
-        fetch(`/api/products/${productId}/orderHistory`),
-        fetch(`/api/products/${productId}/returnHistory`),
+        fetch(`/api/products/${productId}/productOrderHistory`),
       ]);
 
-      if (!stockHistoryRes.ok || !orderHistoryRes.ok || !returnHistoryRes.ok) {
+      if (!stockHistoryRes.ok || !orderHistoryRes.ok) {
         throw new Error('Failed to fetch stock history data');
       }
 
-      const [stockHistoryData, orderHistoryData, returnHistoryData] = await Promise.all([
+      const [productStockHistoryData, orderHistoryData] = await Promise.all([
         stockHistoryRes.json(),
         orderHistoryRes.json(),
-        returnHistoryRes.json(),
       ]);
 
       // Process and standardize data
-      const processedStockHistoryData = processStockHistoryData(stockHistoryData.stockHistory || []);
+      const processedProductStockHistoryData = processProductStockHistoryData(productStockHistoryData.stockHistory || []);
       const processedOrderHistoryData = processOrderHistoryData(orderHistoryData.orderHistory || []);
-      const processedReturnHistoryData = processReturnHistoryData(returnHistoryData.returnHistory || []);
 
       // Combine and sort data by date
       const combinedData = [
-        ...processedStockHistoryData,
+        ...processedProductStockHistoryData,
         ...processedOrderHistoryData,
-        ...processedReturnHistoryData,
       ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-      setStockHistoryData(combinedData);
+      setproductStockHistoryData(combinedData);
       setIsStockHistoryModalOpen(true);
     } catch (error: any) {
       setError(error.message);
@@ -350,7 +346,7 @@ export default function ProductsPage() {
   };
 
   // Data processing functions
-  const processStockHistoryData = (data: any[]) =>
+  const processProductStockHistoryData = (data: any[]) =>
     data.map(item => ({
       date: item.date,
       action: item.action,
@@ -373,19 +369,6 @@ export default function ProductsPage() {
       destination_branch: '',
       employee: item.employee_name || '',
       reason: '',
-      note: '',
-    }));
-
-  const processReturnHistoryData = (data: any[]) =>
-    data.map(item => ({
-      date: item.date,
-      action: item.action,
-      quantity: item.quantity,
-      reference_id: item.order_id || '',
-      source_branch: item.source_branch || '',
-      destination_branch: '',
-      employee: item.employee_name || '',
-      reason: item.reason || '',
       note: '',
     }));
 
@@ -453,7 +436,7 @@ export default function ProductsPage() {
 
       {/* Stock History Modal */}
       <Modal show={isStockHistoryModalOpen} onClose={() => setIsStockHistoryModalOpen(false)}>
-        <StockHistoryTable data={stockHistoryData} />
+        <ProductHistoryTable data={productStockHistoryData} />
       </Modal>
 
       <SuccessfulPrompt

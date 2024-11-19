@@ -1,5 +1,5 @@
 //src/app/api/products/[id]/stockHistory/stocks/route.ts
-//curl -X GET 'http://divine-jewel.local:8000/api/products/71/stockDetailsHistory' | jq .
+//curl -X GET 'http://divine-jewel.local:8000/api/products/71/productStockHistory' | jq .
 
 import { NextRequest, NextResponse } from 'next/server';
 import { query } from '../../../../../lib/db';
