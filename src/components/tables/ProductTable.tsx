@@ -1,6 +1,6 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import styles from '../styles/Table.module.css';
-import { ArrowUpward, ArrowDownward, Edit, Archive, Unarchive, HistoryOutlined} from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward, Edit, Archive, Unarchive, HistoryOutlined } from '@mui/icons-material';
 
 interface Product {
   id: number;
@@ -16,24 +16,22 @@ interface Product {
 }
 
 interface ProductTableProps {
-  // filteredProducts: Product[];
   products: Product[];
   editProduct: (id: number) => void;
   archiveProduct: (id: number) => void;
   unarchiveProduct: (id: number) => void;
   filterCategory: number | string | null;
+  viewStockHistory: (id: number) => void; // Added this line
 }
 
 const ProductTable: React.FC<ProductTableProps> = ({
-  // filteredProducts,
   products,
   editProduct,
   archiveProduct,
   unarchiveProduct,
   filterCategory,
-
+  viewStockHistory, // Added this line
 }) => {
-  console.log('filterCategory:', filterCategory); // Debugging line
   const [sortConfig, setSortConfig] = useState<{ key: keyof Product; direction: 'asc' | 'desc' }>({
     key: 'name',
     direction: 'asc',
@@ -92,13 +90,12 @@ const ProductTable: React.FC<ProductTableProps> = ({
     );
   };
 
-
   return (
     <div className={styles.container}>
       <table className={styles.table}>
         <thead>
           <tr>
-            {columns.map((column) => (
+            {columns.map(column => (
               <th
                 key={column.accessor as string}
                 onClick={() => handleSort(column.accessor)}
@@ -110,11 +107,11 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 </div>
               </th>
             ))}
-            <th className={`${styles.td} ${styles.rightAlign}`}>Actions</th>
+            <th className={`${styles.th} ${styles.rightAlign}`}>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {sortedProducts.map((product) => (
+          {sortedProducts.map(product => (
             <tr key={product.id} className={styles.tableRow}>
               <td className={styles.td}>{product.name}</td>
               <td className={styles.td}>{product.SKU}</td>
@@ -123,24 +120,30 @@ const ProductTable: React.FC<ProductTableProps> = ({
               <td className={styles.td}>{product.color}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>₱{product.price}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>{product.stock}</td>
-              <td className={`${styles.td} ${styles.rightAlign}`}>    
-              {filterCategory !== 'Archive' && product.is_archive !== true && (
-                  <Edit
-                    onClick={() => editProduct(product.id)} 
-                    style={{ cursor: 'pointer', color: '#575757', marginRight: '2px', fontSize: '1.5rem' }}
-                  />
+              <td className={`${styles.td} ${styles.rightAlign}`}>
+                {filterCategory !== 'Archive' && product.is_archive !== true && (
+                  <>
+                    <Edit
+                      onClick={() => editProduct(product.id)}
+                      style={{ cursor: 'pointer', color: '#575757', marginRight: '2px', fontSize: '1.5rem' }}
+                    />
+                    <Archive
+                      onClick={() => archiveProduct(product.id)}
+                      style={{ cursor: 'pointer', color: '#ff4d4f', fontSize: '1.5rem' }}
+                    />
+                  </>
                 )}
-                {filterCategory === 'Archive' ? (
+                {filterCategory === 'Archive' && (
                   <Unarchive
                     onClick={() => unarchiveProduct(product.id)}
                     style={{ cursor: 'pointer', color: '#28a745', fontSize: '1.5rem' }}
                   />
-                ) : (
-                  <Archive
-                    onClick={() => archiveProduct(product.id)}
-                    style={{ cursor: 'pointer', color: '#ff4d4f', fontSize: '1.5rem' }}
-                  />
                 )}
+                {/* History Icon */}
+                <HistoryOutlined
+                  onClick={() => viewStockHistory(product.id)}
+                  style={{ cursor: 'pointer', color: '#575757', marginLeft: '8px', fontSize: '1.5rem' }}
+                />
               </td>
             </tr>
           ))}
