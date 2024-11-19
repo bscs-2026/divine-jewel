@@ -45,7 +45,10 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
 
 
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      // Clear the errors when the modal opens
+      setErrors({});
+    } else {
       // Clear the form data when the modal closes
       setFormData({
         first_name: "",
@@ -83,6 +86,8 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
   ]);
 
   const validate = () => {
+  
+    
     let isValid = true;
     let errors: any = {};
 
