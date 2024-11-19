@@ -43,7 +43,6 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
     password: "",
   });
 
-
   useEffect(() => {
     if (isOpen) {
       // Clear the errors when the modal opens
@@ -86,8 +85,6 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
   ]);
 
   const validate = () => {
-  
-    
     let isValid = true;
     let errors: any = {};
 
@@ -141,9 +138,11 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
       isValid = false;
     }
 
-    if (existingUsernames.includes(formData.username)) {
-    errors.username = "Username already taken";
-    isValid = false;
+    if (currentEmployee && formData.username === currentEmployee.username) {
+      // Do nothing, as the username is the same as the current employee's username
+    } else if (existingUsernames.includes(formData.username)) {
+      errors.username = "Username already taken";
+      isValid = false;
     }
 
     if (formData.password.length < 8) {
