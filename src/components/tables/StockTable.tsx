@@ -17,16 +17,38 @@ interface Stock {
   last_updated: string;
 }
 
-interface StockTableProps {
-  stocks: Stock[];
-  selectedStocks: Stock[];
-  setSelectedStocks: (stocks: Stock[]) => void;
+interface Product {
+  id: number;
+  SKU: string;
+  name: string;
+  size: string;
+  color: string;
+  is_archive: number | boolean;
 }
 
-const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSelectedStocks }) => {
+interface Branch {
+  id: number;
+  name: string;
+  address_line: string;
+}
+
+interface StockTableProps {
+  stocks: Stock[];
+  stockSummary: { [key: number]: { [key: number]: number } } | null;
+  selectedStocks: Stock[];
+  setSelectedStocks: (stocks: Stock[]) => void;
+  products: Product[];
+  branches: Branch[];
+}
+
+const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedStocks, setSelectedStocks, products, branches }) => {
   const [selectAll, setSelectAll] = useState(false);
   const [sortConfig, setSortConfig] = useState<{ key: keyof Stock; direction: 'asc' | 'desc' }>({
     key: 'product_name',
+    direction: 'asc',
+  });
+  const [summarySortConfig, setSummarySortConfig] = useState<{ key: keyof Product | number; direction: 'asc' | 'desc' }>({
+    key: 'name',
     direction: 'asc',
   });
 
@@ -45,6 +67,20 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
       { Header: 'Last Updated', accessor: 'last_updated' as keyof Stock, align: 'right' },
     ],
     []
+  );
+
+  // Define columns for Stock Summary table
+  const summaryColumns = useMemo(
+    () => [
+      { Header: 'Product', accessor: 'name' as keyof Product, align: 'left' },
+      { Header: 'SKU', accessor: 'SKU' as keyof Product, align: 'left' },
+      ...branches.map((branch) => ({
+        Header: branch.name,
+        accessor: branch.id as number, // Dynamic accessor for branch columns
+        align: 'right',
+      })),
+    ],
+    [branches]
   );
 
   // Handle sorting logic
@@ -69,6 +105,45 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
     }
     setSortConfig({ key, direction });
   };
+
+  // Sort Stock Summary table
+  const sortedStockSummary = useMemo(() => {
+    if (!stockSummary) return [];
+
+    const summaryData = products.map((product) => ({
+      ...product,
+      branches: branches.map((branch) => ({
+        branchId: branch.id,
+        quantity: stockSummary[product.id]?.[branch.id] || 0,
+      })),
+    }));
+
+    summaryData.sort((a, b) => {
+      const valueA =
+        typeof summarySortConfig.key === 'number'
+          ? a.branches.find((branch) => branch.branchId === summarySortConfig.key)?.quantity || 0
+          : a[summarySortConfig.key] || '';
+      const valueB =
+        typeof summarySortConfig.key === 'number'
+          ? b.branches.find((branch) => branch.branchId === summarySortConfig.key)?.quantity || 0
+          : b[summarySortConfig.key] || '';
+
+      if (valueA < valueB) return summarySortConfig.direction === 'asc' ? -1 : 1;
+      if (valueA > valueB) return summarySortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return summaryData;
+  }, [products, branches, stockSummary, summarySortConfig]);
+
+    // Handle sorting in Stock Summary table
+    const handleSummarySort = (key: keyof Product | number) => {
+      let direction: 'asc' | 'desc' = 'asc';
+      if (summarySortConfig.key === key && summarySortConfig.direction === 'asc') {
+        direction = 'desc';
+      }
+      setSummarySortConfig({ key, direction });
+    };
 
   // Handle individual row selection
   const handleRowSelect = (stock: Stock) => {
@@ -115,63 +190,116 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, selectedStocks, setSele
     );
   };
 
+  // Render sort icons for Stock Summary table
+  const renderSummarySortIcon = (key: keyof Product | number) => {
+    const isActive = summarySortConfig.key === key;
+    return (
+      <span>
+        <ArrowUpward
+          className={`${styles.sortIcon} ${isActive && summarySortConfig.direction === 'asc' ? styles.active : ''}`}
+          style={{ fontSize: '16px' }}
+        />
+        <ArrowDownward
+          className={`${styles.sortIcon} ${isActive && summarySortConfig.direction === 'desc' ? styles.active : ''}`}
+          style={{ fontSize: '16px', marginLeft: '2px' }}
+        />
+      </span>
+    );
+  };
+
   return (
     <div className={styles.container}>
       <table className={styles.table}>
-        <thead>
+        {stockSummary ? (
+          <thead>
           <tr>
-            <th>
-              <input
-                type="checkbox"
-                checked={selectAll}
-                onChange={handleSelectAll}
-                aria-label="Select all rows"
-              />
-            </th>
-            {columns.map((column) => (
+            {summaryColumns.map((column) => (
               <th
                 key={column.accessor as string}
-                onClick={() => handleSort(column.accessor)}
+                onClick={() => handleSummarySort(column.accessor)}
                 className={`${styles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign}`}
               >
-                <div className={`${styles.sortContent}`}>
+                <div className={styles.sortContent}>
                   {column.Header}
-                  {renderSortIcon(column.accessor)}
+                  {renderSummarySortIcon(column.accessor)}
                 </div>
               </th>
             ))}
           </tr>
         </thead>
-        <tbody>
-          {sortedStocks.map((stock) => (
-            <tr
-              key={stock.id}
-              className={styles.tableRow}
-              onClick={() => handleRowSelect(stock)}
-              style={{ cursor: 'pointer' }} >
-              <td>
+        ) : (
+          <thead>
+            <tr>
+              <th>
                 <input
                   type="checkbox"
-                  checked={selectedStocks.some((s) => s.id === stock.id)}
-                  onChange={() => handleRowSelect(stock)}
-                  aria-label={`Select row ${stock.id}`}
+                  checked={selectAll}
+                  onChange={handleSelectAll}
+                  aria-label="Select all rows"
                 />
-              </td>
-              <td className={styles.td}>{stock.product_name}</td>
-              <td className={styles.td}>{stock.product_SKU || 'Unknown'}</td>
-              {/* <td className={styles.td}>{stock.category_name || 'Unknown'}</td> */}
-              <td className={styles.td}>{stock.product_size || 'Unknown'}</td>
-              <td className={styles.td}>{stock.product_color || 'Unknown'}</td>
-              <td className={styles.td}>{stock.branch_name || 'Unknown'}</td>
-              <td className={`${styles.td} ${styles.rightAlign}`}>{stock.quantity}</td>
-              <td className={`${styles.td} ${styles.rightAlign}`}>{stock.damaged}</td>
-              <td className={`${styles.td} ${styles.rightAlign}`}>
-                {new Date(stock.last_updated).toLocaleDateString()} {/* Format date */}
-                {/* <br /> */}
-                {new Date(stock.last_updated).toLocaleTimeString()}
-              </td>
+              </th>
+              {columns.map((column) => (
+                <th
+                  key={column.accessor as string}
+                  onClick={() => handleSort(column.accessor)}
+                  className={`${styles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign
+                    }`}
+                >
+                  <div className={`${styles.sortContent}`}>
+                    {column.Header}
+                    {renderSortIcon(column.accessor)}
+                  </div>
+                </th>
+              ))}
             </tr>
-          ))}
+          </thead>
+        )}
+
+        <tbody>
+          {stockSummary
+            ? sortedStockSummary.map((product) => (
+              <tr key={product.id} className={styles.tableRow}>
+                <td className={styles.td}>{product.name}</td>
+                <td className={styles.td}>{product.SKU || 'Unknown'}</td>
+                {product.branches.map((branch) => (
+                  <td key={branch.branchId} className={`${styles.td} ${styles.rightAlign}`}>
+                    {branch.quantity}
+                  </td>
+                ))}
+              </tr>
+            ))
+            : sortedStocks.map((stock) => (
+              <tr
+                key={stock.id}
+                className={styles.tableRow}
+                onClick={() => handleRowSelect(stock)}
+                style={{ cursor: 'pointer' }}
+              >
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={selectedStocks.some((s) => s.id === stock.id)}
+                    onChange={() => handleRowSelect(stock)}
+                    aria-label={`Select row ${stock.id}`}
+                  />
+                </td>
+                <td className={styles.td}>{stock.product_name}</td>
+                <td className={styles.td}>{stock.product_SKU || 'Unknown'}</td>
+                <td className={styles.td}>{stock.product_size || 'Unknown'}</td>
+                <td className={styles.td}>{stock.product_color || 'Unknown'}</td>
+                <td className={styles.td}>{stock.branch_name || 'Unknown'}</td>
+                <td className={`${styles.td} ${styles.rightAlign}`}>
+                  {stock.quantity}
+                </td>
+                <td className={`${styles.td} ${styles.rightAlign}`}>
+                  {stock.damaged}
+                </td>
+                <td className={`${styles.td} ${styles.rightAlign}`}>
+                  {new Date(stock.last_updated).toLocaleDateString()} {/* Format date */}
+                  {new Date(stock.last_updated).toLocaleTimeString()}
+                </td>
+              </tr>
+            ))}
         </tbody>
 
 
