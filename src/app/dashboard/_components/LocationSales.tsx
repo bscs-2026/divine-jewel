@@ -16,6 +16,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { BarChart, XAxis, YAxis, Bar } from "recharts";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const horizontalBarChartConfig = {
   sales: {
@@ -63,7 +64,9 @@ const LocationSales: FC<BranchesSalesProps> = ({ branches }) => {
                     {branch.branch_name}
                   </TableCell>
                   <TableCell className="text-xs">
-                    {branch.inCharge || <p className="text-gray-400">No Person Assigned</p>}
+                    {branch.inCharge || (
+                      <p className="text-gray-400">No Person Assigned</p>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -75,10 +78,21 @@ const LocationSales: FC<BranchesSalesProps> = ({ branches }) => {
       {/* Sales per Branch Card */}
       <div className="w-2/3 flex-1">
         <Card className="h-full flex flex-col">
-          <CardHeader className="flex-shrink-0">
+          <CardHeader className="flex-shrink-0 flex flex-row">
             <CardTitle className="text-xl font-bold text-gray-600">
               Sales per Branch
             </CardTitle>
+            <div className="m-3">
+              <Select>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Theme" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="yearBased">Selected Year</SelectItem>
+                  <SelectItem value="monthBased">Selected Month</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </CardHeader>
           <CardContent className="h-full overflow-x-hidden overflow-y-auto flex-1">
             <ChartContainer
