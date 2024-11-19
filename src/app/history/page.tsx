@@ -5,9 +5,10 @@ import OrdersTable from '../../components/tables/TransactionHistory';
 import StockDetailsTable from '../../components/tables/StockDetailsHistory';
 import HistoryTabs from '../../components/tabs/HistoryTabs';
 import Modal from '../../components/modals/Modal';
+import LargeModal from '../../components/modals/LargeModal';
 import CircularIndeterminate from '@/components/loading/Loading';
 import BatchStockDetailsHistory from '@/components/modals/BatchStockDetailsHistory';
-import Receipt from '@/components/modals/Receipt'; 
+import Receipt from '@/components/modals/Receipt';
 import ProductListOnHistory from '@/components/tables/ProductListOnHistory';
 import ProductHistoryDetails from '@/components/modals/ProductHistoryDetails';
 
@@ -97,6 +98,8 @@ const HistoryPage: React.FC = () => {
   const [stockDetailsIndividual, setStockDetailsIndividual] = useState<StockDetailIndividual[]>([]);
   const [orderDetails, setOrderDetails] = useState<OrderDetail[]>([]);
   const [productHistoryData, setProductHistoryData] = useState<any[]>([]);
+  const [selectedProductName, setSelectedProductName] = useState<string>('');
+  const [selectedProductSKU, setSelectedProductSKU] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
 
   // Separate modal states for each tab
@@ -180,7 +183,7 @@ const HistoryPage: React.FC = () => {
     }
   };
 
-  const viewStockHistory = async (productId: number) => {
+  const viewProductHistory = async (productId: number) => {
     try {
       setLoading(true);
 
@@ -246,8 +249,14 @@ const HistoryPage: React.FC = () => {
     }));
 
   const handleViewProductHistory = (productId: number) => {
+    const product = products.find(p => p.id === productId);
+    if (product) {
+      setSelectedProductName(product.name);
+      setSelectedProductSKU(product.SKU);
+    }
+
     setSelectedProductID(productId);
-    viewStockHistory(productId);
+    viewProductHistory(productId);
   };
 
   const stockMetadata = stockDetailsIndividual.length > 0 ? stockDetailsIndividual[0] : null;
@@ -292,14 +301,18 @@ const HistoryPage: React.FC = () => {
         </Modal>
 
         {/* Modal for Product History */}
-        <Modal
+        <LargeModal
           show={isProductHistoryModalOpen && selectedProductID !== null}
           onClose={() => setIsProductHistoryModalOpen(false)}
         >
           {selectedProductID && (
-            <ProductHistoryDetails data={productHistoryData} />
+            <ProductHistoryDetails
+              data={productHistoryData}
+              productName={selectedProductName}
+              productSKU={selectedProductSKU}
+            />
           )}
-        </Modal>
+        </LargeModal>
       </div>
     </Layout>
   );
