@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import styles from '../styles/Table.module.css';
-import { ArrowUpward, ArrowDownward, Edit, Archive, Unarchive} from '@mui/icons-material';
+import { ArrowUpward, ArrowDownward, Edit, Archive, Unarchive, HistoryOutlined} from '@mui/icons-material';
 
 interface Product {
   id: number;
