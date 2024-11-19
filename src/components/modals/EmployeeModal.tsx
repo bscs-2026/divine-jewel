@@ -14,6 +14,7 @@ interface EmployeeModalProps {
   setSelectedRole: (role: string) => void;
   selectedEmployeeType: string;
   setSelectedEmployeeType: (type: string) => void;
+  existingUsernames: string[];
 }
 
 const EmployeeModal: React.FC<EmployeeModalProps> = ({
@@ -27,6 +28,7 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
   setSelectedRole,
   selectedEmployeeType,
   setSelectedEmployeeType,
+  existingUsernames,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [errors, setErrors] = useState<any>({});
@@ -42,7 +44,10 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
   });
 
   useEffect(() => {
-    if (!isOpen) {
+    if (isOpen) {
+      // Clear the errors when the modal opens
+      setErrors({});
+    } else {
       // Clear the form data when the modal closes
       setFormData({
         first_name: "",
@@ -130,6 +135,13 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
 
     if (!/^[a-zA-Z]+$/.test(formData.username)) {
       errors.username = "Username must contain only alphabetic characters";
+      isValid = false;
+    }
+
+    if (currentEmployee && formData.username === currentEmployee.username) {
+      // Do nothing, as the username is the same as the current employee's username
+    } else if (existingUsernames.includes(formData.username)) {
+      errors.username = "Username already taken";
       isValid = false;
     }
 

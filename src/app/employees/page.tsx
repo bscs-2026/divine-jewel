@@ -77,6 +77,7 @@ export default function EmployeesPage() {
       }
       const data = await response.json();
       setEmployees(data.Employees);
+      console.log("Employees:", data.Employees);
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -298,6 +299,8 @@ export default function EmployeesPage() {
     (employee) => employee.is_archive === 1 || employee.is_archive === true
   );
 
+  const existingUsernames = employees.map((employee) => employee.username);
+
   return (
     <Layout defaultTitle="Employees">
       {loading && (
@@ -339,6 +342,7 @@ export default function EmployeesPage() {
           setSelectedRole={setSelectedRole}
           selectedEmployeeType={selectedEmployeeType}
           setSelectedEmployeeType={setSelectedEmployeeType}
+          existingUsernames={existingUsernames}
         />
 
         <SuccessfulPrompt
