@@ -96,7 +96,7 @@ const HistoryPage: React.FC = () => {
   const [selectedProductID, setSelectedProductID] = useState<number | null>(null);
   const [stockDetailsIndividual, setStockDetailsIndividual] = useState<StockDetailIndividual[]>([]);
   const [orderDetails, setOrderDetails] = useState<OrderDetail[]>([]);
-  const [stockHistoryData, setStockHistoryData] = useState<any[]>([]);
+  const [productHistoryData, setProductHistoryData] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   // Separate modal states for each tab
@@ -194,22 +194,22 @@ const HistoryPage: React.FC = () => {
         throw new Error('Failed to fetch stock history data');
       }
 
-      const [stockHistoryData, orderHistoryData] = await Promise.all([
+      const [productHistoryData, orderHistoryData] = await Promise.all([
         stockHistoryRes.json(),
         orderHistoryRes.json(),
       ]);
 
       // Process and standardize data
-      const processedStockHistoryData = processStockHistoryData(stockHistoryData.stockHistory || []);
+      const processedproductHistoryData = processProductHistoryData(productHistoryData.stockHistory || []);
       const processedOrderHistoryData = processOrderHistoryData(orderHistoryData.orderHistory || []);
 
       // Combine and sort data by date
       const combinedData = [
-        ...processedStockHistoryData,
+        ...processedproductHistoryData,
         ...processedOrderHistoryData,
       ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
-      setStockHistoryData(combinedData);
+      setProductHistoryData(combinedData);
       setIsProductHistoryModalOpen(true);
     } catch (error: any) {
       console.error(error);
@@ -219,7 +219,7 @@ const HistoryPage: React.FC = () => {
   };
 
   // Data processing functions
-  const processStockHistoryData = (data: any[]) =>
+  const processProductHistoryData = (data: any[]) =>
     data.map(item => ({
       date: item.date,
       action: item.action,
@@ -297,7 +297,7 @@ const HistoryPage: React.FC = () => {
           onClose={() => setIsProductHistoryModalOpen(false)}
         >
           {selectedProductID && (
-            <ProductHistoryDetails data={stockHistoryData} />
+            <ProductHistoryDetails data={productHistoryData} />
           )}
         </Modal>
       </div>
