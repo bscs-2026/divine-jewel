@@ -30,7 +30,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       INNER JOIN orders o ON od.order_id = o.id
       LEFT JOIN employees e ON o.employee_id = e.id
       LEFT JOIN branches b ON o.branch_code = b.id
-      WHERE od.product_id = '71'
+      WHERE od.product_id = ?
       ORDER BY od.date ASC;
       `,
       [id] // Use parameterized query to safely inject product_id

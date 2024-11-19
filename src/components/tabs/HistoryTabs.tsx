@@ -2,8 +2,8 @@ import React from 'react';
 import styles from '../styles/Layout2.module.css';
 
 interface HistoryTabsProps {
-  selectedTab: 'transaction' | 'stocks';
-  setSelectedTab: (tab: 'transaction' | 'stocks') => void;
+  selectedTab: 'transaction' | 'stocks' | 'productHistory';
+  setSelectedTab: (tab: 'transaction' | 'stocks' | 'productHistory') => void;
 }
 
 const HistoryTabs: React.FC<HistoryTabsProps> = ({ selectedTab, setSelectedTab }) => {
@@ -21,6 +21,12 @@ const HistoryTabs: React.FC<HistoryTabsProps> = ({ selectedTab, setSelectedTab }
           onClick={() => setSelectedTab('transaction')}
         >
           Transaction
+        </button>
+        <button
+          className={`${styles.tabsContainerItem} ${selectedTab === 'productHistory' ? styles.active : styles.inactive}`}
+          onClick={() => setSelectedTab('productHistory')}
+        >
+          Product
         </button>
       </div>
     </div>

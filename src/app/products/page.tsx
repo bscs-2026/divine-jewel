@@ -1,3 +1,5 @@
+// src/app/products/page.tsx
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,7 +11,6 @@ import ManageCategories from '@/components/forms/ManageCategories';
 import { DeletePrompt, SuccessfulPrompt } from '@/components/prompts/Prompt';
 import CircularIndeterminate from '@/components/loading/Loading';
 import Modal from '@/components/modals/Modal';
-import ProductHistoryTable from '@/components/tables/ProductHistoryTable';
 
 interface Product {
   id: number;
@@ -48,10 +49,6 @@ export default function ProductsPage() {
   const [sucessAddCateory, setSuccessAddCategory] = useState<boolean>(false);
   const [successEditCategory, setSuccessEditCategory] = useState<boolean>(false);
   const [successDeleteCategory, setSuccessDeleteCategory] = useState<boolean>(false);
-
-  // New state variables for stock history modal
-  const [isStockHistoryModalOpen, setIsStockHistoryModalOpen] = useState(false);
-  const [productStockHistoryData, setproductStockHistoryData] = useState<any[]>([]);
 
   useEffect(() => {
     fetchProducts();
@@ -306,88 +303,18 @@ export default function ProductsPage() {
     }
   };
 
-  // New function to view stock history
-  const viewStockHistory = async (productId: number) => {
-    try {
-      setLoading(true);
-
-      // Fetch data from the three APIs
-      const [stockHistoryRes, orderHistoryRes] = await Promise.all([
-        fetch(`/api/products/${productId}/stockDetailsHistory`),
-        fetch(`/api/products/${productId}/productOrderHistory`),
-      ]);
-
-      if (!stockHistoryRes.ok || !orderHistoryRes.ok) {
-        throw new Error('Failed to fetch stock history data');
-      }
-
-      const [productStockHistoryData, orderHistoryData] = await Promise.all([
-        stockHistoryRes.json(),
-        orderHistoryRes.json(),
-      ]);
-
-      // Process and standardize data
-      const processedProductStockHistoryData = processProductStockHistoryData(productStockHistoryData.stockHistory || []);
-      const processedOrderHistoryData = processOrderHistoryData(orderHistoryData.orderHistory || []);
-
-      // Combine and sort data by date
-      const combinedData = [
-        ...processedProductStockHistoryData,
-        ...processedOrderHistoryData,
-      ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-      setproductStockHistoryData(combinedData);
-      setIsStockHistoryModalOpen(true);
-    } catch (error: any) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Data processing functions
-  const processProductStockHistoryData = (data: any[]) =>
-    data.map(item => ({
-      date: item.date,
-      action: item.action,
-      quantity: item.quantity,
-      reference_id: item.batch_id || '',
-      source_branch: item.source_branch || '',
-      destination_branch: item.destination_branch || '',
-      employee: item.employee_name || '',
-      reason: item.reason || '',
-      note: item.note || '',
-    }));
-
-  const processOrderHistoryData = (data: any[]) =>
-    data.map(item => ({
-      date: item.date,
-      action: item.action,
-      quantity: item.quantity,
-      reference_id: item.order_id || '',
-      source_branch: item.source_branch || '',
-      destination_branch: '',
-      employee: item.employee_name || '',
-      reason: '',
-      note: '',
-    }));
-
   // Filter products based on search query and selected category or archived status
-  const filteredProducts =
-    filterCategory === 'Archive'
-      ? products.filter(
-          product => product.is_archive && product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const activeProducts = products.filter(product => !product.is_archive);
+  const archivedProducts = products.filter(product => product.is_archive);
+
+  const filteredProducts = filterCategory === 'Archive'
+    ? products.filter(product => product.is_archive && product.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    : filterCategory
+      ? products.filter(product =>
+          product.category_id === filterCategory && !product.is_archive && product.name.toLowerCase().includes(searchQuery.toLowerCase())
         )
-      : filterCategory
-      ? products.filter(
-          product =>
-            product.category_id === filterCategory &&
-            !product.is_archive &&
-            product.name.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-      : products.filter(
-          product => !product.is_archive && product.name.toLowerCase().includes(searchQuery.toLowerCase())
-        );
+      : products.filter(product => !product.is_archive && product.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    
 
   return (
     <Layout defaultTitle="Products">
@@ -408,7 +335,6 @@ export default function ProductsPage() {
         archiveProduct={archiveProduct}
         unarchiveProduct={unarchiveProduct}
         filterCategory={filterCategory}
-        viewStockHistory={viewStockHistory} // Add this line
       />
 
       <Modal show={isModalOpen} onClose={closeModal}>
@@ -432,11 +358,6 @@ export default function ProductsPage() {
           editCategory={editCategory}
           deleteCategory={deleteCategory}
         />
-      </Modal>
-
-      {/* Stock History Modal */}
-      <Modal show={isStockHistoryModalOpen} onClose={() => setIsStockHistoryModalOpen(false)}>
-        <ProductHistoryTable data={productStockHistoryData} />
       </Modal>
 
       <SuccessfulPrompt
