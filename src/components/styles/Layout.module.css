@@ -55,6 +55,22 @@
   border-radius: 0.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   color: #575757;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: thin;
+}
+
+.tabsContainer::-webkit-scrollbar {
+  height: 8px;
+}
+
+.tabsContainer::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 4px;
+}
+
+.tabsContainer::-webkit-scrollbar-track {
+  background: #f9f9f9;
 }
 
 .tabsContainerItem {
@@ -63,7 +79,7 @@
   color: #575757;
   font-size: 13px;
   transition: background-color 0.3s, color 0.3s;
-  cursor: pointer; /* Ensure the pointer changes on hover */
+  cursor: pointer;
 }
 
 .tabsContainerItem.active {

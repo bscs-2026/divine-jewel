@@ -61,6 +61,7 @@ export default function StocksPage() {
     const [isStockOut, setIsStockOut] = useState(false);
     const [isMarkDamaged, setIsMarkDamaged] = useState(false);
     const [filterBranch, setFilterBranch] = useState<number | string>("All");
+    // const [filterBranch, setFilterBranch] = useState<number | string | null>(null);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isManageBranchesModalOpen, setIsManageBranchesModalOpen] = useState(false);
@@ -416,7 +417,7 @@ export default function StocksPage() {
     }, [stocks, filterBranch, searchQuery]);            
       
     const stockSummary = useMemo(() => {
-        if (filterBranch === null) {
+        if (filterBranch === "All") {
           const summary: { [key: number]: { [key: number]: number } } = {};
           stocks.forEach((stock) => {
             if (!summary[stock.product_id]) {
