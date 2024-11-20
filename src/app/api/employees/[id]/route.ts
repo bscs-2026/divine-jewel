@@ -26,28 +26,29 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 
         console.log('Updating employee in database...');
 
-        let hashedPassword = password;
-        // Check if a new password is provided and hash it using the helper function
+        let queryStr = 'UPDATE `employees` SET first_name = ?, last_name = ?, address = ?, birth_date = ?, email_address = ?, contact_number = ?, employee_type = ?, role_id = ?, username = ?';
+        const queryParams = [
+            first_name,
+            last_name,
+            address,
+            birth_date,
+            email_address,
+            contact_number,
+            employee_type,
+            role_id,
+            username,
+        ];
+
         if (password) {
-            hashedPassword = await hashPassword(password);
+            const hashedPassword = await hashPassword(password);
+            queryStr += ', password = ?';
+            queryParams.push(hashedPassword);
         }
 
-        const result = await query(
-            'UPDATE `employees` SET first_name = ?, last_name = ?, address = ?, birth_date = ?, email_address = ?, contact_number = ?, employee_type = ?, role_id = ?, username = ?, password = ? WHERE id = ?',
-            [
-                first_name,
-                last_name,
-                address,
-                birth_date,
-                email_address,
-                contact_number,
-                employee_type,
-                role_id,
-                username,
-                hashedPassword,
-                id,
-            ]
-        );
+        queryStr += ' WHERE id = ?';
+        queryParams.push(id);
+
+        const result = await query(queryStr, queryParams);
 
         console.log('Updated employee:', result);
         return NextResponse.json({ message: 'Employee updated successfully' }, { status: 200 });
