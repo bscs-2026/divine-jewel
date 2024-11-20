@@ -93,7 +93,7 @@ const TotalSalesChart: FC<TotalSalesChartProps> = ({ activeChart, setActiveChart
   <CardContent className="px-2 sm:p-6">
     {chartData.length === 0 ? (
       <div className="flex justify-center items-center h-[250px] text-gray-500">
-        <span>No Data Available on this Date.</span>
+        <span className=" text-center items-center text-gray-500 p-4 border border-gray-300 rounded-lg bg-gray-100">No Data Available on this Date.</span>
       </div>
     ) : (
       <ChartContainer

@@ -16,21 +16,39 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { months } from "@/lib/constants";
 
 interface BranchSalesPieChartProps {
-  branchesOrders: BranchesOrders[];
   year: string;
   month: string;
 }
 
-const BranchSalesPieChart: FC<BranchSalesPieChartProps> = ({
-  branchesOrders,
-  year,
-  month,
-}) => {
+const BranchSalesPieChart: FC<BranchSalesPieChartProps> = ({ year, month }) => {
   const [isMonth, setIsMonth] = useState<boolean>(true);
+  const [branchesOrders, setBranchesOrders] = useState<BranchesOrders[]>([]);
+
+  useEffect(() => {
+    fetchBranchSalesData();
+  }, [year, month]);
+
+  const fetchBranchSalesData = async () => {
+    const monthValue = months.find((m) => m.name === month)?.value;
+    const date = `${year}-${monthValue}`;
+    const url = `/api/sales/branchOrders?date=${date}`;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Failed to fetch branch orders data");
+      }
+      const data = await response.json();
+      setBranchesOrders(data.branchesOrders);
+      console.log(data.branchesOrders);
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
 
   const toggleIsMonth = () => {
     setIsMonth((prevIsMonth) => !prevIsMonth);
@@ -80,21 +98,30 @@ const BranchSalesPieChart: FC<BranchSalesPieChartProps> = ({
       <CardHeader className="items-center pb-0">
         <CardTitle>Orders Per Branch</CardTitle>
         <CardDescription>
-          <Button className="text-sm text-gray-700 p-2 w-[150px] bg-[#FCE4EC] hover:bg-pink-200" onClick={toggleIsMonth}>
+          <Button
+            className="text-sm text-gray-700 p-2 w-[150px] bg-[#FCE4EC] hover:bg-pink-200"
+            onClick={toggleIsMonth}
+          >
             {isMonth ? month : year}
           </Button>
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0 p-8">
-        <ChartContainer
-          config={chartConfig}
-          className="mx-auto aspect-square max-h-[250px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
-        >
-          <PieChart>
-            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-            <Pie data={ChartData} dataKey="orders" label nameKey="branch" />
-          </PieChart>
-        </ChartContainer>
+      <CardContent className="flex-1 pb-0 p-8 min-h-[300px]">
+        {ChartData.length > 0 ? (
+          <ChartContainer
+            config={chartConfig}
+            className="mx-auto aspect-square max-h-[250px] pb-0 [&_.recharts-pie-label-text]:fill-foreground"
+          >
+            <PieChart>
+              <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+              <Pie data={ChartData} dataKey="orders" label nameKey="branch" />
+            </PieChart>
+          </ChartContainer>
+        ) : (
+          <div className="mt-[50px] text-center items-center text-gray-500 p-4 border border-gray-300 rounded-lg bg-gray-100">
+            No available data on this date.
+          </div>
+        )}
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
         <div className="flex items-center gap-2 font-medium leading-none">

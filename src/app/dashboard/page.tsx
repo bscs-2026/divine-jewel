@@ -84,7 +84,6 @@ export default function Home() {
   useEffect(() => {
     fetchSales();
     fetchYearlyOrders();
-    fetchBranchSalesData();
   }, [year, month]);
 
   const fetchYearlyOrders = async () => {
@@ -118,24 +117,6 @@ export default function Home() {
       console.error(error.message);
     }
   };
-
-
-  const fetchBranchSalesData = async () => {
-    const monthValue = months.find(m => m.name === month)?.value;
-    const date = `${year}-${monthValue}`;
-    const url = `/api/sales/branchOrders?date=${date}`;
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error("Failed to fetch branch orders data");
-        }
-        const data = await response.json();
-        setBranchesOrders(data.branchesOrders)
-        console.log(data.branchesOrders)
-    } catch (error: any) {
-        console.error(error.message)
-    }
-  }
   
   const fetchBranchesData = async () => {
     try {
@@ -218,7 +199,6 @@ export default function Home() {
           </div>
           <div className='w-1/3 '>
               <BranchSalesPieChart 
-                branchesOrders={branchesOrders}
                 year={year}
                 month={month}
               />
