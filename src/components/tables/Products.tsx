@@ -42,7 +42,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   // Define columns for the table
   const columns = useMemo(
     () => [
-      { Header: 'Name', accessor: 'name' as keyof Product, align: 'left' },
+      { Header: 'Product Name', accessor: 'name' as keyof Product, align: 'left' },
       { Header: 'SKU', accessor: 'SKU' as keyof Product, align: 'left' },
       { Header: 'Category', accessor: 'category_name' as keyof Product, align: 'left' },
       { Header: 'Size', accessor: 'size' as keyof Product, align: 'left' },
@@ -82,9 +82,11 @@ const ProductTable: React.FC<ProductTableProps> = ({
       <span className={key === 'price' || key === 'stock' ? styles.sortIconsRight : styles.sortIconsLeft}>
         <ArrowUpward
           className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'asc' ? styles.active : ''}`}
+          style={{ fontSize: '16px' }}
         />
         <ArrowDownward
           className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'desc' ? styles.active : ''}`}
+          style={{ fontSize: '16px', marginLeft: '2px' }}
         />
       </span>
     );

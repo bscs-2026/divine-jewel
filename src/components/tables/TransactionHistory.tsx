@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { ArrowUpward, ArrowDownward, InfoOutlined } from '@mui/icons-material';
 import styles from '../styles/Table.module.css';
+import { formatDate } from '@/lib/dateTimeHelper';
 
 interface Order {
     order_id: number;
@@ -100,9 +101,7 @@ const OrdersTable: React.FC<OrdersTableProps> = ({ orders, onViewAction }) => {
                             onClick={() => onViewAction(order.order_id)}
                         >
                             <td className={styles.td}>{order.order_id}</td>
-                            <td className={styles.td}>
-                                {new Date(order.date).toLocaleDateString()}  {new Date(order.date).toLocaleTimeString()}
-                            </td>
+                            <td className={styles.td}>{formatDate(order.date, 'Asia/Manila')}</td>
                             <td className={styles.td}>{order.employee_name}</td>
                             <td className={styles.td}>{order.branch_name}</td>
                             

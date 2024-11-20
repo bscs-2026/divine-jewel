@@ -7,8 +7,9 @@ import ReturnOrder from './ReturnOrder';
 import { formatDate } from '@/lib/dateTimeHelper';
 import CircularIndeterminate from '@/components/loading/Loading';
 import Modal from '@/components/modals/Modal';
-import Receipt from '@/components/modals/Receipt';
+import Receipt from '@/components/modals/OrderReceipt';
 import { getCookieValue } from '@/lib/clientCookieHelper';
+
 
 const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) => {
     const [cashierName, setCashierName] = useState('Unknown Cashier');
@@ -59,6 +60,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
     const [applyOption, setApplyOption] = useState("");
     const [creditId, setCreditId] = useState('');
     const [creditError, setCreditError] = useState('');
+    const [loading, setLoading] = useState<boolean>(false);
 
 
     interface OrderDetail {
@@ -86,16 +88,25 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         reference_number: string | null;
     }
 
-
     useEffect(() => {
         const updateTime = () => {
-            const now = new Date();
-            setCurrentTime(formatDate(now.toISOString(), 'Asia/Manila'));
+          const now = new Date();
+          const options = {
+            timeZone: 'Asia/Manila',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true,
+          };
+          const formattedTime = new Intl.DateTimeFormat('en-US', options).format(now);
+          setCurrentTime(formattedTime);
         };
+    
         updateTime();
         const intervalId = setInterval(updateTime, 1000);
+    
         return () => clearInterval(intervalId);
-    }, []);
+      }, []);
 
     const resetForm = () => {
         setSelectedProducts([]);
@@ -350,6 +361,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
 
     return (
         <div className={styles.container}>
+            {loading && <CircularIndeterminate />}
             {/* Order and Customer Details */}
             <div className={styles.orderDetails}>
                 <div className={styles.headerContainer}>
@@ -357,7 +369,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                         <div className={styles.heading2}>Current Order</div>
                     </div>
                     <div className={styles.primary}>Cashier: {cashierName}</div>
-                    <div className={styles.primary}>Date & Time: {currentTime}</div>
+                    <div className={styles.primary}>Date & Time: {new Date().toLocaleDateString()} {currentTime}</div>
                     <div className={styles.primary}>
                         {(selectedBranch?.branch_name || 'No Branch') + ', ' + (selectedBranch?.branch_address || 'No Address')}
                     </div>

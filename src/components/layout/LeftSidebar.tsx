@@ -97,7 +97,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
           <li className={styles.navItem} onClick={() => onSelectTitle('Return Items')}>
             <Link href="/return">
               <FontAwesomeIcon icon={faHeartCrack} className={styles.icon} />
-              Return Items
+              Returns
             </Link>
           </li>
         </ul>

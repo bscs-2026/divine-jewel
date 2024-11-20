@@ -1,44 +1,3 @@
-/* styles/Layout2.module.css */
-
-.layout {
-    display: flex;
-    min-height: 100vh;
-}
-
-.leftSidebar {
-    width: 15%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    background-color: #FFE7EF;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 1rem 1rem;
-    color: #575757;
-}
-
-.mainContent {
-    margin-left: 15%;
-    padding: 20px;
-    width: 85%;
-    background-color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: left;
-    justify-content: flex-start;
-    font-size: 13px;
-    padding-left: 20px;
-}
-
-.mainContent h1 {
-    font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    color: #575757;
-}
-
 .tabsContainer {
     width: 100%;
     display: flex;
@@ -88,7 +47,7 @@
     color: #575757;
 }
 
-.searchInput {
+/* .searchInput {
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
     border: 1px solid #b0b0b0;
@@ -100,7 +59,17 @@
     width: 100%;
     max-width: 300px;
     text-align: left;
-}
+} */
+
+.searchInput {
+    padding-left: 40px;
+    font-size: 14px;
+    width: 200px;
+    height: 35px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
 
 .searchInput::placeholder {
     color: #b0b0b0;
@@ -140,35 +109,18 @@
     color: #b0b0b0;
 }
 
-.boldButton {
-    font-weight: bold;
-}
-
-/* Container for the search bar */
 .searchContainer {
     position: relative;
     display: inline-block;
     margin-right: 20px;
   }
   
-  /* Magnifying Glass Icon */
   .searchIcon {
     position: absolute;
     top: 50%;
     left: 10px;
     transform: translateY(-50%);
-    font-size: 20px; /* Adjust size as needed */
-    color: #ccc; /* Adjust color */
-  }
-  
-  /* Search Input Field */
-  .searchInput {
-    padding-left: 40px; /* Space for the icon */
-    font-size: 14px;
-    width: 250px;
-    height: 35px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
+    font-size: 20px;
+    color: #ccc;
   }
   

@@ -1,6 +1,7 @@
 import React from 'react';
+import SearchIcon from '@mui/icons-material/Search';
 import Search from '@/components/filters/SearchFilter';
-import styles from '../styles/Layout2.module.css';
+import Styles from '../styles/Tabs.module.css';
 import formStyles from '../styles/Form.module.css';
 
 interface Category {
@@ -36,9 +37,19 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
   };
 
   return (
-    <div className={styles.tabsContainer}>
-      <div className={styles.leftTabs}>
-        <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder={placeholder} />
+    <div className={Styles.tabsContainer}>
+      <div className={Styles.leftTabs}>
+
+        <div className={Styles.searchContainer}>
+          <SearchIcon className={Styles.searchIcon} />
+          <input
+            type="text"
+            placeholder={placeholder}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={Styles.searchInput}
+          />
+        </div>
         <label className={formStyles.heading2} htmlFor="category-filter">
           Select Category:
         </label>
@@ -58,9 +69,9 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
         </select>
       </div>
 
-      <div className={styles.rightButtonGroup}>
+      <div className={Styles.rightButtonGroup}>
         <button
-          className={`${styles.tabsContainerItem} ${filterCategory === 'manage' ? styles.active : styles.inactive
+          className={`${Styles.tabsContainerItem} ${filterCategory === 'manage' ? Styles.active : Styles.inactive
             }`}
           onClick={toggleManageCategories}
         >
@@ -68,7 +79,7 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
         </button>
 
         <button
-          className={`${styles.tabsContainerItem} ${filterCategory === 'add' ? styles.active : styles.inactive
+          className={`${Styles.tabsContainerItem} ${filterCategory === 'add' ? Styles.active : Styles.inactive
             }`}
           onClick={handleAddProduct}
         >

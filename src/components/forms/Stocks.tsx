@@ -269,8 +269,9 @@ const StockForm: React.FC<StockFormProps> = ({
                 {/* Display Batch ID */}
                 <div className={styles.batchIDContainer}>
                     <p><strong>Batch ID:</strong> {batchID}</p>
-                    <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
-                    <p><strong>Time:</strong> {currentTime}</p>
+                    <p>
+                        <strong>Date & Time:</strong> {new Date().toLocaleDateString()} {currentTime}
+                    </p>
                     <p><strong>Employee:</strong> {employeeFullname}</p>
                 </div>
                 <br />

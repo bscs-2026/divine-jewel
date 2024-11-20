@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import ProductTable from '@/components/tables/Products';
 import CategoryTabs from '@/components/tabs/CategoryTabs';
-import ProductForm from '@/components/forms/ProductForm';
+import ProductForm from '@/components/forms/Products';
 import ManageCategories from '@/components/forms/ManageCategories';
 import { DeletePrompt, SuccessfulPrompt } from '@/components/prompts/Prompt';
 import CircularIndeterminate from '@/components/loading/Loading';
@@ -328,7 +328,7 @@ export default function ProductsPage() {
         handleAddProduct={openModal}
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        placeholder="Search Product Name"
+        placeholder="Search products"
       />
       <ProductTable
         products={filteredProducts}

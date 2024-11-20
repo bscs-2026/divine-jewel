@@ -11,6 +11,7 @@ import BatchStockDetailsHistory from '@/components/modals/BatchStockDetailsHisto
 import Receipt from '@/components/modals/Receipt';
 import ProductListOnHistory from '@/components/tables/ProductListOnHistory';
 import ProductHistoryDetails from '@/components/modals/ProductHistoryDetails';
+import Receipt from '@/components/modals/OrderReceipt'; 
 
 interface StockDetailGroup {
   id: number;

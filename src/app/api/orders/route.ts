@@ -76,8 +76,10 @@ export async function POST(request: NextRequest) {
             );
 
             const itemDiscountedPct = discount_percentage || 0;
-            const itemDiscountedPrice = unit_price * (itemDiscountedPct / 100);
-            const itemFinalPrice = unit_price - itemDiscountedPrice;
+            const itemFinalPrice = discount_percentage
+                ? unit_price - (unit_price * (itemDiscountedPct / 100))
+                : unit_price;
+
 
             await connection.query(
                 'INSERT INTO `order_details` (order_id, product_id, sku, quantity, unit_price, discount_pct, unit_price_deducted, status, employee_incharge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',

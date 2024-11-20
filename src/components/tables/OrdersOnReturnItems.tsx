@@ -11,6 +11,9 @@ interface Orders {
   product_size: string;
   product_color: string;
   quantity: number;
+  unit_price: number;
+  discount_percent: number;
+  unit_price_deducted: number;
 }
 
 interface RecentOrdersProps {
@@ -34,11 +37,13 @@ const RecentOrders: React.FC<RecentOrdersProps> = ({
     () => [
       { Header: 'Order ID', accessor: 'order_id' as keyof Orders, align: 'left' },
       { Header: 'Order Date', accessor: 'order_date' as keyof Orders, align: 'left' },
-      { Header: 'Customer Name', accessor: 'customer_name' as keyof Orders, align: 'left' },
-      { Header: 'Product Name', accessor: 'product_name' as keyof Orders, align: 'left' },
+      { Header: 'Customer', accessor: 'customer_name' as keyof Orders, align: 'left' },
+      { Header: 'Product', accessor: 'product_name' as keyof Orders, align: 'left' },
       { Header: 'Size', accessor: 'product_size' as keyof Orders, align: 'left' },
       { Header: 'Color', accessor: 'product_color' as keyof Orders, align: 'left' },
-      { Header: 'Quantity', accessor: 'quantity' as keyof Orders, align: 'right' },
+      { Header: 'Qty.', accessor: 'quantity' as keyof Orders, align: 'right' },
+      { Header: 'Unit Price', accessor: 'unit_price' as keyof Orders, align: 'right' },
+      { Header: 'Discount %', accessor: 'discount_percent' as keyof Orders, align: 'right' },
     ],
     []
   );
@@ -109,9 +114,11 @@ const RecentOrders: React.FC<RecentOrdersProps> = ({
       <span className={key === 'quantity' ? styles.sortIconsRight : styles.sortIconsLeft}>
         <ArrowUpward
           className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'asc' ? styles.active : ''}`}
+          style={{ fontSize: '16px' }}
         />
         <ArrowDownward
           className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'desc' ? styles.active : ''}`}
+          style={{ fontSize: '16px', marginLeft: '2px' }}
         />
       </span>
     );
@@ -169,6 +176,8 @@ const RecentOrders: React.FC<RecentOrdersProps> = ({
               <td className={styles.td}>{order.product_size || 'N/A'}</td>
               <td className={styles.td}>{order.product_color || 'N/A'}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>{order.quantity}</td>
+              <td className={`${styles.td} ${styles.rightAlign}`}>{order.unit_price}</td>
+              <td className={`${styles.td} ${styles.rightAlign}`}>{order.discount_percent || 'N/A'}</td>
             </tr>
           ))}
         </tbody>

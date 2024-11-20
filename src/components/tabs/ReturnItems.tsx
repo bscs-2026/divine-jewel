@@ -1,25 +1,56 @@
-import React from 'react';
-import Search from '@/components/filters/SearchFilter';
-import styles from '@/components/styles/Layout2.module.css';
-import ReturnOrder from '@/components/forms/ReturnOrder';
+import React, { useState } from 'react';
+import SearchIcon from '@mui/icons-material/Search';
+import Styles from '@/components/styles/Tabs.module.css';
+import ReturnItemsForm from '@/components/forms/ReturnItems';
+import Modal from '@/components/modals/Modal';
 
 interface ReturnItemsProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   placeholder?: string;
-  selectedOrders: any[]; // Array of selected orders
+  selectedOrders: {
+    order_id: number;
+    product_name: string;
+    product_size: string;
+    product_color: string;
+    quantity: number;
+    unit_price: number;
+    discount_percent: number;
+    unit_price_deducted: number;
+  }[];
+  returnItem: (
+    item: {
+      order_id: number;
+      product_name: string;
+      product_size: string;
+      product_color: string;
+      quantity: number;
+      unit_price: number;
+      discount_percent: number;
+      unit_price_deducted: number;
+      customer_name?: string
+      branch_name?: string;
+      branch_address?: string;
+      employee_id?: number;
+      employee_fullname?: string;
+    },
+    returnQuantity: number,
+    note: string
+  ) => Promise<{ ok: boolean; message?: string }>;
 }
 
-const ReturnItems: React.FC<ReturnItemsProps> = ({
+const ReturnItemsTabs: React.FC<ReturnItemsProps> = ({
   searchQuery,
   setSearchQuery,
-  placeholder,
+  placeholder = 'Search Order ID',
   selectedOrders,
+  returnItem,
 }) => {
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Handle the "Return Items" button click
   const handleReturnItemsClick = () => {
+    console.log("Selected orders:", selectedOrders);
+
     if (selectedOrders.length === 0) {
       alert('Please select at least one order to return.');
       return;
@@ -27,25 +58,27 @@ const ReturnItems: React.FC<ReturnItemsProps> = ({
     setIsModalOpen(true);
   };
 
-  // Handle modal close
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
 
   return (
-    <div className={styles.tabsContainer}>
-      <div className={styles.leftTabs}>
-        <Search
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
+    <div className={Styles.tabsContainer}>
+      <div className={Styles.searchContainer}>
+        <SearchIcon className={Styles.searchIcon} />
+        <input
+          type="text"
           placeholder={placeholder}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className={Styles.searchInput}
         />
       </div>
-      <div className={styles.rightTabs}>
+
+      <div className={Styles.rightButtonGroup}>
         <button
-          className={`${styles.tabsContainerItem} ${
-            selectedOrders.length > 0 ? styles.active : styles.inactive
-          }`}
+          className={`${Styles.tabsContainerItem} ${selectedOrders.length > 0 ? Styles.active : Styles.inactive
+            }`}
           onClick={handleReturnItemsClick}
           disabled={selectedOrders.length === 0}
         >
@@ -53,16 +86,17 @@ const ReturnItems: React.FC<ReturnItemsProps> = ({
         </button>
       </div>
 
-      {/* Modal for handling return items */}
-      {isModalOpen && (
-        <ReturnOrder
-          isOpen={isModalOpen}
-          onClose={handleCloseModal}
-          selectedOrders={selectedOrders} // Pass selectedOrders if needed
-        />
-      )}
+      <Modal show={isModalOpen} onClose={handleCloseModal}>
+        {selectedOrders.length > 0 && (
+          <ReturnItemsForm
+            selectedOrders={selectedOrders}
+            returnItem={returnItem}
+            onClose={handleCloseModal}
+          />
+        )}
+      </Modal>
     </div>
   );
 };
 
-export default ReturnItems;
+export default ReturnItemsTabs;

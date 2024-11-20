@@ -30,7 +30,7 @@ const SupplyTable: React.FC<SupplyTableProps> = ({
   const columns = useMemo(
     () => [
       { Header: 'Batch ID', accessor: 'batch_id' as keyof Supply, align: 'left' },
-      { Header: 'Supply Date', accessor: 'supply_date' as keyof Supply, align: 'left' },
+      { Header: 'Date', accessor: 'supply_date' as keyof Supply, align: 'left' },
       { Header: 'Supplier', accessor: 'supplier_name' as keyof Supply, align: 'left' },
       { Header: 'Status', accessor: 'status' as keyof Supply, align: 'left' },
     ],
@@ -113,7 +113,7 @@ const SupplyTable: React.FC<SupplyTableProps> = ({
               style={{ cursor: 'pointer' }}
             >
               <td className={styles.td}>{supply.batch_id}</td>
-              <td className={styles.td}>{formatDate(new Date().toISOString(), 'Asia/Singapore').split(' ')[0]}</td>
+              <td className={styles.td}>{formatDate(supply.supply_date, 'Asia/Manila')}</td>
               <td className={styles.td}>{supply.supplier_name}</td>
               <td className={styles.td}>{supply.status}</td>
             </tr>

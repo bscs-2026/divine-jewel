@@ -105,7 +105,7 @@ const Receipt: React.FC<ReceiptProps> = ({
                   {detail.product_name}
                   <br />
                   <span className={styles.itemDetails}>
-                    {detail.product_id}&nbsp;&nbsp;&nbsp;&nbsp;{detail.product_size}&nbsp;&nbsp;&nbsp;&nbsp;{detail.product_color}
+                    {detail.product_id}&emsp;{detail.product_size}&emsp;{detail.product_color}
                   </span>
                 </td>
                 <td>{detail.quantity}</td>

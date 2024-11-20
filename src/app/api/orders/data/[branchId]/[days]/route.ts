@@ -48,14 +48,17 @@ export async function GET(req, context) {
                 o.date AS order_date,
                 o.customer_name,
                 b.name AS branch_name,
+                b.address_line AS branch_address,
                 p.id AS product_id,
                 p.name AS product_name,
+                p.sku AS product_sku,
                 p.size AS product_size,
                 p.color AS product_color,
                 o.discount_pct AS discount_percent,
                 o.applied_credits,
                 od.quantity,
                 od.unit_price,
+                od.unit_price_deducted,
                 (od.quantity * od.unit_price) AS total_unit_price,
                 (od.quantity * od.unit_price_deducted) AS total_unit_price_deducted,
                 pm.amount_tendered,
@@ -78,10 +81,13 @@ export async function GET(req, context) {
             WHERE 
                 od.date >= DATE_SUB(NOW(), INTERVAL ? DAY)
                 AND od.date <= NOW()
-                AND b.id = ?;
+                AND b.id = ?
+                AND od.status = 'paid';
         `;
 
         const orderData = await query(getOrderData, [Number(days), Number(branchId)]);
+
+        console.log(`Fetched order details for branch ${branchId} and the past ${days} days:`, orderData);
 
         return NextResponse.json({
             success: true,

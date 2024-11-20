@@ -1,8 +1,9 @@
 // src/components/tabs/BranchTabs.tsx
 
 import React from 'react';
+import SearchIcon from '@mui/icons-material/Search';
 import Search from '@/components/filters/SearchFilter';
-import styles from '../styles/Layout2.module.css';
+import Styles from '../styles/Tabs.module.css';
 import formStyles from '../styles/Form.module.css';
 
 interface Branch {
@@ -20,7 +21,7 @@ interface BranchTabsProps {
   handleStockOut: () => void;
   handleTransferStocks: () => void;
   handleMarkDamaged: () => void;
-  selectedStocks: { id: number; [key: string]: any }[];
+  selectedStocks: { id: number;[key: string]: any }[];
   searchQuery: string;
   setSearchQuery: (query: string) => void;
   placeholder?: string;
@@ -44,13 +45,22 @@ const BranchTabs: React.FC<BranchTabsProps> = ({
 
   const handleBranchChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const value = event.target.value;
-    setFilterBranch(value === 'null' ? null : parseInt(value));
+    setFilterBranch(value === 'null' ? null : value === 'All' ? "All" : parseInt(value));
   };
 
   return (
-    <div className={styles.tabsContainer}>
-      <div className={styles.leftTabs}>
-        <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} placeholder={placeholder} />
+    <div className={Styles.tabsContainer}>
+      <div className={Styles.leftTabs}>
+        <div className={Styles.searchContainer}>
+          <SearchIcon className={Styles.searchIcon} />
+          <input
+            type="text"
+            placeholder={placeholder}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className={Styles.searchInput}
+          />
+        </div>
 
         <label className={formStyles.heading2} htmlFor="branch-filter">
           Select Branch:
@@ -58,32 +68,31 @@ const BranchTabs: React.FC<BranchTabsProps> = ({
         <select
           className={formStyles.select}
           id="branch-filter"
-          value={filterBranch === null ? 'null' : filterBranch.toString()}
+          value={filterBranch === null || filterBranch === "All" ? 'All' : filterBranch.toString()}
           onChange={handleBranchChange}
         >
-          <option value="null">All</option>
+          <option value="All">All</option>
           {branches.map((branch) => (
             <option key={branch.id} value={branch.id.toString()}>
               {branch.name}
             </option>
           ))}
         </select>
+
       </div>
 
-      <div className={styles.rightButtonGroup}>
+      <div className={Styles.rightButtonGroup}>
         <button
-          className={`${styles.tabsContainerItem} ${
-            filterBranch === 'manage' ? styles.active : styles.inactive
-          }`}
+          className={`${Styles.tabsContainerItem} ${filterBranch === 'manage' ? Styles.active : Styles.inactive
+            }`}
           onClick={toggleManageBranches}
         >
           Manage Branches
         </button>
 
         <button
-          className={`${styles.tabsContainerItem} ${
-            isStocksSelected ? styles.active : styles.inactive
-          }`}
+          className={`${Styles.tabsContainerItem} ${isStocksSelected ? Styles.active : Styles.inactive
+            }`}
           onClick={handleAddStocks}
           disabled={!isStocksSelected}
         >
@@ -91,9 +100,8 @@ const BranchTabs: React.FC<BranchTabsProps> = ({
         </button>
 
         <button
-          className={`${styles.tabsContainerItem} ${
-            isStocksSelected ? styles.active : styles.inactive
-          }`}
+          className={`${Styles.tabsContainerItem} ${isStocksSelected ? Styles.active : Styles.inactive
+            }`}
           onClick={handleStockOut}
           disabled={!isStocksSelected}
         >
@@ -101,9 +109,8 @@ const BranchTabs: React.FC<BranchTabsProps> = ({
         </button>
 
         <button
-          className={`${styles.tabsContainerItem} ${
-            isStocksSelected ? styles.active : styles.inactive
-          }`}
+          className={`${Styles.tabsContainerItem} ${isStocksSelected ? Styles.active : Styles.inactive
+            }`}
           onClick={handleTransferStocks}
           disabled={!isStocksSelected}
         >
@@ -111,9 +118,8 @@ const BranchTabs: React.FC<BranchTabsProps> = ({
         </button>
 
         <button
-          className={`${styles.tabsContainerItem} ${
-            isStocksSelected ? styles.active : styles.inactive
-          }`}
+          className={`${Styles.tabsContainerItem} ${isStocksSelected ? Styles.active : Styles.inactive
+            }`}
           onClick={handleMarkDamaged}
           disabled={!isStocksSelected}
         >

@@ -1,8 +1,8 @@
 // src/components/forms/ProductForm.tsx
 
 import React, { useState, useEffect } from 'react';
-import styles from '../styles/Modal.module.css';
-import { Product, Category } from '../../types';
+import styles from '@/components/styles/Modal.module.css';
+import { Product, Category } from '@/types';
 
 interface ProductFormProps {
   categories: Category[];

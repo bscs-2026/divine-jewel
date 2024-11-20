@@ -9,7 +9,6 @@ import BranchFilter from '@/components/filters/StoreBranchOnTrans';
 import OrderForm from '@/components/forms/Orders';
 import { SuccessfulPrompt } from '@/components/prompts/Prompt';
 import CircularIndeterminate from '@/components/loading/Loading';
-import { getCookieValue } from '@/lib/clientCookieHelper';
 
 interface Product {
   product_id: number;
