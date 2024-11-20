@@ -41,6 +41,7 @@ const ProductListOnHistory: React.FC<ProductListOnHistoryProps> = ({
       { Header: 'Color', accessor: 'color' as keyof Product, align: 'left' },
       { Header: 'Price', accessor: 'price' as keyof Product, align: 'right' },
       { Header: 'Stock', accessor: 'stock' as keyof Product, align: 'right' },
+      { Header: 'Status', accessor : 'is_archive' as keyof Product, align: 'right' }
     ],
     []
   );
@@ -101,7 +102,6 @@ const ProductListOnHistory: React.FC<ProductListOnHistoryProps> = ({
                 </div>
               </th>
             ))}
-            <th className={`${styles.th} ${styles.rightAlign}`}>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -114,7 +114,8 @@ const ProductListOnHistory: React.FC<ProductListOnHistoryProps> = ({
               <td className={styles.td}>{product.color}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>₱{product.price}</td>
               <td className={`${styles.td} ${styles.rightAlign}`}>{product.stock}</td>
-              <td className={`${styles.td} ${styles.rightAlign}`}>
+              <td className={`${styles.td} ${styles.rightAlign}`}>{product.is_archive ? 'Inactive' : 'Active'}</td>
+              <td className={`${styles.td} ${styles.rightAlign}`}> 
               <InfoOutlined onClick={() => onViewAction(product.id)} style={{ cursor: 'pointer', fontSize: '20px' }} /> 
               </td>
             </tr>

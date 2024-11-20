@@ -15,6 +15,7 @@ export async function GET(request: NextRequest, context: { params: { id: string 
 
     const rows = await query(`
       SELECT 
+        od.status,
         o.id AS order_id,
         o.date AS order_date,
         o.customer_name,
@@ -51,7 +52,7 @@ export async function GET(request: NextRequest, context: { params: { id: string 
       LEFT JOIN 
         payments pm ON o.id = pm.order_id
       WHERE 
-        o.id = ?;
+        o.id = ? AND od.status = 'Paid';
     `, [id]);
 
     if (rows.length === 0) {
