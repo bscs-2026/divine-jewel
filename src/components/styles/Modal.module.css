@@ -16,6 +16,16 @@ body.no-scroll {
     z-index: 1000;
 }
 
+.largeModalContent {
+    background-color: #ffffff;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+    position: relative;
+    max-height: 95vh;
+    width: 100%;
+}
+
 .modalContent {
     background-color: #ffffff;
     border-radius: 0.5rem;
@@ -31,11 +41,17 @@ body.no-scroll {
     .modalContent {
         max-width: 600px;
     }
+    .largeModalContent {
+        max-width: 800px;
+    }
 }
 
 /* Modal size for screens smaller than 600px (medium modal) */
 @media (max-width: 599px) {
     .modalContent {
+        max-width: 500px;
+    }
+    .largeModalContent {
         max-width: 500px;
     }
 }
