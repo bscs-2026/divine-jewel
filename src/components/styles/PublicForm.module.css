@@ -37,8 +37,25 @@
     border: 1px solid #575757;
     border-radius: 0.75rem;
     font-size: 13px;
+    outline: none; 
+  }
+
+  .passwordInputContainer {
+    margin-bottom: 15px;
+    padding: 10px;
+    border: 1px solid #575757;
+    border-radius: 0.75rem;
+    font-size: 13px;
   }
   
+  .passwordInput {
+    border: none;
+    width: 93%;
+    font-size: 13px;
+    outline: none; 
+  }
+  
+
   .button {
     padding: 10px;
     background-color: #FF6799;
