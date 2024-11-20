@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid username, password, or branch.' }, { status: 401 });
     }
 
-    const user: { id: string, username: string, role_id: string, first_name: string, last_name: string } = userResults[0];
+    const user = userResults[0];
     const branchData: { id: string, name: string } = branchResults[0];
     const passwordMatch = await comparePassword(password, user.password);
 
