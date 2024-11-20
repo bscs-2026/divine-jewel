@@ -1,4 +1,4 @@
-// src/lib/sessionHelper.ts
+// src/lib/passwordHelper.ts
 
 import bcrypt from 'bcryptjs';
 

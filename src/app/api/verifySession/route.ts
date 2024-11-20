@@ -1,7 +1,7 @@
-// src/app/api/verify-session/route.ts
+// src/app/api/verifySession/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { verifySession } from '../../../lib/sessionHelper';
+import { verifySession } from '../../../lib/serverSessionHelper';
 
 export async function POST(req: NextRequest) {
   try {

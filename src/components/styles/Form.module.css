@@ -204,7 +204,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  width: 120px; /* Fixed width for the product name */
+  width: 120px;
 }
 
 
@@ -212,7 +212,7 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  width: 100px; /* Fixed width for the quantity section */
+  width: 100px;
 }
 
 .customInput {
@@ -250,7 +250,7 @@
 
 
 .productPrice {
-  flex: 0 0 60px; /* Fixed width for price */
+  flex: 0 0 60px;
   text-align: right;
   font-size: 14px;
   white-space: nowrap;
@@ -261,14 +261,14 @@
 
 .paymentContainer {
   display: flex;
-  justify-content: space-between; /* Align left and right */
-  align-items: center;            /* Center items vertically */
-  margin: 1rem 0 2rem;            /* Top and bottom margin */
+  justify-content: space-between;
+  align-items: center;
+  margin: 1rem 0 2rem;
 }
 
 .paymentMethods, .paymentRebates {
   display: flex;
-  gap: 1rem;                      /* Space between items within each section */
+  gap: 1rem;
 }
 
 .paymentButton {

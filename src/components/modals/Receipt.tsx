@@ -15,8 +15,8 @@ interface OrderDetail {
   product_size: string | null;
   product_color: string | null;
   quantity: number;
-  price: number | string;
-  total_price: number | string;
+  unit_price: number | string;
+  total_unit_price: number | string;
   mop: string;
   discount_percent: number;
   credit_id: number;
@@ -43,7 +43,7 @@ const Receipt: React.FC<ReceiptProps> = ({
 
   // Function to calculate total amount
   const calculateTotalAmount = (orderDetails: OrderDetail[]) => {
-    return orderDetails.reduce((sum, detail) => sum + Number(detail.total_price), 0);
+    return orderDetails.reduce((sum, detail) => sum + Number(detail.total_unit_price), 0);
   };
 
   // Function to calculate discount in pesos
@@ -109,8 +109,8 @@ const Receipt: React.FC<ReceiptProps> = ({
                   </span>
                 </td>
                 <td>{detail.quantity}</td>
-                <td>{Number(detail.price).toFixed(2)}</td>
-                <td>{Number(detail.total_price).toFixed(2)}</td>
+                <td>{Number(detail.unit_price).toFixed(2)}</td>
+                <td>{Number(detail.total_unit_price).toFixed(2)}</td>
               </tr>
             ))}
           </tbody>

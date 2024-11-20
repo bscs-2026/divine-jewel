@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { AddBox, IndeterminateCheckBox, ArrowDropUp, ArrowDropDown, Add } from '@mui/icons-material';
-import styles from '../styles/Form.module.css';
+import styles from '@/components/styles/Form.module.css';
 import { SuccessfulPrompt } from "@/components/prompts/Prompt";
 import ReturnOrder from './ReturnOrder';
-import { formatDate } from '../../lib/helpers';
+import { formatDate } from '@/lib/helpers';
 import CircularIndeterminate from '@/components/loading/Loading';
 import Modal from '@/components/modals/Modal';
-import Receipt from '../modals/Receipt';
-
+import Receipt from '@/components/modals/Receipt';
+import { getCookieValue } from '@/lib/clientCookieHelper';
 
 const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) => {
     const [cashierName, setCashierName] = useState('Unknown Cashier');
@@ -20,25 +20,18 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         }, {})
     );
 
-    // Retrieve first_name and last_name from cookies on load
+    // Retrieve cookie data
     useEffect(() => {
-        const getCookieValue = (name) => {
-            const matches = document.cookie.match(new RegExp(
-                `(?:^|; )${name.replace(/([.$?*|{}()[]\/+^])/g, '\\$1')}=([^;]*)`
-            ));
-            return matches ? decodeURIComponent(matches[1]) : undefined;
-        };
-
         const firstName = getCookieValue('first_name');
         const lastName = getCookieValue('last_name');
         const userId = getCookieValue('user_id');
-
+    
         if (firstName && lastName) {
             setCashierName(`${firstName} ${lastName}`);
         } else {
             setCashierName('Unknown Cashier');
         }
-
+    
         if (userId) {
             setEmployeeId(userId);
         }

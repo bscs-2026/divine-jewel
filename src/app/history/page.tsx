@@ -62,7 +62,8 @@ interface OrderDetail {
   product_color: String | null;
   quantity: number;
   price: number | string;
-  total_price: number | string;
+  total_unit_price: number | string;
+  total_unit_price_deducted: number | string;
   mop: string;
   discount_percent: number;
   applied_credits: number;
@@ -219,6 +220,10 @@ const HistoryPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
+
+  // Function to calculate total amount
+  const calculateTotalAmount = (orderDetails: OrderDetail[]) => {
+    return orderDetails.reduce((sum, detail) => sum + Number(detail.total_unit_price_deducted), 0);
   };
 
   // Data processing functions

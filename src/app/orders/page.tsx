@@ -9,6 +9,7 @@ import BranchFilter from '@/components/filters/StoreBranchOnTrans';
 import OrderForm from '@/components/forms/Orders';
 import { SuccessfulPrompt } from '@/components/prompts/Prompt';
 import CircularIndeterminate from '@/components/loading/Loading';
+import { getCookieValue } from '@/lib/clientCookieHelper';
 
 interface Product {
   product_id: number;
@@ -30,12 +31,6 @@ interface Branch {
   branch_name: string;
   branch_address: string;
 }
-
-// Helper function to get a cookie by name
-const getCookieValue = (name: string) => {
-  const matches = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
-  return matches ? decodeURIComponent(matches[1]) : null;
-};
 
 export default function TransactionsPage() {
   const [products, setProducts] = useState<Product[]>([]);
