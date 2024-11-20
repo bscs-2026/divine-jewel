@@ -138,7 +138,7 @@ export default function StocksPage() {
     };
 
     const handleStockOut = () => {
-        setIsStockOut(true); 
+        setIsStockOut(true);
         setIsTransfer(false);
         setIsMarkDamaged(false);
         setIsModalOpen(true);
@@ -183,14 +183,14 @@ export default function StocksPage() {
                     quantity: stock.quantity,
                     batch_id,
                     note,
-                    
+
                 }),
             });
 
             if (!response.ok) {
                 throw new Error('Failed to update stock');
             }
-            
+
             await fetchData();
             setSuccessAddStockPrompt(true);
             return { ok: true };
@@ -405,31 +405,66 @@ export default function StocksPage() {
 
     const filteredStocks = useMemo(() => {
         const query = searchQuery.toLowerCase();
-    
+
         return stocks.filter((stock) => {
             const branchMatch =
                 filterBranch === null || filterBranch === "All" || stock.branch_code === Number(filterBranch);
-    
+
             const searchMatch = stock.product_name.toLowerCase().includes(query);
-    
+
             return branchMatch && searchMatch;
         });
-    }, [stocks, filterBranch, searchQuery]);            
-      
+    }, [stocks, filterBranch, searchQuery]);
+
     const stockSummary = useMemo(() => {
-        if (filterBranch === "All") {
-          const summary: { [key: number]: { [key: number]: number } } = {};
-          stocks.forEach((stock) => {
-            if (!summary[stock.product_id]) {
-              summary[stock.product_id] = {};
-            }
-            summary[stock.product_id][stock.branch_code] = stock.quantity;
-          });
-          return summary;
+        if (filterBranch === null || filterBranch === "All") {
+            const summary: { [key: number]: { [key: number]: number } } = {};
+            stocks.forEach((stock) => {
+                if (!summary[stock.product_id]) {
+                    summary[stock.product_id] = {};
+                }
+                summary[stock.product_id][stock.branch_code] = stock.quantity;
+            });
+            return summary;
         }
         return null;
-      }, [filterBranch, stocks]);
+    }, [filterBranch, stocks]);
+
+    // const stockSummary = useMemo(() => {
+    //     if (filterBranch === "All") {
+    //       const filteredStocksForSummary = stocks.filter((stock) =>
+    //         stock.product_name.toLowerCase().includes(searchQuery.toLowerCase())
+    //       );
       
+    //       const summary: { [key: number]: { [key: number]: number } } = {};
+      
+    //       filteredStocksForSummary.forEach((stock) => {
+    //         if (!summary[stock.product_id]) {
+    //           summary[stock.product_id] = {};
+    //         }
+    //         summary[stock.product_id][stock.branch_code] = stock.quantity;
+    //       });
+      
+    //       return summary;
+    //     }
+    //     return null;
+    //   }, [filterBranch, stocks, searchQuery]);
+      
+    //   const filteredStocksList = useMemo(() => {
+    //     const query = searchQuery.toLowerCase();
+      
+    //     return stocks.filter((stock) => {
+    //       const branchMatch =
+    //         filterBranch === null || filterBranch === "All" || stock.branch_code === Number(filterBranch);
+      
+    //       const searchMatch = stock.product_name.toLowerCase().includes(query);
+      
+    //       return branchMatch && searchMatch;
+    //     });
+    //   }, [stocks, filterBranch, searchQuery]);
+      
+      
+
 
     return (
         <Layout defaultTitle="Stocks">
@@ -455,8 +490,8 @@ export default function StocksPage() {
                 stockSummary={stockSummary}
                 selectedStocks={selectedStocks}
                 setSelectedStocks={setSelectedStocks}
-                products={products} //for product stock summary per branch
-                branches={branches} //for product stock summary per branch
+                products={products}
+                branches={branches}
             />
 
             <Modal show={isModalOpen} onClose={() => closeModal(true)}>
