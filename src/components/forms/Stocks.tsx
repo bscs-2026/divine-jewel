@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import styles from '../styles/Modal.module.css';
+import styles from '@/components/styles/Modal.module.css';
 import { ArrowBack } from '@mui/icons-material';
-import { generateBatchID } from '../../lib/helpers';
+import { generateBatchID } from '@/lib/generatorHelper';
 
 interface Stock {
     id: number;
@@ -269,8 +269,9 @@ const StockForm: React.FC<StockFormProps> = ({
                 {/* Display Batch ID */}
                 <div className={styles.batchIDContainer}>
                     <p><strong>Batch ID:</strong> {batchID}</p>
-                    <p><strong>Date:</strong> {new Date().toLocaleDateString()}</p>
-                    <p><strong>Time:</strong> {currentTime}</p>
+                    <p>
+                        <strong>Date & Time:</strong> {new Date().toLocaleDateString()} {currentTime}
+                    </p>
                     <p><strong>Employee:</strong> {employeeFullname}</p>
                 </div>
                 <br />

@@ -1,4 +1,4 @@
-// components/EmployeeTable.tsx
+// components/Employees.tsx
 import React from 'react';
 import { format } from 'date-fns';
 import { Employee } from '@/app/employees/page';

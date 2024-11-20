@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import styles from '../styles/Table.module.css';
+import styles from '@/components/styles/Table.module.css';
 import { ArrowUpward, ArrowDownward, Edit, Archive, Unarchive} from '@mui/icons-material';
 
 interface Product {
@@ -42,7 +42,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   // Define columns for the table
   const columns = useMemo(
     () => [
-      { Header: 'Name', accessor: 'name' as keyof Product, align: 'left' },
+      { Header: 'Product Name', accessor: 'name' as keyof Product, align: 'left' },
       { Header: 'SKU', accessor: 'SKU' as keyof Product, align: 'left' },
       { Header: 'Category', accessor: 'category_name' as keyof Product, align: 'left' },
       { Header: 'Size', accessor: 'size' as keyof Product, align: 'left' },

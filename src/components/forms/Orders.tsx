@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import CloseIcon from '@mui/icons-material/Close';
 import { AddBox, IndeterminateCheckBox, ArrowDropUp, ArrowDropDown, Add } from '@mui/icons-material';
-import styles from '../styles/Form.module.css';
+import styles from '@/components/styles/Form.module.css';
 import { SuccessfulPrompt } from "@/components/prompts/Prompt";
-import ReturnOrder from './ReturnOrder';
-import { formatDate } from '../../lib/helpers';
+import { formatDate } from '@/lib/dateTimeHelper';
 import CircularIndeterminate from '@/components/loading/Loading';
 import Modal from '@/components/modals/Modal';
-import Receipt from '../modals/Receipt';
+import Receipt from '@/components/modals/OrderReceipt';
+import { getCookieValue } from '@/lib/clientCookieHelper';
 
 
 const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) => {
@@ -20,15 +20,8 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         }, {})
     );
 
-    // Retrieve first_name and last_name from cookies on load
+    // Retrieve cookie data
     useEffect(() => {
-        const getCookieValue = (name) => {
-            const matches = document.cookie.match(new RegExp(
-                `(?:^|; )${name.replace(/([.$?*|{}()[]\/+^])/g, '\\$1')}=([^;]*)`
-            ));
-            return matches ? decodeURIComponent(matches[1]) : undefined;
-        };
-
         const firstName = getCookieValue('first_name');
         const lastName = getCookieValue('last_name');
         const userId = getCookieValue('user_id');
@@ -43,10 +36,6 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
             setEmployeeId(userId);
         }
     }, []);
-
-    const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
-    const handleOpenReturnModal = () => setIsReturnModalOpen(true);
-    const handleCloseReturnModal = () => setIsReturnModalOpen(false);
 
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('Cash');
     const [tenderedAmount, setTenderedAmount] = useState('');
@@ -66,6 +55,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
     const [applyOption, setApplyOption] = useState("");
     const [creditId, setCreditId] = useState('');
     const [creditError, setCreditError] = useState('');
+    const [loading, setLoading] = useState<boolean>(false);
 
 
     interface OrderDetail {
@@ -93,14 +83,23 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         reference_number: string | null;
     }
 
-
     useEffect(() => {
         const updateTime = () => {
             const now = new Date();
-            setCurrentTime(formatDate(now.toISOString(), 'Asia/Manila'));
+            const options = {
+                timeZone: 'Asia/Manila',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true,
+            };
+            const formattedTime = new Intl.DateTimeFormat('en-US', options).format(now);
+            setCurrentTime(formattedTime);
         };
+
         updateTime();
         const intervalId = setInterval(updateTime, 1000);
+
         return () => clearInterval(intervalId);
     }, []);
 
@@ -128,7 +127,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         if (successOrderPrompt) {
             const timer = setTimeout(() => {
                 setSuccessOrderPrompt(false);
-            }, 3000);
+            }, 1000);
             return () => clearTimeout(timer);
         }
     }, [successOrderPrompt]);
@@ -357,6 +356,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
 
     return (
         <div className={styles.container}>
+            {loading && <CircularIndeterminate />}
             {/* Order and Customer Details */}
             <div className={styles.orderDetails}>
                 <div className={styles.headerContainer}>
@@ -364,7 +364,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                         <div className={styles.heading2}>Current Order</div>
                     </div>
                     <div className={styles.primary}>Cashier: {cashierName}</div>
-                    <div className={styles.primary}>Date & Time: {currentTime}</div>
+                    <div className={styles.primary}>Date & Time: {new Date().toLocaleDateString()} {currentTime}</div>
                     <div className={styles.primary}>
                         {(selectedBranch?.branch_name || 'No Branch') + ', ' + (selectedBranch?.branch_address || 'No Address')}
                     </div>
@@ -587,7 +587,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 </div>
             )}
 
-            {/* Place Order and Return Buttons */}
+            {/* Place Order and New Order Buttons */}
             <div className={styles.buttonsContainer}>
                 <button onClick={handleNewOrder} className={styles.newOrderButton}>
                     New Order
@@ -596,11 +596,6 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 <button onClick={handlePlaceOrder} disabled={isLoading || isPlaceOrderDisabled} className={styles.placeOrderButton}>
                     {isLoading ? 'Placing Order...' : 'Place Order'}
                 </button>
-
-                <button onClick={handleOpenReturnModal} className={styles.returnOrderButton}>
-                    Return Order
-                </button>
-                <ReturnOrder isOpen={isReturnModalOpen} onClose={handleCloseReturnModal} />
             </div>
 
             {/* Success Prompt */}

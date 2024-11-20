@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
             reference_number,
             receipt_image,
             applied_credits,
-            credit_id
+            credit_id,
         } = await request.json();
 
         connection = await getConnection();
@@ -43,12 +43,12 @@ export async function POST(request: NextRequest) {
                 discount_percentage || null,
                 applied_credits || null,
                 credit_id || null,
-                total_amount ?? 0
+                total_amount ?? 0,
             ]
         );
 
         const orderId = orderResult.insertId;
-        console.log('Generated order_id:', orderId);
+        console.log("Generated order_id:", orderId);
 
         // Process each order item
         for (const item of order_items) {
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
             console.log(`Processing SKU: ${sku}`);
 
             const [stockResult] = await connection.query(
-                'SELECT quantity FROM `stocks` WHERE product_id = ? AND branch_code = ?',
+                "SELECT quantity FROM `stocks` WHERE product_id = ? AND branch_code = ?",
                 [product_id, branch_code]
             );
 
@@ -71,17 +71,18 @@ export async function POST(request: NextRequest) {
 
             // Update stock quantity
             await connection.query(
-                'UPDATE `stocks` SET quantity = quantity - ? WHERE product_id = ? AND branch_code = ?',
+                "UPDATE `stocks` SET quantity = quantity - ? WHERE product_id = ? AND branch_code = ?",
                 [quantity, product_id, branch_code]
             );
 
             const itemDiscountedPct = discount_percentage || 0;
-            const itemDiscountedPrice = unit_price * (itemDiscountedPct / 100);
-            const itemFinalPrice = unit_price - itemDiscountedPrice;
+            const itemFinalPrice = discount_percentage
+                ? unit_price - unit_price * (itemDiscountedPct / 100)
+                : unit_price;
 
             await connection.query(
-                'INSERT INTO `order_details` (order_id, product_id, sku, quantity, unit_price, discount_pct, unit_price_deducted, status, employee_incharge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [orderId, product_id, sku, quantity, unit_price, itemDiscountedPct, itemFinalPrice, 'pending', employee_id]
+                "INSERT INTO `order_details` (order_id, product_id, sku, quantity, unit_price, discount_pct, unit_price_deducted, status, employee_incharge) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                [orderId, product_id, sku, quantity, unit_price, itemDiscountedPct, itemFinalPrice, "pending", employee_id]
             );
         }
 
@@ -96,22 +97,21 @@ export async function POST(request: NextRequest) {
                 payment_method,
                 e_wallet_provider || null,
                 reference_number || null,
-                receipt_image || null
+                receipt_image || null,
             ]
         );
 
         await connection.query(
-            'UPDATE `order_details` SET status = ? WHERE order_id = ?',
-            ['paid', orderId]
+            "UPDATE `order_details` SET status = ? WHERE order_id = ?",
+            ["paid", orderId]
         );
 
-        // Process store credits only if credits are being applied
+        // Handle applied credits if present
         if (applied_credits > 0 && credit_id) {
             const [creditCheck] = await connection.query(
-                'SELECT * FROM store_credits WHERE id = ? AND status = "active"',
+                "SELECT * FROM store_credits WHERE id = ? AND status = 'active'",
                 [credit_id]
             );
-            console.log("Store credit check:", creditCheck);
 
             if (creditCheck.length === 0) {
                 console.error(`Credit ID ${credit_id} is not active or does not exist.`);
@@ -123,14 +123,14 @@ export async function POST(request: NextRequest) {
 
             const remainingCredits = creditCheck[0].credit_amount - Math.abs(subtotal_amount);
 
-            const [creditResult] = await connection.query(
+            await connection.query(
                 `
-                UPDATE store_credits 
+                UPDATE store_credits
                 SET credit_amount = GREATEST(?, 0),
                     status = CASE 
                                 WHEN ? <= 0 THEN 'used' 
                                 ELSE 'active' 
-                             END,
+                            END,
                     order_id = ?
                 WHERE id = ? AND status = 'active'
                 `,
@@ -138,30 +138,27 @@ export async function POST(request: NextRequest) {
             );
 
             console.log(`Credits updated for credit_id: ${credit_id}, Remaining credits: ${remainingCredits}`);
-            console.log("Affected rows:", creditResult.affectedRows);
-
-            if (creditResult.affectedRows === 0) {
-                console.warn(`No rows were updated. Check if credit ID ${credit_id} is active and valid.`);
-            }
         }
 
+        // Commit transaction
         await connection.commit();
-        console.log('Order, payment, stock updated, and order_details status set to paid successfully');
 
+        // Return success response
         return NextResponse.json(
             {
-                message: 'Order, details, payment, stock updated, and status paid successfully',
-                order_id: orderId
+                message: "Order, details, payment, stock updated, and status paid successfully",
+                order_id: orderId,
+                credit_id: credit_id || null,
             },
             { status: 201 }
         );
     } catch (error: any) {
-        console.error('Error while processing order:', error.message, error.stack);
+        console.error("Error while processing order:", error.message, error.stack);
 
         if (connection) await connection.rollback();
 
         return NextResponse.json(
-            { error: 'Internal Server Error', details: error.message },
+            { error: "Internal Server Error", details: error.message },
             { status: 500 }
         );
     } finally {

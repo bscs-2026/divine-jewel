@@ -8,17 +8,23 @@ interface ModalProps {
 }
 
 const Modal: React.FC<ModalProps> = ({ show, onClose, children }) => {
-  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 600);
+  const [isLargeScreen, setIsLargeScreen] = useState<boolean | null>(null);
 
   useEffect(() => {
     const handleResize = () => {
       setIsLargeScreen(window.innerWidth >= 600);
     };
 
-    window.addEventListener('resize', handleResize);
+    // Ensure this runs only on the client
+    if (typeof window !== 'undefined') {
+      setIsLargeScreen(window.innerWidth >= 600); // Initial check
+      window.addEventListener('resize', handleResize);
+    }
 
     return () => {
-      window.removeEventListener('resize', handleResize);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('resize', handleResize);
+      }
     };
   }, []);
 
@@ -26,7 +32,11 @@ const Modal: React.FC<ModalProps> = ({ show, onClose, children }) => {
     return null;
   }
 
-  // Handle clicking outside the modal content to close it
+  if (isLargeScreen === null) {
+    // Prevent rendering until screen size is determined
+    return null;
+  }
+
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       onClose();

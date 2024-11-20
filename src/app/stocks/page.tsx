@@ -3,16 +3,15 @@
 'use client';
 import { useEffect, useState, useMemo } from 'react';
 import Layout from '@/components/layout/Layout';
-import StockTable from '@/components/tables/StockTable';
-import StockForm from '@/components/forms/StockForm';
+import StockTable from '@/components/tables/Stocks';
+import StockForm from '@/components/forms/Stocks';
 import BranchTabs from '@/components/tabs/BranchTabs';
 import ManageBranches from '@/components/forms/ManageBranches';
 import Modal from '@/components/modals/Modal';
 import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
 import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
 import CircularIndeterminate from '@/components/loading/Loading';
-import { se } from 'date-fns/locale';
-import { set } from 'date-fns';
+import { Product, Category } from '@/types';
 
 interface Stock {
     id: number;
@@ -61,7 +60,7 @@ export default function StocksPage() {
     const [isTransfer, setIsTransfer] = useState(false);
     const [isStockOut, setIsStockOut] = useState(false);
     const [isMarkDamaged, setIsMarkDamaged] = useState(false);
-    const [filterBranch, setFilterBranch] = useState<number | string | null>(null);
+    const [filterBranch, setFilterBranch] = useState<number | string>("All");
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isManageBranchesModalOpen, setIsManageBranchesModalOpen] = useState(false);
@@ -402,13 +401,20 @@ export default function StocksPage() {
     };
 
     const activeProductIds = products.map((product) => product.id);
-    const filteredStocks = stocks.filter(
-        (stock) =>
-            activeProductIds.includes(stock.product_id) &&
-            (!filterBranch || stock.branch_code === filterBranch) &&
-            stock.product_name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
 
+    const filteredStocks = useMemo(() => {
+        const query = searchQuery.toLowerCase();
+    
+        return stocks.filter((stock) => {
+            const branchMatch =
+                filterBranch === null || filterBranch === "All" || stock.branch_code === Number(filterBranch);
+    
+            const searchMatch = stock.product_name.toLowerCase().includes(query);
+    
+            return branchMatch && searchMatch;
+        });
+    }, [stocks, filterBranch, searchQuery]);            
+      
     const stockSummary = useMemo(() => {
         if (filterBranch === null) {
           const summary: { [key: number]: { [key: number]: number } } = {};
@@ -440,6 +446,7 @@ export default function StocksPage() {
                 selectedStocks={selectedStocks}
                 searchQuery={searchQuery}
                 setSearchQuery={setSearchQuery}
+                placeholder="Search products"
             />
 
             <StockTable

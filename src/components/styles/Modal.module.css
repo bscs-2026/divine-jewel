@@ -108,6 +108,16 @@ body.no-scroll {
     margin-bottom: 0.25rem;
 }
 
+.modalReturnItemsInputFixed {
+    width: 80px;
+    padding: 0.5rem 0.5rem;
+    border: 1px solid #ACACAC;
+    border-radius: 0.5rem;
+    color: #575757;
+    font-size: 13px;
+    margin-bottom: 0.25rem;
+}
+
 .modalMediumButtonContainer {
     display: flex;
     justify-content: flex-end;
@@ -471,5 +481,18 @@ body.no-scroll {
     padding-top: 0px;
     padding-bottom: 0px;
     display: block;
+}
+
+.modalReturnNote {
+    font-size: 14px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    line-height: 1.5;
+    resize: vertical;
+    min-height: 40px;
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
 }
 

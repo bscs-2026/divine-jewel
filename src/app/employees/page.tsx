@@ -5,7 +5,7 @@ import { Suspense, useEffect, useState, FormEvent } from "react";
 import Layout from '../../components/layout/Layout';
 import EmployeeModal from "@/components/modals/EmployeeModal";
 import InformationModal from "@/components/modals/InformationModal";
-import EmployeeTable from "@/components/tables/EmployeeTable";
+import EmployeeTable from "@/components/tables/Employees";
 import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
 import { AddBox } from '@mui/icons-material';
 import CircularIndeterminate from '@/components/loading/Loading';

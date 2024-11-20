@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styles from '../styles/Modal.module.css';
-import { formatDateHumanReadable } from '../../lib/helpers';
+import { formatDate } from '../../lib/dateTimeHelper';
 
 interface SupplyBatch {
     id: number;
@@ -78,7 +78,7 @@ const SupplyBatchForm: React.FC<SupplyBatchFormProps> = ({ batchId, onClose }) =
                 <div className={styles.batchIDContainer}>
                     <p><strong>Batch ID:</strong> {batch_id}</p>
                     <p><strong>Supplier:</strong> {supplier}</p>
-                    <p><strong>Supply Date:</strong> {formatDateHumanReadable(supply_date)}</p>
+                    <p><strong>Date:</strong> {formatDate(supply_date)}</p>
                 </div>
 
                 <table className={styles.modalTable}>

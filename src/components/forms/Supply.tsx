@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { generateBatchID } from '../../lib/helpers';
+import { generateBatchID } from '@/lib/generatorHelper';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
-import styles from '../styles/Modal.module.css';
-import { formatDate } from '../../lib/helpers';
+import styles from '@/components/styles/Modal.module.css';
+import { formatDate } from '@/lib/dateTimeHelper';
 
 interface Supplier {
   id: number;

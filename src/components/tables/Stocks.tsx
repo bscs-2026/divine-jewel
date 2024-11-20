@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
-import styles from '../styles/Table.module.css';
+import styles from '@/components/styles/Table.module.css';
+import { formatDate } from '@/lib/dateTimeHelper';
 
 interface Stock {
   id: number;
@@ -55,7 +56,7 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
   // Define columns for the table
   const columns = useMemo(
     () => [
-      { Header: 'Product', accessor: 'product_name' as keyof Stock, align: 'left' },
+      { Header: 'Product Name', accessor: 'product_name' as keyof Stock, align: 'left' },
       { Header: 'SKU', accessor: 'product_SKU' as keyof Stock, align: 'left' },
       // { Header: 'Category', accessor: 'category_name' as keyof Stock, align: 'left' },
       { Header: 'Size', accessor: 'product_size' as keyof Stock, align: 'left' },
@@ -294,10 +295,7 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
                 <td className={`${styles.td} ${styles.rightAlign}`}>
                   {stock.damaged}
                 </td>
-                <td className={`${styles.td} ${styles.rightAlign}`}>
-                  {new Date(stock.last_updated).toLocaleDateString()} {/* Format date */}
-                  {new Date(stock.last_updated).toLocaleTimeString()}
-                </td>
+                <td className={`{styles.td} ${styles.rightAlign}`}>{formatDate(stock.last_updated, 'Asia/Manila')}</td>
               </tr>
             ))}
         </tbody>

@@ -6,7 +6,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation'; // Use `next/navigation` for App Router
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChartLine, faMoneyCheck, faHistory, faBox, faBoxes, faWarehouse, faUsers } from '@fortawesome/free-solid-svg-icons';
+import { faChartLine, faMoneyCheck, faHistory, faBox, faBoxes, faWarehouse, faUsers, faHeartCrack } from '@fortawesome/free-solid-svg-icons';
 import styles from '../styles/Layout.module.css';
 import CircularIndeterminate from '@/components/loading/Loading';
 
@@ -92,6 +92,12 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
             <Link href="/history">
               <FontAwesomeIcon icon={faHistory} className={styles.icon} />
               History
+            </Link>
+          </li>
+          <li className={styles.navItem} onClick={() => onSelectTitle('Return Items')}>
+            <Link href="/return">
+              <FontAwesomeIcon icon={faHeartCrack} className={styles.icon} />
+              Returns
             </Link>
           </li>
         </ul>

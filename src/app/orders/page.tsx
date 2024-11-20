@@ -31,12 +31,6 @@ interface Branch {
   branch_address: string;
 }
 
-// Helper function to get a cookie by name
-const getCookieValue = (name: string) => {
-  const matches = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
-  return matches ? decodeURIComponent(matches[1]) : null;
-};
-
 export default function TransactionsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);

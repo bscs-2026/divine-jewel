@@ -2,7 +2,8 @@
 
 import React, { useMemo, useState } from 'react';
 import { ArrowUpward, ArrowDownward, InfoOutlined } from '@mui/icons-material';
-import styles from '../styles/Table.module.css';
+import styles from '@/components/styles/Table.module.css';
+import { formatDate } from '@/lib/dateTimeHelper';
 
 interface StockDetailGroup {
   id: number;
@@ -101,9 +102,7 @@ const StockDetailsTable: React.FC<StockDetailsTableProps> = ({ stockDetails, onV
               onClick={() => onViewAction(detail.batch_id)}
             >
               <td className={styles.td}>{detail.batch_id}</td>
-              <td className={styles.td}>
-                {new Date(detail.date).toLocaleDateString()} {new Date(detail.date).toLocaleTimeString()}
-              </td>
+              <td className={styles.td}>{formatDate(detail.date, 'Asia/Manila')}</td>
               <td className={styles.td}>{detail.action}</td>
               <td className={styles.td}>{detail.source_branch_name || 'N/A'}</td>
               <td className={styles.td}>{detail.destination_branch_name || 'N/A'}</td>
