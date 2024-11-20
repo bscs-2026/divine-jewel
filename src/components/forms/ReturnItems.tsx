@@ -26,7 +26,7 @@ interface ReturnItemsProps {
         item: ReturnItem,
         returnQuantity: number,
         note: string
-    ) => Promise<{ ok: boolean; message?: string }>;
+    ) => Promise<{ ok: boolean; message?: string; creditId?: number; totalCredits?: number }>;
     onClose: () => void;
 }
 
@@ -45,7 +45,16 @@ const ReturnItemsForm: React.FC<ReturnItemsProps> = ({
     const [globalMessage, setGlobalMessage] = useState<string | null>(null);
     const [showReceipt, setShowReceipt] = useState(false);
     const [returnItemsData, setReturnItemsData] = useState<any[]>([]);
-    const [submitting, setSubmitting] = useState(false); // Add state to track submission
+    const [submitting, setSubmitting] = useState(false);
+    const [returnItemsMetadata, setReturnItemsMetadata] = useState<{
+        order_id: number;
+        customer_name: string;
+        branch_name: string;
+        branch_address: string;
+        employee_fullname: string;
+        credit_id: number; // Single credit ID
+        total_credits: number;
+    } | null>(null); // Metadata state for the receipt
 
     const handleInputChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -73,7 +82,7 @@ const ReturnItemsForm: React.FC<ReturnItemsProps> = ({
         e.preventDefault();
 
         setGlobalMessage(null);
-        setSubmitting(true); // Set submitting to true when submission starts
+        setSubmitting(true);
 
         const newErrors = formDataList.map((formData, index) => {
             const returnQuantity = parseInt(formData.returnQuantity, 10);
@@ -89,7 +98,7 @@ const ReturnItemsForm: React.FC<ReturnItemsProps> = ({
         setErrors(newErrors);
 
         if (newErrors.some((error) => error)) {
-            setSubmitting(false); // Reset submitting if errors exist
+            setSubmitting(false);
             return;
         }
 
@@ -108,6 +117,8 @@ const ReturnItemsForm: React.FC<ReturnItemsProps> = ({
                         returnQuantity,
                         note,
                         success: result.ok,
+                        creditId: result.creditId || null, // Single credit ID
+                        totalCredits: result.totalCredits || 0, // Total credits
                     };
                 })
             );
@@ -116,6 +127,23 @@ const ReturnItemsForm: React.FC<ReturnItemsProps> = ({
 
             if (success) {
                 setReturnItemsData(results);
+
+                // Use the single credit ID and total credits from the first result (assuming backend sends one per transaction)
+                const { creditId, totalCredits } = results[0];
+
+                // Log the credit ID to the console
+                console.log('Generated Credit ID:', creditId);
+
+                setReturnItemsMetadata({
+                    order_id: selectedOrders[0].order_id,
+                    customer_name: selectedOrders[0].customer_name || 'N/A',
+                    branch_name: selectedOrders[0].branch_name || 'N/A',
+                    branch_address: selectedOrders[0].branch_address || 'N/A',
+                    employee_fullname: `${getCookieValue('first_name')} ${getCookieValue('last_name')}`,
+                    credit_id: creditId as number,
+                    total_credits: totalCredits,
+                });
+
                 setShowReceipt(true);
             } else {
                 const messages = results
@@ -127,7 +155,7 @@ const ReturnItemsForm: React.FC<ReturnItemsProps> = ({
         } catch (error: any) {
             setGlobalMessage(error.message || 'An unexpected error occurred.');
         } finally {
-            setSubmitting(false); // Reset submitting once submission is complete
+            setSubmitting(false);
         }
     };
 
@@ -146,7 +174,7 @@ const ReturnItemsForm: React.FC<ReturnItemsProps> = ({
 
     return (
         <div className={`${styles.modalContent} ${styles.modalContentMedium}`}>
-            {showReceipt ? (
+            {showReceipt && returnItemsMetadata ? (
                 <Receipt
                     returnItemsDatas={returnItemsData.map((item) => ({
                         product_id: item.product_id,
@@ -159,13 +187,13 @@ const ReturnItemsForm: React.FC<ReturnItemsProps> = ({
                         unit_price_deducted: item.unit_price_deducted,
                     }))}
                     returnItemsMetadata={{
-                        order_id: selectedOrders[0].order_id,
-                        customer_name: selectedOrders[0].customer_name || 'N/A',
-                        branch_name: selectedOrders[0].branch_name || 'N/A',
-                        branch_address: selectedOrders[0].branch_address || 'N/A',
-                        employee_fullname: `${getCookieValue('first_name')} ${getCookieValue('last_name')}`,
+                        credit_id: returnItemsMetadata.credit_id,
+                        total_credits: returnItemsMetadata.total_credits,
+                        customer_name: returnItemsMetadata.customer_name,
+                        branch_name: returnItemsMetadata.branch_name,
+                        branch_address: returnItemsMetadata.branch_address,
+                        employee_fullname: returnItemsMetadata.employee_fullname,
                     }}
-                    onClose={handleClose}
                 />
             ) : (
                 <div className={styles.modalContentScrollable}>

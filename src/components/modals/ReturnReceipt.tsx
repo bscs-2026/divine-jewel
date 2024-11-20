@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from 'react';
 import { formatDate } from '../../lib/dateTimeHelper';
-import styles from '@/components/styles/Modal.module.css';
 
 interface returnItemsData {
     product_id: number;
@@ -18,6 +17,7 @@ interface ReceiptProps {
     returnItemsDatas: returnItemsData[];
     returnItemsMetadata: {
         credit_id: number;
+        total_credits: number;
         customer_name: string;
         branch_name: string;
         branch_address: string;
@@ -37,7 +37,6 @@ const Receipt: React.FC<ReceiptProps> = ({
         window.print();
     };
 
-    // Calculate total credits for returned items
     const totalAmount = useMemo(
         () =>
             returnItemsDatas.reduce(
@@ -51,112 +50,110 @@ const Receipt: React.FC<ReceiptProps> = ({
     );
 
     return (
-        <div className={`${styles.modalContent} ${styles.modalContentMedium}`}>
-            <div className={styles.modalContentScrollable}>
-                <div className={styles.header}>
-                    <img
-                        src="/img/divine-jewel-logo.png"
-                        alt="Divine Jewel Logo"
-                        className={styles.logo}
-                    />
-                </div>
-                <div className={styles.companyDetails}>
-                    <h2>{returnItemsMetadata.branch_name}</h2>
-                    <h2>{returnItemsMetadata.branch_address}</h2>
-                    <h1 className={styles.receiptHeader}>Return Items Receipt</h1>
-                </div>
-                <div className={styles.infoContainer}>
-                    <div className={styles.infoRow}>
-                        <div className={styles.label}>Name:</div>
-                        <div className={styles.value}>
-                            {returnItemsMetadata.customer_name}
-                        </div>
-                    </div>
-                    <div className={styles.infoRow}>
-                        <div className={styles.label}>Credit ID:</div>
-                        <div className={styles.value}>
-                            {returnItemsMetadata.credit_id}
-                        </div>
-                    </div>
-                    <div className={styles.infoRow}>
-                        <div className={styles.label}>Date & Time:</div>
-                        <div className={styles.value}>{currentTime}</div>
-                    </div>
-                </div>
-                <br />
-                <table className={styles.receiptTable}>
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th className={styles.priceHeader}>Qty.</th>
-                            <th className={styles.priceHeader}>Unit Price</th>
-                            <th className={styles.priceHeader}>Disc. %</th>
-                            <th className={styles.priceHeader}>Returned Qty.</th>
-                            <th className={styles.priceHeader}>Credits</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {returnItemsDatas.length > 0 ? (
-                            returnItemsDatas.map((detail, index) => {
-                                const paidAmount =
+        <div
+            style={{
+                width: '58mm',
+                fontFamily: 'monospace',
+                fontSize: '12px',
+                padding: '5px',
+            }}
+        >
+            <div style={{ textAlign: 'center', marginBottom: '10px' }}>
+                <img
+                    src="/img/divine-jewel-logo.png"
+                    alt="Divine Jewel Logo"
+                    style={{ width: '50px', marginBottom: '5px' }}
+                />
+                <h2 style={{ margin: 0 }}>{returnItemsMetadata.branch_name}</h2>
+                <p style={{ margin: 0, fontSize: '10px' }}>
+                    {returnItemsMetadata.branch_address}
+                </p>
+                <h3 style={{ margin: '10px 0', fontSize: '14px' }}>
+                    Return Items Receipt
+                </h3>
+            </div>
+            <div>
+                <p style={{ margin: '2px 0' }}>
+                    <strong>Name:</strong> {returnItemsMetadata.customer_name}
+                </p>
+                <p style={{ margin: '2px 0' }}>
+                    <strong>Credit ID:</strong> {returnItemsMetadata.credit_id}
+                </p>
+                <p style={{ margin: '2px 0' }}>
+                    <strong>Date & Time:</strong> {currentTime}
+                </p>
+            </div>
+            <table
+                style={{
+                    width: '100%',
+                    borderCollapse: 'collapse',
+                    marginTop: '10px',
+                }}
+            >
+                <thead>
+                    <tr>
+                        <th style={{ textAlign: 'left' }}>Item</th>
+                        <th style={{ textAlign: 'right' }}>Qty.</th>
+                        <th style={{ textAlign: 'right' }}>Returned</th>
+                        <th style={{ textAlign: 'right' }}>Credits</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {returnItemsDatas.map((detail, index) => (
+                        <tr key={index}>
+                            <td style={{ textAlign: 'left' }}>
+                                {detail.product_name}
+                            </td>
+                            <td style={{ textAlign: 'right' }}>{detail.quantity}</td>
+                            <td style={{ textAlign: 'right' }}>
+                                {detail.quantity_returned}
+                            </td>
+                            <td style={{ textAlign: 'right' }}>
+                                {(
                                     Number(detail.unit_price_deducted || 0) *
-                                    Number(detail.quantity_returned || 0);
-                                return (
-                                    <tr key={index}>
-                                        <td className={styles.itemDescription}>
-                                            {detail.product_name}
-                                            <br />
-                                            <span className={styles.itemDetails}>
-                                                {detail.product_id}&emsp;
-                                                {detail.product_size || 'N/A'}
-                                                &emsp;
-                                                {detail.product_color || 'N/A'}
-                                            </span>
-                                        </td>
-                                        <td>{detail.quantity}</td>
-                                        <td>{Number(detail.unit_price).toFixed(2)}</td>
-                                        <td>{detail.discount_percent}</td>
-                                        <td>{detail.quantity_returned}</td>
-                                        <td>{paidAmount.toFixed(2)}</td>
-                                    </tr>
-                                );
-                            })
-                        ) : (
-                            <tr>
-                                <td colSpan={5} className={styles.noData}>
-                                    No items to display.
-                                </td>
-                            </tr>
-                        )}
-                    </tbody>
-                </table>
-
-                <div className={styles.receiptSummary}>
-                    <p>
-                        <span>Total Credits:</span> {totalAmount.toFixed(2)}
-                    </p>
-                </div>
-
-                <br />
-                <p className={styles.cashierInfo}>
-                    Cashier: {returnItemsMetadata.employee_fullname}
-                </p>
-                <br />
-                <p className={styles.receiptNotice}>
-                    Credits from this return can be used for your next purchase. <br />
-                    Please show this receipt during your next visit to redeem applicable credits.
-                </p>
-                <br />
-                <h2 className={styles.receiptSubHeading}>
-                    Thank you! We look forward to serving you again.
-                </h2>
-                <br />
-                <div className={`${styles.printButtonContainer} printButtonContainer`}>
-                    <button onClick={handlePrint} className={styles.printButton}>
-                        Print Receipt
-                    </button>
-                </div>
-                <br />
+                                    Number(detail.quantity_returned || 0)
+                                ).toFixed(2)}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+            <hr style={{ margin: '10px 0' }} />
+            <p style={{ textAlign: 'right', fontSize: '12px' }}>
+                <strong>Total Credits: {totalAmount.toFixed(2)}</strong>
+            </p>
+            <p style={{ fontSize: '12px', margin: '5px 0' }}>
+                <strong>Cashier:</strong> {returnItemsMetadata.employee_fullname}
+            </p>
+            <p
+                style={{
+                    textAlign: 'center',
+                    fontSize: '10px',
+                    margin: '5px 0',
+                    lineHeight: '1.2',
+                }}
+            >
+                Credits from this return can be used for your next purchase. <br />
+                Please show this receipt to redeem applicable credits.
+            </p>
+            <p style={{ textAlign: 'center', fontSize: '12px', margin: '5px 0' }}>
+                Thank you!
+            </p>
+            <div style={{ textAlign: 'center', marginTop: '10px' }}>
+                <button
+                    onClick={handlePrint}
+                    style={{
+                        display: 'none',
+                        padding: '5px 10px',
+                        fontSize: '12px',
+                        backgroundColor: '#FCB6D7',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                    }}
+                >
+                    Print Receipt
+                </button>
             </div>
         </div>
     );

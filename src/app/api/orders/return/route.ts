@@ -72,26 +72,29 @@ export async function POST(request: NextRequest) {
                 [orderId, product_id, sku, quantity, unit_price, discount_pct, unit_price_deducted, note, employeeId]
             );
             console.log(`Return recorded for Product ID ${product_id}.`);
-
-            // Add store credit for the return
-            await connection.query(
-                `INSERT INTO store_credits 
-                 (customer_name, order_id, credit_amount, credit_date, status, credit_type, description) 
-                 VALUES (?, ?, ?, NOW(), 'active', 'return', ?)`,
-                [customerName || null, orderId, creditAmount, `Return for Product ID ${product_id}`]
-            );
-            console.log(`Store credit issued for Product ID ${product_id}: ${creditAmount}`);
         }
+
+        // Add a single store credit for the total credit amount
+        const [storeCreditResult] = await connection.query(
+            `INSERT INTO store_credits 
+             (customer_name, order_id, credit_amount, credit_date, status, credit_type, description) 
+             VALUES (?, ?, ?, NOW(), 'active', 'return', ?)`,
+            [customerName || null, orderId, totalCreditAmount, `Total credit for returned items`]
+        );
+
+        const creditId = storeCreditResult.insertId; // Fetch the inserted credit ID
+        console.log(`Single store credit issued for total amount: ${totalCreditAmount}, Credit ID: ${creditId}`);
 
         // Commit the transaction
         console.log("Committing transaction...");
         await connection.commit();
         console.log("Transaction committed successfully.");
 
-        // Return a success response
+        // Return a success response with the single credit ID
         const response = {
             message: 'Return processed successfully.',
             totalCreditAmount,
+            creditId, // Single credit ID
         };
         console.log("API Response:", response);
 

@@ -3,7 +3,6 @@ import CloseIcon from '@mui/icons-material/Close';
 import { AddBox, IndeterminateCheckBox, ArrowDropUp, ArrowDropDown, Add } from '@mui/icons-material';
 import styles from '@/components/styles/Form.module.css';
 import { SuccessfulPrompt } from "@/components/prompts/Prompt";
-import ReturnOrder from './ReturnOrder';
 import { formatDate } from '@/lib/dateTimeHelper';
 import CircularIndeterminate from '@/components/loading/Loading';
 import Modal from '@/components/modals/Modal';
@@ -26,21 +25,17 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         const firstName = getCookieValue('first_name');
         const lastName = getCookieValue('last_name');
         const userId = getCookieValue('user_id');
-    
+
         if (firstName && lastName) {
             setCashierName(`${firstName} ${lastName}`);
         } else {
             setCashierName('Unknown Cashier');
         }
-    
+
         if (userId) {
             setEmployeeId(userId);
         }
     }, []);
-
-    const [isReturnModalOpen, setIsReturnModalOpen] = useState(false);
-    const handleOpenReturnModal = () => setIsReturnModalOpen(true);
-    const handleCloseReturnModal = () => setIsReturnModalOpen(false);
 
     const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('Cash');
     const [tenderedAmount, setTenderedAmount] = useState('');
@@ -90,23 +85,23 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
 
     useEffect(() => {
         const updateTime = () => {
-          const now = new Date();
-          const options = {
-            timeZone: 'Asia/Manila',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: true,
-          };
-          const formattedTime = new Intl.DateTimeFormat('en-US', options).format(now);
-          setCurrentTime(formattedTime);
+            const now = new Date();
+            const options = {
+                timeZone: 'Asia/Manila',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true,
+            };
+            const formattedTime = new Intl.DateTimeFormat('en-US', options).format(now);
+            setCurrentTime(formattedTime);
         };
-    
+
         updateTime();
         const intervalId = setInterval(updateTime, 1000);
-    
+
         return () => clearInterval(intervalId);
-      }, []);
+    }, []);
 
     const resetForm = () => {
         setSelectedProducts([]);
@@ -132,7 +127,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         if (successOrderPrompt) {
             const timer = setTimeout(() => {
                 setSuccessOrderPrompt(false);
-            }, 3000);
+            }, 1000);
             return () => clearTimeout(timer);
         }
     }, [successOrderPrompt]);
@@ -592,7 +587,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 </div>
             )}
 
-            {/* Place Order and Return Buttons */}
+            {/* Place Order and New Order Buttons */}
             <div className={styles.buttonsContainer}>
                 <button onClick={handleNewOrder} className={styles.newOrderButton}>
                     New Order
@@ -601,11 +596,6 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 <button onClick={handlePlaceOrder} disabled={isLoading || isPlaceOrderDisabled} className={styles.placeOrderButton}>
                     {isLoading ? 'Placing Order...' : 'Place Order'}
                 </button>
-
-                <button onClick={handleOpenReturnModal} className={styles.returnOrderButton}>
-                    Return Order
-                </button>
-                <ReturnOrder isOpen={isReturnModalOpen} onClose={handleCloseReturnModal} />
             </div>
 
             {/* Success Prompt */}

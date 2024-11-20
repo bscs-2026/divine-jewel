@@ -406,12 +406,6 @@ body.no-scroll {
     margin-top: 1em;
 }
 
-@media print {
-    .printButtonContainer {
-        display: none;
-    }
-}
-
 .printButton {
     padding: 0.5rem 1rem;
     border-radius: 0.75rem;
@@ -501,3 +495,4 @@ body.no-scroll {
     width: 100%;
     box-sizing: border-box;
 }
+
