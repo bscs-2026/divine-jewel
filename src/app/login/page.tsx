@@ -4,7 +4,10 @@ import React, { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../../components/styles/PublicForm.module.css';
 import CircularIndeterminate from '@/components/loading/Loading';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
+
 
 interface Branch {
   id: number;
@@ -17,6 +20,7 @@ export default function LoginPage() {
   const [selectedBranch, setSelectedBranch] = useState<string>('');
   const [username, setUsername] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [isPasswordVisible, setIsPasswordVisible] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
@@ -122,15 +126,27 @@ export default function LoginPage() {
           className={styles.input}
         />
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          className={styles.input}
-        />
+        <div  className={styles.passwordInputContainer}> 
+          <input
+            type={isPasswordVisible ? 'text' : 'password'}
+            name="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className={styles.passwordInput}
+          />
+
+          <button
+            type="button"
+            onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+          >
+            <FontAwesomeIcon
+              icon={isPasswordVisible ? faEyeSlash : faEye}
+              className="text-sm"
+            />
+          </button>
+        </div>
 
         <select
           id="branch"
