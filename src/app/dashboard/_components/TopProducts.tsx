@@ -120,12 +120,12 @@ const TopProducts: FC<BranchesSalesProps> = ({ branches }) => {
   };
 
   return (
-    <div className="bg-white h-[430px] shadow-md w-full rounded-2xl flex flex-col border border-gray-200">
+    <div className="bg-white h-full shadow-md w-full rounded-2xl flex flex-col border border-gray-200">
       <div className="flex flex-row">
         <div className="m-4 font-extrabold text-xl">Top Products</div>
         <div className="m-3">
           <Select value={selectedBranch} onValueChange={setSelectedBranch}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Branch" />
             </SelectTrigger>
             <SelectContent>
@@ -142,7 +142,7 @@ const TopProducts: FC<BranchesSalesProps> = ({ branches }) => {
         </div>
         <div className="m-3">
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-[200px]">
+            <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
             <SelectContent>
@@ -157,9 +157,9 @@ const TopProducts: FC<BranchesSalesProps> = ({ branches }) => {
             </SelectContent>
           </Select>
         </div>
-        <div className="m-3">
+        {/* <div className="m-3">
           <Select>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Theme" />
             </SelectTrigger>
             <SelectContent>
@@ -167,7 +167,7 @@ const TopProducts: FC<BranchesSalesProps> = ({ branches }) => {
               <SelectItem value="monthBased">Selected Month</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </div> */}
       </div>
       <div className="mx-4 gap-2 flex flex-row mb-2">
         <div className="w-full">

@@ -25,8 +25,11 @@ import {
 } from "@/components/ui/chart"
 import TotalSalesChart from './_components/TotalSalesChart';
 import TopProducts from './_components/TopProducts';
-import LocationSales from './_components/LocationSales';
+import LocationSales from './_components/ActiveBranches';
 import { months } from '@/lib/constants';
+import BranchSalesPieChart from './_components/BranchSalesPieChart';
+import { OrdersSummary } from './_components/OrdersSummary';
+import ActiveBranches from './_components/ActiveBranches';
 
 interface Sales {
   order_date: string;
@@ -46,6 +49,13 @@ interface Branches {
   inCharge: string;
 }
 
+export interface BranchesOrders {
+  branch_name: string;
+  branch_code: number;
+  orders_count: number;
+  orders_date: string;
+}
+
 const barChartConfig = {
   sales: {
     label: "Sales",
@@ -63,6 +73,7 @@ export default function Home() {
   const [month, setMonth] = useState<string>(currentMonth);
   const [sales, setSales] = useState<Sales[]>([]);
   const [branches, setBranches] = useState<Branches[]>([]);
+  const [branchesOrders, setBranchesOrders] = useState<BranchesOrders[]>([]);
   const [activeChart, setActiveChart] = useState<keyof typeof barChartConfig>("sales");
 
   useEffect(() => {
@@ -73,6 +84,7 @@ export default function Home() {
   useEffect(() => {
     fetchSales();
     fetchYearlyOrders();
+    fetchBranchSalesData();
   }, [year, month]);
 
   const fetchYearlyOrders = async () => {
@@ -106,6 +118,24 @@ export default function Home() {
       console.error(error.message);
     }
   };
+
+
+  const fetchBranchSalesData = async () => {
+    const monthValue = months.find(m => m.name === month)?.value;
+    const date = `${year}-${monthValue}`;
+    const url = `/api/sales/branchOrders?date=${date}`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error("Failed to fetch branch orders data");
+        }
+        const data = await response.json();
+        setBranchesOrders(data.branchesOrders)
+        console.log(data.branchesOrders)
+    } catch (error: any) {
+        console.error(error.message)
+    }
+  }
   
   const fetchBranchesData = async () => {
     try {
@@ -170,75 +200,6 @@ export default function Home() {
             </Select>
           </div>
         </div>
-        {/* <div>
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                role="combobox"
-                aria-expanded={open}
-                className="w-[250px] h-[48px] justify-between bg-[#FCB6D7] rounded-xl hover:bg-[#FCE4EC]"
-              >
-                {value
-                  ? timePeriod.find((period) => period.value === value)?.label
-                  : "Select Time Period"}
-                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-[200px] p-0">
-              <Command>
-                <CommandList>
-                  <CommandGroup>
-                    {timePeriod.map((period) => (
-                      <CommandItem
-                        key={period.value}
-                        value={period.value}
-                        onSelect={(currentValue) => {
-                          const newValue =
-                            currentValue === value ? "" : currentValue;
-                          setValue(newValue);
-                          setOpen(false);
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4",
-                            value === period.value ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        {period.label}
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Popover>
-        </div> */}
-        {/* <div>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant={"outline"}
-                className={cn(
-                  "w-[280px] justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {date ? format(date, "PPP") : <span>Pick a date</span>}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0">
-              <Calendar
-                mode="single"
-                selected={date}
-                onSelect={setDate}
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-        </div> */}
       </div>
       <div className="flex flex-col gap-2 mx-8 ">
         <div className="bg-gray-100 w-full rounded-2xl">
@@ -249,13 +210,29 @@ export default function Home() {
             setActiveChart={setActiveChart}
           />
         </div>
-        <div>
-          <TopProducts 
-            branches={branches}
-          />
+        <div className='flex flex-row gap-2'>
+          <div className='w-2/3'>
+            <TopProducts
+              branches={branches}
+            />
+          </div>
+          <div className='w-1/3 '>
+              <BranchSalesPieChart 
+                branchesOrders={branchesOrders}
+                year={year}
+                month={month}
+              />
+          </div>
         </div>
-        <div>
-          <LocationSales branches={branches} />
+        <div className='flex flex-row gap-2 mb-4'>
+          <div className='w-1/2'>
+            <ActiveBranches
+              branches={branches}
+            />
+          </div>
+          <div className='w-1/2'>
+            <OrdersSummary />
+          </div>
         </div>
       </div>
     </MainLayout>
