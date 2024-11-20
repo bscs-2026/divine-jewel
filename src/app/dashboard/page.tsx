@@ -150,7 +150,7 @@ export default function Home() {
         <div className="flex flex-row gap-2 m-1">
           <div>
             <Select value={year} onValueChange={setYear}>
-              <SelectTrigger className="w-[180px] h-[40px] ">
+              <SelectTrigger className="w-[180px] h-[50px] ">
                 <SelectValue placeholder="Year">{year}</SelectValue>
               </SelectTrigger>
               <SelectContent>
@@ -166,7 +166,7 @@ export default function Home() {
           </div>
           <div>
             <Select value={month} onValueChange={setMonth}>
-              <SelectTrigger className="w-[180px] h-[40px]">
+              <SelectTrigger className="w-[180px] h-[50px]">
                 <SelectValue placeholder="Month" />
               </SelectTrigger>
               <SelectContent>

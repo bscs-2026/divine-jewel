@@ -30,13 +30,19 @@ const BranchSalesPieChart: FC<BranchSalesPieChartProps> = ({ year, month }) => {
   const [branchesOrders, setBranchesOrders] = useState<BranchesOrders[]>([]);
 
   useEffect(() => {
-    fetchBranchSalesData();
-  }, [year, month]);
+    fetchBranchSalesData(isMonth);
+  }, [year, month, isMonth]);
 
-  const fetchBranchSalesData = async () => {
-    const monthValue = months.find((m) => m.name === month)?.value;
-    const date = `${year}-${monthValue}`;
-    const url = `/api/sales/branchOrders?date=${date}`;
+  const fetchBranchSalesData = async (isMonth: boolean) => {
+    let url;
+    if (isMonth) {
+      const monthValue = months.find((m) => m.name === month)?.value;
+      const date = `${year}-${monthValue}`;
+      url = `/api/sales/branchOrders?date=${date}`;
+    } else {
+      url = `/api/sales/branchOrders?year=${year}`;
+    }
+
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -52,6 +58,7 @@ const BranchSalesPieChart: FC<BranchSalesPieChartProps> = ({ year, month }) => {
 
   const toggleIsMonth = () => {
     setIsMonth((prevIsMonth) => !prevIsMonth);
+    console.log(isMonth)
   };
 
   const pinkShades = [
@@ -96,7 +103,7 @@ const BranchSalesPieChart: FC<BranchSalesPieChartProps> = ({ year, month }) => {
   return (
     <Card className="flex flex-col rounded-xl shadow-md">
       <CardHeader className="items-center pb-0">
-        <CardTitle>Orders Per Branch</CardTitle>
+        <CardTitle className="text-xl font-bold text-gray-600">Orders Per Branch</CardTitle>
         <CardDescription>
           <Button
             className="text-sm text-gray-700 p-2 w-[150px] bg-[#FCE4EC] hover:bg-pink-200"
@@ -124,11 +131,11 @@ const BranchSalesPieChart: FC<BranchSalesPieChartProps> = ({ year, month }) => {
         )}
       </CardContent>
       <CardFooter className="flex-col gap-2 text-sm">
-        <div className="flex items-center gap-2 font-medium leading-none">
+        {/* <div className="flex items-center gap-2 font-medium leading-none">
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
-        </div>
-        <div className="leading-none text-muted-foreground">
-          Showing total orders for the last 6 months
+        </div> */}
+        <div className="leading-none text-muted-foreground mx-6 text-center">
+          Showing total orders per branch for the month of {month} {year}.
         </div>
       </CardFooter>
     </Card>
