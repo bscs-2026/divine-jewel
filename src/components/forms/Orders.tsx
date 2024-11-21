@@ -170,7 +170,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
     };
 
     const handleTenderedAmountChange = (event) => {
-        setTenderedAmount(parseFloat(event.target.value) || 0);
+        setTenderedAmount(parseFloat(event.target.value) || '');
     };
     const handleEWalletProviderChange = (event) => {
         setSelectedEWalletProvider(event.target.value);
@@ -269,7 +269,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 setTenderedAmount(subTotalAmount);
             }
         } else {
-            setTenderedAmount(0);
+            setTenderedAmount('');
         }
     };
 
@@ -345,10 +345,31 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
 
     const change = tenderedAmount > totalAmount ? tenderedAmount - totalAmount : 0;
 
-    // Allow place order when total is zero
-    const isPlaceOrderDisabled = selectedPaymentMethod === 'Cash'
-        ? tenderedAmount < totalAmount && totalAmount !== 0
-        : totalAmount === 0;
+    const [isPlaceOrderDisabled, setIsPlaceOrderDisabled] = useState(true);
+
+    // Validation Logic for Button
+    useEffect(() => {
+        const isOrderValid = () => {
+            // Check if there are items in the order
+            if (!selectedProducts || selectedProducts.length === 0) return false;
+
+            // Check payment validity
+            if (selectedPaymentMethod === 'Cash') {
+                return tenderedAmount >= totalAmount;
+            }
+            if (selectedPaymentMethod === 'E-Wallet') {
+                return !!referenceNumber && !!selectedEWalletProvider && totalAmount > 0; 
+            }
+            if (selectedPaymentMethod === 'Credits') {
+                return appliedCredits >= totalAmount && totalAmount > 0;
+            }
+
+            return false;
+        };
+        setIsPlaceOrderDisabled(!isOrderValid());
+    }, [selectedProducts, selectedPaymentMethod, tenderedAmount, totalAmount, referenceNumber, selectedEWalletProvider, appliedCredits]);
+
+
 
     const handleNewOrder = () => {
         resetForm();
@@ -593,7 +614,11 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                     New Order
                 </button>
 
-                <button onClick={handlePlaceOrder} disabled={isLoading || isPlaceOrderDisabled} className={styles.placeOrderButton}>
+                <button
+                    onClick={handlePlaceOrder}
+                    disabled={isLoading || isPlaceOrderDisabled}
+                    className={styles.placeOrderButton}
+                >
                     {isLoading ? 'Placing Order...' : 'Place Order'}
                 </button>
             </div>

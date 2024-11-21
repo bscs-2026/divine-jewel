@@ -2,7 +2,6 @@
 
 import React from 'react';
 import SearchIcon from '@mui/icons-material/Search';
-import Search from '@/components/filters/SearchFilter';
 import Styles from '../styles/Tabs.module.css';
 import formStyles from '../styles/Form.module.css';
 

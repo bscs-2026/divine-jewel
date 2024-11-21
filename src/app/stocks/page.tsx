@@ -11,13 +11,14 @@ import Modal from '@/components/modals/Modal';
 import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
 import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
 import CircularIndeterminate from '@/components/loading/Loading';
-import { Product, Category } from '@/types';
+import { Product } from '@/types';
 
 interface Stock {
     id: number;
     product_id: number;
     branch_code: number;
     quantity: number;
+    employee_id: number;
     damaged: number;
     product_name: string;
     product_SKU: string;
@@ -49,6 +50,7 @@ interface StockDetails {
     source_branch: number;
     destination_branch: number;
     quantity: number;
+    employee_id: number;
     note: string;
 }
 
@@ -182,6 +184,7 @@ export default function StocksPage() {
                     branch_code: stock.branch_code,
                     quantity: stock.quantity,
                     batch_id,
+                    employee_id: stock.employee_id,
                     note,
 
                 }),
@@ -219,6 +222,7 @@ export default function StocksPage() {
                     branch_code: stock.branch_code,
                     quantity: stock.quantity,
                     batch_id,
+                    employee_id: stock.employee_id,
                     note,
                     stock_out_reason
                 }),
@@ -256,6 +260,7 @@ export default function StocksPage() {
                     branch_code: stock.branch_code,
                     quantity: stock.quantity,
                     batch_id,
+                    employee_id: stock.employee_id,
                     note
                 }),
             });
@@ -305,6 +310,7 @@ export default function StocksPage() {
                     source_branch: stockDetails.source_branch,
                     destination_branch: stockDetails.destination_branch,
                     quantity: stockDetails.quantity,
+                    employee_id: stockDetails.employee_id,
                     note: stockDetails.note,
                     batch_id: stockDetails.batch_id,
                 }),
@@ -401,20 +407,7 @@ export default function StocksPage() {
         }
     };
 
-    const activeProductIds = products.map((product) => product.id);
-
-    const filteredStocks = useMemo(() => {
-        const query = searchQuery.toLowerCase();
-
-        return stocks.filter((stock) => {
-            const branchMatch =
-                filterBranch === null || filterBranch === "All" || stock.branch_code === Number(filterBranch);
-
-            const searchMatch = stock.product_name.toLowerCase().includes(query);
-
-            return branchMatch && searchMatch;
-        });
-    }, [stocks, filterBranch, searchQuery]);
+    // const activeProductIds = products.map((product) => product.id);
 
     const stockSummary = useMemo(() => {
         if (filterBranch === null || filterBranch === "All") {
@@ -430,40 +423,25 @@ export default function StocksPage() {
         return null;
     }, [filterBranch, stocks]);
 
-    // const stockSummary = useMemo(() => {
-    //     if (filterBranch === "All") {
-    //       const filteredStocksForSummary = stocks.filter((stock) =>
-    //         stock.product_name.toLowerCase().includes(searchQuery.toLowerCase())
-    //       );
-      
-    //       const summary: { [key: number]: { [key: number]: number } } = {};
-      
-    //       filteredStocksForSummary.forEach((stock) => {
-    //         if (!summary[stock.product_id]) {
-    //           summary[stock.product_id] = {};
-    //         }
-    //         summary[stock.product_id][stock.branch_code] = stock.quantity;
-    //       });
-      
-    //       return summary;
-    //     }
-    //     return null;
-    //   }, [filterBranch, stocks, searchQuery]);
-      
-    //   const filteredStocksList = useMemo(() => {
-    //     const query = searchQuery.toLowerCase();
-      
-    //     return stocks.filter((stock) => {
-    //       const branchMatch =
-    //         filterBranch === null || filterBranch === "All" || stock.branch_code === Number(filterBranch);
-      
-    //       const searchMatch = stock.product_name.toLowerCase().includes(query);
-      
-    //       return branchMatch && searchMatch;
-    //     });
-    //   }, [stocks, filterBranch, searchQuery]);
-      
-      
+    const filteredData = useMemo(() => {
+        const query = searchQuery.toLowerCase();
+
+        if (stockSummary) {
+            // For the summary view
+            return products.filter((product) =>
+                product.name.toLowerCase().includes(query)
+            );
+        } else {
+            // For the detailed stocks view
+            return stocks.filter((stock) => {
+                const searchMatch = stock.product_name.toLowerCase().includes(query);
+                const branchMatch = filterBranch === "All" || stock.branch_code === Number(filterBranch);
+
+                return searchMatch && branchMatch;
+            });
+        }
+    }, [stocks, stockSummary, products, filterBranch, searchQuery]);
+
 
 
     return (
@@ -486,7 +464,9 @@ export default function StocksPage() {
             />
 
             <StockTable
-                stocks={filteredStocks}
+                // stocks={filteredStocks}
+                stocks={stockSummary ? [] : filteredData}
+                filteredData={filteredData}
                 stockSummary={stockSummary}
                 selectedStocks={selectedStocks}
                 setSelectedStocks={setSelectedStocks}

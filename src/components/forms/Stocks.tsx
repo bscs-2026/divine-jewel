@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import styles from '@/components/styles/Modal.module.css';
 import { ArrowBack } from '@mui/icons-material';
 import { generateBatchID } from '@/lib/generatorHelper';
@@ -82,11 +82,22 @@ const StockForm: React.FC<StockFormProps> = ({
     const [successMessage, setSuccessMessage] = useState("");
     const [batchID, setBatchID] = useState<string>("");
     const [currentTime, setCurrentTime] = useState<string>("");
-    const employeeFullname = getCookieValue("first_name") + " " + getCookieValue("last_name");
+    const [employeeName, setEmployeeName] = useState<string>("");
+    const [employeeId, setEmployeeId] = useState<number | null>(null);
 
     useEffect(() => {
         const newBatchID = generateBatchID();
         setBatchID(newBatchID);
+    }, []);
+
+    useEffect(() => {
+        const firstName = getCookieValue('first_name') || '';
+        const lastName = getCookieValue('last_name') || '';
+        const userName = `${firstName} ${lastName}`.trim();
+        setEmployeeName(userName || 'N/A');
+    
+        const userId = parseInt(getCookieValue('user_id') || '', 10);
+        setEmployeeId(!isNaN(userId) ? userId : null);
     }, []);
 
     useEffect(() => {
@@ -210,6 +221,7 @@ const StockForm: React.FC<StockFormProps> = ({
                         source_branch: parseInt(formData.branch_code),
                         destination_branch: parseInt(destinationBranch),
                         quantity: parseInt(formData.quantity),
+                        employee_id: employeeId,
                         note: note || '',
                     };
                     response = await transferStock(stockDetails);
@@ -226,6 +238,7 @@ const StockForm: React.FC<StockFormProps> = ({
                         product_id: parseInt(formData.product_id),
                         branch_code: parseInt(formData.branch_code),
                         quantity: parseInt(formData.quantity),
+                        employee_id: employeeId,
                     };
                     response = await stockOut(stock, batchID, note, stockOutReason);
                     if (response.ok) {
@@ -237,6 +250,7 @@ const StockForm: React.FC<StockFormProps> = ({
                         product_id: parseInt(formData.product_id),
                         branch_code: parseInt(formData.branch_code),
                         quantity: parseInt(formData.quantity),
+                        employee_id: employeeId,
                     };
                     response = await markDamaged(stock, batchID, note);
                     if (response.ok) {
@@ -248,6 +262,7 @@ const StockForm: React.FC<StockFormProps> = ({
                         product_id: parseInt(formData.product_id),
                         branch_code: parseInt(formData.branch_code),
                         quantity: parseInt(formData.quantity),
+                        employee_id: employeeId,
                     };
                     response = await addStock(stock, batchID, note);
                     if (response.ok) {
@@ -273,7 +288,7 @@ const StockForm: React.FC<StockFormProps> = ({
                     <p>
                         <strong>Date & Time:</strong> {new Date().toLocaleDateString()} {currentTime}
                     </p>
-                    <p><strong>Employee:</strong> {employeeFullname}</p>
+                    <p><strong>Employee:</strong> {employeeName}</p>
                 </div>
                 <br />
 

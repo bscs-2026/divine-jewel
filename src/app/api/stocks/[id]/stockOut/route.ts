@@ -1,11 +1,11 @@
 // src/app/api/stocks/[id]/stockOut/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { query } from '../../../../../lib/db';
+import { query } from '@/lib/db';
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     try {
         const { id } = params;
-        const { branch_code, quantity, stock_out_reason, employee, batch_id, note } = await request.json();
+        const { branch_code, quantity, stock_out_reason, employee_id, batch_id, note } = await request.json();
 
         if (!id || !branch_code || !quantity) {
             return NextResponse.json({ error: 'Product ID, Branch Code, and Quantity are required' }, { status: 400 });
@@ -34,7 +34,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         // Insert the stock out record in stock_details, including the note
         await query(
             'INSERT INTO stock_details (batch_id, action, product_id, source_branch, quantity, employee_id, stock_out_reason, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [batch_id, 'Stock Out', id, branch_code, quantity, employee || 20, stock_out_reason, note || null]
+            [batch_id, 'Stock Out', id, branch_code, quantity, employee_id, stock_out_reason, note || null]
         );
 
         return NextResponse.json({ message: 'Stock out processed successfully' }, { status: 200 });

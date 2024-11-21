@@ -51,9 +51,15 @@ const SupplyForm: React.FC<SupplyFormProps> = ({ addSupply, suppliers, onClose }
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [supplierError, setSupplierError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<{ [index: number]: { [field: string]: string } }>({});
+  const [employeeName, setEmployeeName] = useState<string>('');
 
-  const employeeFullname = getCookieValue('first_name') + ' ' + getCookieValue('last_name');
-  
+  useEffect(() => {
+    const firstName = getCookieValue('first_name') || '';
+    const lastName = getCookieValue('last_name') || '';
+    const userName = `${firstName} ${lastName}`.trim();
+    setEmployeeName(userName || 'N/A');
+}, []);
+
   useEffect(() => {
     const newBatchID = generateBatchID();
     setBatchID(newBatchID);
@@ -207,7 +213,7 @@ const SupplyForm: React.FC<SupplyFormProps> = ({ addSupply, suppliers, onClose }
         <div className={styles.modalSubHeading}>
           <p><strong>Batch ID:</strong> {batchID}</p>
           <p><strong>Date & Time:</strong> {currentTime}</p>
-          <p><strong>Employee:</strong> {employeeFullname}</p>
+          <p><strong>Employee:</strong> {employeeName}</p>
         </div>
         <br />
 

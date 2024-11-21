@@ -82,6 +82,15 @@ const ReturnItemsTabs: React.FC<ReturnItemsProps> = ({
           onClick={handleReturnItemsClick}
           disabled={selectedOrders.length === 0}
         >
+          Customer Credits
+        </button>
+   
+        <button
+          className={`${Styles.tabsContainerItem} ${selectedOrders.length > 0 ? Styles.active : Styles.inactive
+            }`}
+          onClick={handleReturnItemsClick}
+          disabled={selectedOrders.length === 0}
+        >
           Return Items
         </button>
       </div>
