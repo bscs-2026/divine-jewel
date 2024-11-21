@@ -11,7 +11,7 @@ import { getCookieValue } from '@/lib/clientCookieHelper';
 
 
 const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) => {
-    const [cashierName, setCashierName] = useState('Unknown Cashier');
+    const [employeeName, setEmployeeName] = useState('Unknown Cashier');
     const [employeeId, setEmployeeId] = useState(null);
     const [productQuantities, setProductQuantities] = useState(
         selectedProducts.reduce((acc, product) => {
@@ -27,9 +27,9 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         const userId = getCookieValue('user_id');
 
         if (firstName && lastName) {
-            setCashierName(`${firstName} ${lastName}`);
+            setEmployeeName(`${firstName} ${lastName}`);
         } else {
-            setCashierName('Unknown Cashier');
+            setEmployeeName('N/A');
         }
 
         if (userId) {
@@ -363,7 +363,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                     <div className={styles.headerLeft}>
                         <div className={styles.heading2}>Current Order</div>
                     </div>
-                    <div className={styles.primary}>Cashier: {cashierName}</div>
+                    <div className={styles.primary}>Cashier: {employeeName}</div>
                     <div className={styles.primary}>Date & Time: {new Date().toLocaleDateString()} {currentTime}</div>
                     <div className={styles.primary}>
                         {(selectedBranch?.branch_name || 'No Branch') + ', ' + (selectedBranch?.branch_address || 'No Address')}

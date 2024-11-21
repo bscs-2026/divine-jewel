@@ -6,8 +6,6 @@ import styles from '../../components/styles/PublicForm.module.css';
 import CircularIndeterminate from '@/components/loading/Loading';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
-import Image from "next/image";
-
 
 interface Branch {
   id: number;
@@ -33,9 +31,9 @@ export default function LoginPage() {
         });
         if (response.ok) {
           console.log('Session cleared via /api/auth/logout');
-        // } else {
-        //     console.error('Failed to clear session on /login');
-        //
+          // } else {
+          //     console.error('Failed to clear session on /login');
+          //
         }
       } catch (error) {
         console.error('Error clearing session:', error);
@@ -81,10 +79,19 @@ export default function LoginPage() {
       });
 
       if (response.ok) {
-        // Add a 1-second delay before redirecting
-        setTimeout(() => {
-          router.push('/dashboard');
-        }, 1000);
+        const responseData = await response.json();
+        const roleId = responseData.role_id;
+
+        if (roleId === 1 || roleId === 2) {
+          setTimeout(() => {
+            router.push('/dashboard');
+          }, 1000);
+        } else {
+          setTimeout(() => {
+            router.push('/orders');
+          }, 1000);
+        }
+
       } else {
         console.error('Failed to log in');
         const errorResponse = await response.json();
@@ -95,10 +102,13 @@ export default function LoginPage() {
       console.error('Error during login:', error);
       alert('An unexpected error occurred.');
       setLoading(false);
+    } finally {
+      setLoading(false);
     }
   }
 
   const isButtonDisabled = loading || !username || !password || !selectedBranch;
+
 
   return (
     <div className={styles.loginContainer}>
@@ -126,7 +136,7 @@ export default function LoginPage() {
           className={styles.input}
         />
 
-        <div  className={styles.passwordInputContainer}> 
+        <div className={styles.passwordInputContainer}>
           <input
             type={isPasswordVisible ? 'text' : 'password'}
             name="password"

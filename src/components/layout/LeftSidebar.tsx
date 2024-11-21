@@ -1,14 +1,12 @@
-// src/components/layout/LeftSidebar.tsx
-
-// This component ensures it runs only on the client side using a React component structure.
-import React from 'react';
-import { useState } from 'react';
-import { useRouter } from 'next/navigation'; // Use `next/navigation` for App Router
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartLine, faMoneyCheck, faHistory, faBox, faBoxes, faWarehouse, faUsers, faHeartCrack } from '@fortawesome/free-solid-svg-icons';
-import styles from '../styles/Layout.module.css';
+import styles from '@/components/styles/Layout.module.css';
 import CircularIndeterminate from '@/components/loading/Loading';
+import { getCookieValue } from '@/lib/clientCookieHelper';
+import { hasAccess } from '@/lib/pageAccessHelper';
 
 interface LeftSidebarProps {
   onSelectTitle: (title: string) => void;
@@ -16,7 +14,15 @@ interface LeftSidebarProps {
 
 const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
   const [loading, setLoading] = useState<boolean>(false);
-  const router = useRouter(); // Call `useRouter` directly for client-side navigation
+  const [employeeFirstName, setEmployeeFirstName] = useState<string | null>(null);
+  const [roleId, setRoleId] = useState<number | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    setEmployeeFirstName(getCookieValue('first_name'));
+    const role = parseInt(getCookieValue('role_id') || '0', 10);
+    setRoleId(role);
+  }, []);
 
   const handleLogout = async () => {
     setLoading(true);
@@ -26,7 +32,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
       });
 
       if (response.ok) {
-        router.push('/login'); // Navigate to login after successful logout
+        router.push('/login');
       } else {
         console.error('Failed to log out');
       }
@@ -35,6 +41,21 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Conditionally render navigation items based on access
+  const renderNavItem = (path: string, title: string, icon: any) => {
+    if (roleId && hasAccess(roleId, path)) {
+      return (
+        <li className={styles.navItem} onClick={() => onSelectTitle(title)}>
+          <Link href={path}>
+            <FontAwesomeIcon icon={icon} className={styles.icon} />
+            {title}
+          </Link>
+        </li>
+      );
+    }
+    return null; // Do not render if access is not allowed
   };
 
   return (
@@ -49,65 +70,25 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
             alt="Divine"
             className={`${styles.avatar} rounded-full`}
           />
-          <p className={`${styles.greeting} text-black`}>Hello, Divine!</p>
+          <p className={`${styles.greeting} text-black`}>
+            {employeeFirstName ? `Hello, ${employeeFirstName}!` : 'Loading...'}
+          </p>
         </div>
         <ul className={`${styles.navList}`}>
-          <li className={styles.navItem} onClick={() => onSelectTitle('Dashboard')}>
-            <Link href="/dashboard">
-              <FontAwesomeIcon icon={faChartLine} className={styles.icon} />
-              Dashboard
-            </Link>
-          </li>
-          <li className={styles.navItem} onClick={() => onSelectTitle('Orders')}>
-            <Link href="/orders">
-              <FontAwesomeIcon icon={faMoneyCheck} className={styles.icon} />
-              Orders
-            </Link>
-          </li>
-          <li className={styles.navItem} onClick={() => onSelectTitle('Products')}>
-            <Link href="/products">
-              <FontAwesomeIcon icon={faBox} className={styles.icon} />
-              Products
-            </Link>
-          </li>
-          <li className={styles.navItem} onClick={() => onSelectTitle('Stocks')}>
-            <Link href="/stocks">
-              <FontAwesomeIcon icon={faBoxes} className={styles.icon} />
-              Stocks
-            </Link>
-          </li>
-          <li className={styles.navItem} onClick={() => onSelectTitle('Supplies')}>
-            <Link href="/supplies">
-              <FontAwesomeIcon icon={faWarehouse} className={styles.icon} />
-              Supplies
-            </Link>
-          </li>
-          <li className={styles.navItem} onClick={() => onSelectTitle('Employees')}>
-            <Link href="/employees">
-              <FontAwesomeIcon icon={faUsers} className={styles.icon} />
-              Employees
-            </Link>
-          </li>
-          <li className={styles.navItem} onClick={() => onSelectTitle('History')}>
-            <Link href="/history">
-              <FontAwesomeIcon icon={faHistory} className={styles.icon} />
-              History
-            </Link>
-          </li>
-          <li className={styles.navItem} onClick={() => onSelectTitle('Return Items')}>
-            <Link href="/return">
-              <FontAwesomeIcon icon={faHeartCrack} className={styles.icon} />
-              Returns
-            </Link>
-          </li>
+          {renderNavItem('/dashboard', 'Dashboard', faChartLine)}
+          {renderNavItem('/orders', 'Orders', faMoneyCheck)}
+          {renderNavItem('/products', 'Products', faBox)}
+          {renderNavItem('/stocks', 'Stocks', faBoxes)}
+          {renderNavItem('/supplies', 'Supplies', faWarehouse)}
+          {renderNavItem('/employees', 'Employees', faUsers)}
+          {renderNavItem('/history', 'History', faHistory)}
+          {renderNavItem('/returns', 'Returns', faHeartCrack)}
         </ul>
       </div>
       <button className={`${styles.logoutButton} mt-auto mx-auto`} onClick={handleLogout}>
         Logout
       </button>
-      {loading && (
-        <CircularIndeterminate />
-      )}
+      {loading && <CircularIndeterminate />}
     </div>
   );
 };

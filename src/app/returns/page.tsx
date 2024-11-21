@@ -7,6 +7,7 @@ import RecentOrders from '@/components/tables/OrdersOnReturnItems';
 import ReturnItemsTabs from '@/components/tabs/ReturnItems';
 import { SuccessfulPrompt } from '@/components/prompts/Prompt';
 import { getCookieValue } from '@/lib/clientCookieHelper';
+import styles from '@/components/styles/Filter.module.css';
 
 interface OrderDetail {
   order_id: number;
@@ -32,6 +33,12 @@ export default function OrdersPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedOrders, setSelectedOrders] = useState<OrderDetail[]>([]);
   const [successReturnPrompt, setSuccessReturnPrompt] = useState(false);
+  const [userBranchName, setUserBranchName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const branch = getCookieValue('branch_name');
+    setUserBranchName(branch);
+  }, []);
 
   useEffect(() => {
     fetchOrders();
@@ -106,12 +113,15 @@ export default function OrdersPage() {
   };
 
 
-
   return (
     <Layout defaultTitle="Return Items">
       {loading && <Spinner />}
       {error && <p className="error-message">{error}</p>}
-
+      <div>
+        <p className={styles.secondaryHeading}>
+          <strong>{userBranchName}</strong>
+        </p>
+      </div>
       <ReturnItemsTabs
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
@@ -119,13 +129,13 @@ export default function OrdersPage() {
         selectedOrders={selectedOrders}
         returnItem={handleReturnItems}
       />
-
+  
       <RecentOrders
         Orderss={filteredOrders}
         selectedOrders={selectedOrders}
         setSelectedOrders={setSelectedOrders}
       />
-
+  
       <SuccessfulPrompt
         message="Items successfully returned!"
         isVisible={successReturnPrompt}
@@ -133,4 +143,4 @@ export default function OrdersPage() {
       />
     </Layout>
   );
-}
+}  

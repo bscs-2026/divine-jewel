@@ -38,11 +38,11 @@ export async function POST(req: NextRequest) {
     }
 
     // Create JWT payload
-    const payload = { 
-      id: user.id, 
-      username: user.username, 
-      role_id: user.role_id, 
-      branch_id: branchData.id 
+    const payload = {
+      id: user.id,
+      username: user.username,
+      role_id: user.role_id,
+      branch_id: branchData.id
     };
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
 
@@ -56,7 +56,15 @@ export async function POST(req: NextRequest) {
     );
 
     // Set JWT and other session data in the response cookies
-    const response = NextResponse.json({ success: true, userId: user.id }, { status: 200 });
+    const response = NextResponse.json({
+      success: true,
+      userId: user.id,
+      role_id: user.role_id,
+      branch_id: branchData.id,
+      first_name: user.first_name,
+      last_name: user.last_name,
+    }, { status: 200 });
+
     const cookieOptions = {
       maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
       httpOnly: true,
