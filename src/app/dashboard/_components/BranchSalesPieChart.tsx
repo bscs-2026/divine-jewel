@@ -58,7 +58,6 @@ const BranchSalesPieChart: FC<BranchSalesPieChartProps> = ({ year, month }) => {
 
   const toggleIsMonth = () => {
     setIsMonth((prevIsMonth) => !prevIsMonth);
-    console.log(isMonth)
   };
 
 
