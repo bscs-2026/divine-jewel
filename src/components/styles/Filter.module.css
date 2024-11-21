@@ -1,0 +1,25 @@
+.heading {
+    color: #575757;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .secondaryHeading {
+    color: #575757;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-top: 0rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .select {
+    width: 300px;
+    max-width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #DDDDDD;
+    border-radius: 0.5rem;
+    color: #575757;
+    font-size: 13px;
+  }

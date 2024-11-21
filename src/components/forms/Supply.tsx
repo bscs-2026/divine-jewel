@@ -4,6 +4,7 @@ import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import styles from '@/components/styles/Modal.module.css';
 import { formatDate } from '@/lib/dateTimeHelper';
+import { getCookieValue } from '@/lib/clientCookieHelper';
 
 interface Supplier {
   id: number;
@@ -51,8 +52,8 @@ const SupplyForm: React.FC<SupplyFormProps> = ({ addSupply, suppliers, onClose }
   const [supplierError, setSupplierError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<{ [index: number]: { [field: string]: string } }>({});
 
-  const employeeFullname = 'Divine Villanueva';
-
+  const employeeFullname = getCookieValue('first_name') + ' ' + getCookieValue('last_name');
+  
   useEffect(() => {
     const newBatchID = generateBatchID();
     setBatchID(newBatchID);

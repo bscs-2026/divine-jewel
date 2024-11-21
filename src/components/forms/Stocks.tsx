@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styles from '@/components/styles/Modal.module.css';
 import { ArrowBack } from '@mui/icons-material';
 import { generateBatchID } from '@/lib/generatorHelper';
+import { getCookieValue } from '@/lib/clientCookieHelper';
 
 interface Stock {
     id: number;
@@ -18,7 +19,7 @@ interface Stock {
 }
 
 interface StockDetails {
-    batch_id: string; // Updated to string for alphanumeric batch_id
+    batch_id: string;
     product_id: number;
     source_branch: number;
     destination_branch: number;
@@ -81,7 +82,7 @@ const StockForm: React.FC<StockFormProps> = ({
     const [successMessage, setSuccessMessage] = useState("");
     const [batchID, setBatchID] = useState<string>("");
     const [currentTime, setCurrentTime] = useState<string>("");
-    const employeeFullname = 'Divine Villanueva';
+    const employeeFullname = getCookieValue("first_name") + " " + getCookieValue("last_name");
 
     useEffect(() => {
         const newBatchID = generateBatchID();
@@ -370,7 +371,7 @@ const StockForm: React.FC<StockFormProps> = ({
                                             : undefined // No max for add stock
                                     }
                                     placeholder={' qty.'}
-                                    
+
                                 />
                                 {errors[index] && <p className={styles.modalErrorText}>{errors[index]}</p>}
                             </div>
