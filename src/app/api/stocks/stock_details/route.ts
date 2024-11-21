@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { query } from '../../../../lib/db';
+import { query } from '@/lib/db';
 
 export async function GET() {
     try {
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
         console.log('Adding stock details to database...');
         const result = await query(
             'INSERT INTO `stock_details` (batch_id, action, product_id, source_branch, destination_branch, quantity, employee_id, note) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [batch_id, 'Transfer', product_id, source_branch, destination_branch, quantity, employee_id || 20, note || null]
+            [batch_id, 'Transfer', product_id, source_branch, destination_branch, quantity, employee_id, note || null]
         );
         console.log('Added stock_details:', result);
 

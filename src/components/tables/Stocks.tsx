@@ -36,13 +36,14 @@ interface Branch {
 interface StockTableProps {
   stocks: Stock[];
   stockSummary: { [key: number]: { [key: number]: number } } | null;
+  filteredData: Product[];
   selectedStocks: Stock[];
   setSelectedStocks: (stocks: Stock[]) => void;
   products: Product[];
   branches: Branch[];
 }
 
-const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedStocks, setSelectedStocks, products, branches }) => {
+const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, filteredData, selectedStocks, setSelectedStocks, products, branches }) => {
   const [selectAll, setSelectAll] = useState(false);
   const [sortConfig, setSortConfig] = useState<{ key: keyof Stock; direction: 'asc' | 'desc' }>({
     key: 'product_name',
@@ -56,7 +57,7 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
   // Define columns for the table
   const columns = useMemo(
     () => [
-      { Header: 'Product Name', accessor: 'product_name' as keyof Stock, align: 'left' },
+      { Header: 'Product', accessor: 'product_name' as keyof Stock, align: 'left' },
       { Header: 'SKU', accessor: 'product_SKU' as keyof Stock, align: 'left' },
       // { Header: 'Category', accessor: 'category_name' as keyof Stock, align: 'left' },
       { Header: 'Size', accessor: 'product_size' as keyof Stock, align: 'left' },
@@ -84,19 +85,44 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
     [branches]
   );
 
-  // Handle sorting logic
+  // Sort stocks for the detailed view
   const sortedStocks = useMemo(() => {
-    const sortedData = [...stocks];
-    sortedData.sort((a, b) => {
-      const valueA = a[sortConfig.key] ?? ''
-      const valueB = b[sortConfig.key] ?? ''
+    const dataToSort = [...stocks];
+    dataToSort.sort((a, b) => {
+      const valueA = a[sortConfig.key] ?? '';
+      const valueB = b[sortConfig.key] ?? '';
 
       if (valueA < valueB) return sortConfig.direction === 'asc' ? -1 : 1;
       if (valueA > valueB) return sortConfig.direction === 'asc' ? 1 : -1;
       return 0;
     });
-    return sortedData;
+    return dataToSort;
   }, [stocks, sortConfig]);
+
+  // Sort filteredData for the summary view
+  const sortedFilteredData = useMemo(() => {
+    const dataToSort = [...filteredData];
+    dataToSort.sort((a, b) => {
+      let valueA, valueB;
+
+      // Check if sorting by a branch column
+      if (typeof summarySortConfig.key === 'number') {
+        const branchA = stockSummary[a.id]?.[summarySortConfig.key] || 0;
+        const branchB = stockSummary[b.id]?.[summarySortConfig.key] || 0;
+        valueA = branchA;
+        valueB = branchB;
+      } else {
+        // Sorting by static columns like `name` or `SKU`
+        valueA = a[summarySortConfig.key] ?? '';
+        valueB = b[summarySortConfig.key] ?? '';
+      }
+
+      if (valueA < valueB) return summarySortConfig.direction === 'asc' ? -1 : 1;
+      if (valueA > valueB) return summarySortConfig.direction === 'asc' ? 1 : -1;
+      return 0;
+    });
+    return dataToSort;
+  }, [filteredData, summarySortConfig, stockSummary]);
 
   // Handle column header click for sorting
   const handleSort = (key: keyof Stock) => {
@@ -137,14 +163,14 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
     return summaryData;
   }, [products, branches, stockSummary, summarySortConfig]);
 
-    // Handle sorting in Stock Summary table
-    const handleSummarySort = (key: keyof Product | number) => {
-      let direction: 'asc' | 'desc' = 'asc';
-      if (summarySortConfig.key === key && summarySortConfig.direction === 'asc') {
-        direction = 'desc';
-      }
-      setSummarySortConfig({ key, direction });
-    };
+  // Handle sorting in Stock Summary table
+  const handleSummarySort = (key: keyof Product | number) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (summarySortConfig.key === key && summarySortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSummarySortConfig({ key, direction });
+  };
 
   // Handle individual row selection
   const handleRowSelect = (stock: Stock) => {
@@ -213,21 +239,21 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
       <table className={styles.table}>
         {stockSummary ? (
           <thead>
-          <tr>
-            {summaryColumns.map((column) => (
-              <th
-                key={column.accessor as string}
-                onClick={() => handleSummarySort(column.accessor)}
-                className={`${styles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign}`}
-              >
-                <div className={styles.sortContent}>
-                  {column.Header}
-                  {renderSummarySortIcon(column.accessor)}
-                </div>
-              </th>
-            ))}
-          </tr>
-        </thead>
+            <tr>
+              {summaryColumns.map((column) => (
+                <th
+                  key={column.accessor as string}
+                  onClick={() => handleSummarySort(column.accessor)}
+                  className={`${styles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign}`}
+                >
+                  <div className={styles.sortContent}>
+                    {column.Header}
+                    {renderSummarySortIcon(column.accessor)}
+                  </div>
+                </th>
+              ))}
+            </tr>
+          </thead>
         ) : (
           <thead>
             <tr>
@@ -258,13 +284,16 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
 
         <tbody>
           {stockSummary
-            ? sortedStockSummary.map((product) => (
-              <tr key={product.id} className={styles.tableRow}>
+            ? sortedFilteredData.map((product) => (
+              <tr key={product.id} className={styles.tableRow} style={{ cursor: 'default' }}>
                 <td className={styles.td}>{product.name}</td>
-                <td className={styles.td}>{product.SKU || 'Unknown'}</td>
-                {product.branches.map((branch) => (
-                  <td key={branch.branchId} className={`${styles.td} ${styles.rightAlign}`}>
-                    {branch.quantity}
+                <td className={styles.td}>{product.SKU || 'N/A'}</td>
+                {branches.map((branch) => (
+                  <td
+                    key={branch.id}
+                    className={`${styles.td} ${styles.rightAlign}`}
+                  >
+                    {stockSummary[product.id]?.[branch.id] || 0}
                   </td>
                 ))}
               </tr>
@@ -274,7 +303,6 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
                 key={stock.id}
                 className={styles.tableRow}
                 onClick={() => handleRowSelect(stock)}
-                style={{ cursor: 'pointer' }}
               >
                 <td>
                   <input
@@ -285,22 +313,24 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, selectedS
                   />
                 </td>
                 <td className={styles.td}>{stock.product_name}</td>
-                <td className={styles.td}>{stock.product_SKU || 'Unknown'}</td>
-                <td className={styles.td}>{stock.product_size || 'Unknown'}</td>
-                <td className={styles.td}>{stock.product_color || 'Unknown'}</td>
-                <td className={styles.td}>{stock.branch_name || 'Unknown'}</td>
+                <td className={styles.td}>{stock.product_SKU || 'N/A'}</td>
+                <td className={styles.td}>{stock.product_size || 'N/A'}</td>
+                <td className={styles.td}>{stock.product_color || 'N/A'}</td>
+                <td className={styles.td}>{stock.branch_name || 'N/A'}</td>
                 <td className={`${styles.td} ${styles.rightAlign}`}>
                   {stock.quantity}
                 </td>
                 <td className={`${styles.td} ${styles.rightAlign}`}>
                   {stock.damaged}
                 </td>
-                <td className={`{styles.td} ${styles.rightAlign}`}>{formatDate(stock.last_updated, 'Asia/Manila')}</td>
+                <td
+                  className={`{styles.td} ${styles.rightAlign}`}
+                >
+                  {formatDate(stock.last_updated, 'Asia/Manila')}
+                </td>
               </tr>
             ))}
         </tbody>
-
-
       </table>
     </div>
   );

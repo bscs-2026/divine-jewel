@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import Layout from '@/components/layout/Layout';
 import SupplyTable from '@/components/tables/Supply';
 import SupplierTabs from '@/components/tabs/SupplierTabs';
@@ -11,7 +11,6 @@ import SupplyBatchForm from '@/components/forms/SupplyBatch';
 import { generateBatchID } from '@/lib/generatorHelper';
 import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
 import CircularIndeterminate from '@/components/loading/Loading';
-
 
 interface Supplier {
   id: number;
@@ -40,7 +39,6 @@ const SuppliesPage: React.FC = () => {
   const [successDeleteSupplierPrompt, setSuccessDeleteSupplierPrompt] = useState<boolean>(false);
   const [successEditSupplierPrompt, setSuccessEditSupplierPrompt] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-
 
   useEffect(() => {
     fetchSuppliers();
