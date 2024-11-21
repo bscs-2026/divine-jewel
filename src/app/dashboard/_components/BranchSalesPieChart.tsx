@@ -1,5 +1,5 @@
 "use client";
-import { TrendingUp } from "lucide-react";
+import { pinkShades } from "@/lib/constants";
 import { BranchesOrders } from "../page";
 import { Pie, PieChart } from "recharts";
 import {
@@ -61,28 +61,6 @@ const BranchSalesPieChart: FC<BranchSalesPieChartProps> = ({ year, month }) => {
     console.log(isMonth)
   };
 
-  const pinkShades = [
-    "#ffb3c6",
-    "#ffccd5",
-    "#ffe0e6",
-    "#ff99af",
-    "#ff6f91",
-    "#fcb8c7",
-    "#fcdbdf",
-    "#fdf1f4",
-    "#fc8fb2",
-    "#fa678e",
-    "#ffa6c1",
-    "#ffc4d6",
-    "#ffe4e8",
-    "#ff8db0",
-    "#ff5e87",
-    "#fc9fb5",
-    "#fcb4c5",
-    "#ffd2d8",
-    "#fb859f",
-    "#f94d78",
-  ];
 
   const ChartData = branchesOrders.map((branch, index) => ({
     branch: branch.branch_name,

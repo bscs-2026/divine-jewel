@@ -16,7 +16,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="bg-white">
+    <html lang="en" className="bg-white" >
       {/* Apply Poppins font to the entire body */}
       <body className={poppins.className}>{children}</body>
     </html>

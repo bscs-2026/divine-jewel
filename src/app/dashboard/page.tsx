@@ -211,7 +211,9 @@ export default function Home() {
             />
           </div>
           <div className='w-1/2'>
-            <OrdersSummary />
+            <OrdersSummary 
+              year={year}
+            />
           </div>
         </div>
       </div>

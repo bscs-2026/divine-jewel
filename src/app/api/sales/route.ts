@@ -26,7 +26,6 @@ export async function GET(request: Request) {
                 order_date`,
             [year, month]
         );
-        console.log('Fetched orders:', data);
         return NextResponse.json({ Orders: data }, { status: 200 });
     } catch (error: any) {
         console.error('An error occurred while fetching orders:', error);

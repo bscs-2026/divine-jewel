@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { TrendingUp } from "lucide-react"
-import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts"
+import { TrendingUp } from "lucide-react";
+import { CartesianGrid, LabelList, Line, LineChart, XAxis } from "recharts";
 
 import {
   Card,
@@ -10,53 +10,113 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card"
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-import { FC, useState } from "react"
+} from "@/components/ui/chart";
+import { FC, useEffect, useState } from "react";
+import { months } from "@/lib/constants";
+import { Button } from "@/components/ui/button";
 
 const chartData = [
-  { month: "January", desktop: 186 },
-  { month: "February", desktop: 305 },
-  { month: "March", desktop: 237 },
-  { month: "April", desktop: 73 },
-  { month: "May", desktop: 209 },
-  { month: "June", desktop: 214 },
-]
+  { month: "January", orders: 5 },
+  { month: "February", orders: 113 },
+  { month: "March", orders: 1 },
+  { month: "April", orders: 73 },
+  { month: "May", orders: 209 },
+  { month: "June", orders: 214 },
+  { month: "July", orders: 87 },
+  { month: "August", orders: 2 },
+  { month: "September", orders: 0 },
+  { month: "October", orders: 0 },
+  { month: "November", orders: 0 },
+  { month: "December", orders: 0 },
+];
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
-    color: "hsl(var(--chart-1))",
+  orders: {
+    label: "orders",
+    color: "#FCB6D7",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 interface OrdersSummaryProps {
   year: string;
 }
 
-interface OrdersSummary{
-  
+interface OrdersSummary {
+  order_date: string;
+  orders_count: number;
 }
 
 export const OrdersSummary: FC<OrdersSummaryProps> = ({ year }) => {
   const [ordersSummary, setOrdersSummary] = useState<OrdersSummary[]>([]);
+  const [isYear, setIsYear] = useState<boolean>(true);
+
+  useEffect(() => {
+    fetchOrdersSummary();
+  }, []);
+
+  const fetchOrdersSummary = async () => {
+    const url = `/api/sales/ordersSummary?year=${year}`;
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Failed to fetch orders summary data");
+      }
+      const data = await response.json();
+      setOrdersSummary(data.ordersSummary);
+      console.log(data.ordersSummary);
+    } catch (error: any) {
+      console.error(error.message);
+    }
+  };
+
+  const monthsSummary = ordersSummary.map((order) => {
+    const [yearValue, monthValue] = order.order_date.split("-");
+    const monthName =
+      months.find((m) => m.value === monthValue)?.name || monthValue;
+    return {
+      month: monthName,
+      orders: order.orders_count,
+    };
+  });
+
+  const toggleIsYear = () => {
+    setIsYear((prevIsYear) => !prevIsYear);
+
+  }
 
   return (
-    <Card className="shadow-md">
+    <Card className="shadow-md ">
       <CardHeader>
-        <CardTitle className="text-xl font-bold text-gray-600">Orders Summary</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
+        <div className="flex flex-row">
+          <div>
+            <CardTitle className="text-xl font-bold text-gray-600">
+              Orders Summary
+            </CardTitle>
+            <CardDescription>
+              {isYear ? `The count of Orders for ${year}.` : "The count of Orders for all years."}
+            </CardDescription>
+          </div>
+            <div className="ml-auto">
+            <Button
+              className="text-sm text-gray-700 p-2 w-[130px] h-[50px] bg-[#FCE4EC] hover:bg-pink-200"
+              onClick={toggleIsYear}
+            >
+              {isYear ? year : "All Years"}
+            </Button>
+            </div>
+        </div>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
           <LineChart
             accessibilityLayer
-            data={chartData}
+            data={monthsSummary}
             margin={{
               top: 20,
               left: 12,
@@ -76,12 +136,12 @@ export const OrdersSummary: FC<OrdersSummaryProps> = ({ year }) => {
               content={<ChartTooltipContent indicator="line" />}
             />
             <Line
-              dataKey="desktop"
+              dataKey="orders"
               type="natural"
-              stroke="var(--color-desktop)"
+              stroke="var(--color-orders)"
               strokeWidth={2}
               dot={{
-                fill: "var(--color-desktop)",
+                fill: "var(--color-orders)",
               }}
               activeDot={{
                 r: 6,
@@ -106,5 +166,5 @@ export const OrdersSummary: FC<OrdersSummaryProps> = ({ year }) => {
         </div>
       </CardFooter> */}
     </Card>
-  )
-}
+  );
+};
