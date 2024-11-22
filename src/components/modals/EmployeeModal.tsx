@@ -150,8 +150,8 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
     if (!formData.password) {
       errors.password = "Password is required";
       isValid = false;
-      if (formData.password.length < 6) {
-        errors.password = "Password must be at least 6 characters long";
+      if (formData.password.length < 8) {
+        errors.password = "Password must be at least 8 characters long";
         isValid = false;
       }
     }
