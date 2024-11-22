@@ -61,20 +61,6 @@ const InformationModal: React.FC<InformationModalProps> = ({ isInfoModalOpen, on
                     <div>
                         <strong>Username:</strong> {employee.username}
                     </div>
-                    <div className="flex items-center justify-between">
-                        <strong>Password:</strong>
-                        <div className="flex items-center w-full ml-2">
-                            <span className="flex-1">
-                                {showPassword ? employee.password : '********'}
-                            </span>
-                            <button
-                                className="ml-2 text-[#575757] hover:text-[#FCB6D7]"
-                                onClick={togglePasswordVisibility}
-                            >
-                                <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-                            </button>
-                        </div>
-                    </div>
                 </div>
                 <button
                     className="mt-4 px-4 py-2 rounded-full text-[#575757] bg-[#FCB6D7] hover:bg-[#FFE7EF]"

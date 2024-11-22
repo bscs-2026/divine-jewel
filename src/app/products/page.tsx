@@ -8,9 +8,10 @@ import ProductTable from '@/components/tables/Products';
 import CategoryTabs from '@/components/tabs/CategoryTabs';
 import ProductForm from '@/components/forms/Products';
 import ManageCategories from '@/components/forms/ManageCategories';
-import { DeletePrompt, SuccessfulPrompt } from '@/components/prompts/Prompt';
+import { DeletePrompt, SuccessfulPrompt, ErrorPrompt } from '@/components/prompts/Prompt';
 import CircularIndeterminate from '@/components/loading/Loading';
 import Modal from '@/components/modals/Modal';
+import { set } from 'date-fns';
 
 interface Product {
   id: number;
@@ -49,6 +50,7 @@ export default function ProductsPage() {
   const [sucessAddCateory, setSuccessAddCategory] = useState<boolean>(false);
   const [successEditCategory, setSuccessEditCategory] = useState<boolean>(false);
   const [successDeleteCategory, setSuccessDeleteCategory] = useState<boolean>(false);
+  const [ErrorDeleteCategory, setErrorDeleteCategory] = useState<boolean>(false);
 
   useEffect(() => {
     fetchProducts();
@@ -132,6 +134,7 @@ export default function ProductsPage() {
       setSuccessDeleteCategory(true);
     } catch (error: any) {
       setError(error.message);
+      setErrorDeleteCategory(true);
     } finally {
       setLoading(false);
     }
@@ -342,6 +345,7 @@ export default function ProductsPage() {
         <ProductForm
           categories={categories}
           currentProduct={currentProduct}
+          products={products}
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
           editingProduct={editingProduct}
@@ -395,6 +399,11 @@ export default function ProductsPage() {
         message="Category deleted successfully"
         isVisible={successDeleteCategory}
         onClose={() => setSuccessDeleteCategory(false)}
+      />
+      <ErrorPrompt
+        message="Failed to delete category"
+        isVisible={ErrorDeleteCategory}
+        onClose={() => setErrorDeleteCategory(false)}
       />
     </Layout>
   );

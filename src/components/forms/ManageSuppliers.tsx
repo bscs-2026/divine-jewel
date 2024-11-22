@@ -70,7 +70,7 @@ const ManageSuppliers: React.FC<ManageSuppliersProps> = ({
     }
 
     if (!formData.contact_info?.trim()) {
-      newErrors.contact_info = 'Contact info is required';
+      newErrors.contact_info = 'Contact Person Name is required';
       formIsValid = false;
     }
 
@@ -165,7 +165,7 @@ const ManageSuppliers: React.FC<ManageSuppliersProps> = ({
 
             <input
               type="text"
-              placeholder={errors.contact_info || 'Contact Info'}
+              placeholder={errors.contact_info || 'Contact Person Name'}
               value={formData.contact_info}
               onChange={(e) => {
                 setFormData({ ...formData, contact_info: e.target.value });

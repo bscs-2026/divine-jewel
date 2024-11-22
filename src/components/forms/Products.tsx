@@ -15,6 +15,7 @@ interface ProductFormProps {
   saveProduct: (product: Product) => void;
   onClose: () => void;
   loading: boolean;
+  products: Product[];
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({
@@ -27,6 +28,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
   addProduct,
   saveProduct,
   onClose,
+  loading,
+  products,
 }) => {
   const [productSKU, setProductSKU] = useState<string>('');
   const [productName, setProductName] = useState<string>('');
@@ -176,6 +179,20 @@ const ProductForm: React.FC<ProductFormProps> = ({
       formIsValid = false;
     }
 
+    // Check for duplicates
+    const isDuplicate = products.some(
+      (product) =>
+        product.name.toLowerCase() === productName.toLowerCase() &&
+        product.size === productSize &&
+        product.color.toLowerCase() === productColor.toLowerCase() &&
+        (!editingProduct || product.id !== currentProduct?.id) // Exclude current product in edit mode
+    );
+
+    if (isDuplicate) {
+      errors.duplicate = 'Duplicate product variation not allowed.';
+      formIsValid = false;
+    }
+
     setValidationErrors(errors);
 
     if (!formIsValid) {
@@ -304,6 +321,10 @@ const ProductForm: React.FC<ProductFormProps> = ({
             className={`${styles.modalInput} ${validationErrors.price ? styles.inputError : ''}`}
             min="0"
           />
+
+          {validationErrors.duplicate && ( // <-- Added block for displaying duplicate error
+            <div className={styles.errorText}>{validationErrors.duplicate}</div>
+          )}
 
           <div className={styles.modalMediumButtonContainer}>
             <button type="submit" className={styles.modalMediumButton}>

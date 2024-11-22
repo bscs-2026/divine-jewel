@@ -95,7 +95,7 @@ const BranchTabs: React.FC<BranchTabsProps> = ({
           onClick={handleAddStocks}
           disabled={!isStocksSelected}
         >
-          Add Stock
+          Stock In
         </button>
 
         <button

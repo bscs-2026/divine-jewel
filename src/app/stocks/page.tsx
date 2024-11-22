@@ -9,9 +9,10 @@ import BranchTabs from '@/components/tabs/BranchTabs';
 import ManageBranches from '@/components/forms/ManageBranches';
 import Modal from '@/components/modals/Modal';
 import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
-import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
+import { DeletePrompt, SuccessfulPrompt, ErrorPrompt } from "@/components/prompts/Prompt";
 import CircularIndeterminate from '@/components/loading/Loading';
 import { Product } from '@/types';
+import { set } from 'date-fns';
 
 interface Stock {
     id: number;
@@ -77,6 +78,7 @@ export default function StocksPage() {
     const [successAddBranchPrompt, setSuccessAddBranchPrompt] = useState<boolean>(false);
     const [successEditBranchPrompt, setSuccessEditBranchPrompt] = useState<boolean>(false);
     const [successDeleteBranchPrompt, setSuccessDeleteBranchPrompt] = useState<boolean>(false);
+    const [ErrorDeleteBranch, setErrorDeleteBranch] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
@@ -402,6 +404,7 @@ export default function StocksPage() {
             setSuccessDeleteBranchPrompt(true);
         } catch (error: any) {
             setError(error.message);
+            setErrorDeleteBranch(true);
         } finally {
             setLoading(false);
         }
@@ -535,6 +538,11 @@ export default function StocksPage() {
                 message="Branch deleted successfully"
                 isVisible={successDeleteBranchPrompt}
                 onClose={() => setSuccessDeleteBranchPrompt(false)}
+            />
+            <ErrorPrompt
+                message="Failed to delete branch"
+                isVisible={ErrorDeleteBranch}
+                onClose={() => setErrorDeleteBranch(false)}
             />
         </Layout>
     );

@@ -72,7 +72,7 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
         email_address: currentEmployee.email_address || "",
         contact_number: currentEmployee.contact_number || "",
         username: currentEmployee.username || "",
-        password: currentEmployee.password || "",
+        password: "",
       });
       setSelectedRole(currentEmployee.role_name || "");
       setSelectedEmployeeType(currentEmployee.employee_type || "");
@@ -127,9 +127,8 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
       isValid = false;
     }
 
-    // Validate username and password
-    if (formData.username.length < 8) {
-      errors.username = "Username must be at least 8 characters";
+    if (formData.username.length < 3) {
+      errors.username = "Username must be at least 3 characters";
       isValid = false;
     }
 
@@ -145,10 +144,26 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
       isValid = false;
     }
 
-    if (formData.password.length < 8) {
-      errors.password = "Password must be at least 8 characters";
+  // Password validation
+  if (!editingEmployee) {
+    // For new employees, password is required
+    if (!formData.password) {
+      errors.password = "Password is required";
       isValid = false;
+      if (formData.password.length < 8) {
+        errors.password = "Password must be at least 8 characters long";
+        isValid = false;
+      }
     }
+  } else {
+    // For editing employees, validate only if a new password is provided
+    if (formData.password && formData.password.trim() !== "") {
+      if (formData.password.length < 6) {
+        errors.password = "Password must be at least 6 characters long";
+        isValid = false;
+      }
+    }
+  }
 
     setErrors(errors);
     return isValid;
@@ -359,12 +374,16 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
 
           <div>
             <label className="text-[13px] font-bold text-[#575757] mr-[170px]">
-              Password
+              {editingEmployee ? "Reset Password" : "Password"}
             </label>
             <div className="relative w-full overflow-hidden">
               <input
                 className="w-full p-2 border border-[#ACACAC] rounded-md text-[#575757] text-xs pr-10"
-                placeholder="Password"
+                placeholder={
+                  editingEmployee
+                    ? "Leave empty to keep the current password"
+                    : "Password"
+                }
                 type={isPasswordVisible ? "text" : "password"}
                 id="password"
                 name="password"

@@ -185,6 +185,7 @@ export default function TransactionsPage() {
           setSelectedProducts={setSelectedProducts}
           selectedBranch={selectedBranch}
           onSuccess={handleOrderSuccess}
+          reloadData={fetchData}
         />
       }
     >
