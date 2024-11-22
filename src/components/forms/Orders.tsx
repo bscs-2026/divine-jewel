@@ -10,7 +10,7 @@ import Receipt from '@/components/modals/OrderReceipt';
 import { getCookieValue } from '@/lib/clientCookieHelper';
 
 
-const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) => {
+const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch, reloadData }) => {
     const [employeeName, setEmployeeName] = useState('Unknown Cashier');
     const [employeeId, setEmployeeId] = useState(null);
     const [productQuantities, setProductQuantities] = useState(
@@ -273,6 +273,19 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
         }
     };
 
+    const handleDiscountChange = (event) => {
+        let value = parseFloat(event.target.value) || 0;
+    
+        // Ensure the value is within the range of 0 to 100
+        if (value < 0) {
+            value = 0;
+        } else if (value > 100) {
+            value = 100;
+        }
+    
+        setDiscountPercentage(value);
+    };
+
 
     const handlePlaceOrder = async () => {
         setIsLoading(true);
@@ -319,6 +332,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                 setSuccessOrderPrompt(true);
                 const order_id = data.order_id;
                 fetchOrderDetails(order_id);
+                reloadData();
             } else {
                 console.error('Failed to place order:', data.error);
             }
@@ -478,7 +492,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                         type="number"
                         className={styles.discountInput}
                         value={discountPercentage === 0 ? '' : discountPercentage}
-                        onChange={(e) => setDiscountPercentage(parseFloat(e.target.value) || 0)}
+                        onChange={(e) => handleDiscountChange(e)}
                         placeholder="0"
                     />
                 </div>
@@ -497,7 +511,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                             className={styles.creditIdInput}
                             value={creditId}
                             onChange={handleCreditIdChange}
-                            placeholder="000000"
+                            placeholder="12345678"
                         />
                     </div>
 
@@ -556,6 +570,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                             }
                             onChange={handleTenderedAmountChange}
                             min="0"
+                            placeholder='0'
                         />
                     </div>
 
@@ -590,15 +605,17 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch }) =>
                             }
                             onChange={handleTenderedAmountChange}
                             min="0"
+                            placeholder="0"
                         />
                     </div>
                     <div className={styles.payRow}>
                         <label>Reference No.</label>
                         <input
                             className={styles.tenderedInput}
-                            type="text"
+                            type="number"
                             value={referenceNumber}
                             onChange={handleReferenceNumberChange}
+                            placeholder="12345678"
                         />
                     </div>
                     <div className={styles.payRow}>

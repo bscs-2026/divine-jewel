@@ -103,8 +103,8 @@
 }
 
 .disabledRow {
-  background-color: #f9f9f9;
-  color: #aaa;
+  /* background-color: #f9f9f9; */
+  /* color: #aaa; */
   pointer-events: none;
   cursor: not-allowed;
 }
