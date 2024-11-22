@@ -39,14 +39,14 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             username,
         ];
 
-        if (password) {
+        if (password && password.trim() !== "") {
             const hashedPassword = await hashPassword(password);
-            queryStr += ', password = ?';
+            queryStr += ", password = ?";
             queryParams.push(hashedPassword);
-        }
-
-        queryStr += ' WHERE id = ?';
-        queryParams.push(id);
+          }
+      
+          queryStr += " WHERE id = ?";
+          queryParams.push(id);
 
         const result = await query(queryStr, queryParams);
 
