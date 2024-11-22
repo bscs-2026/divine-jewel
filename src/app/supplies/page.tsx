@@ -9,7 +9,7 @@ import ManageSuppliers from '@/components/forms/ManageSuppliers';
 import Modal from '@/components/modals/Modal';
 import SupplyBatchForm from '@/components/forms/SupplyBatch';
 import { generateBatchID } from '@/lib/generatorHelper';
-import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
+import { DeletePrompt, SuccessfulPrompt, ErrorPrompt } from "@/components/prompts/Prompt";
 import CircularIndeterminate from '@/components/loading/Loading';
 
 interface Supplier {
@@ -37,6 +37,7 @@ const SuppliesPage: React.FC = () => {
   const [successAddSupplyPrompt, setSuccessAddSupplyPrompt] = useState<boolean>(false);
   const [sucessAddSupplierPrompt, setSuccessAddSupplierPrompt] = useState<boolean>(false);
   const [successDeleteSupplierPrompt, setSuccessDeleteSupplierPrompt] = useState<boolean>(false);
+  const [errorDeleteSupplierPrompt, setErrorDeleteSupplierPrompt] = useState<boolean>(false);
   const [successEditSupplierPrompt, setSuccessEditSupplierPrompt] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -133,7 +134,7 @@ const SuppliesPage: React.FC = () => {
       setSuppliers((prevSuppliers) => prevSuppliers.filter((supplier) => supplier.id !== id));
       setSuccessDeleteSupplierPrompt(true);
     } catch (error) {
-      console.error('Error deleting supplier:', error);
+      setErrorDeleteSupplierPrompt(true);
     }
   };
 
@@ -245,6 +246,11 @@ const SuppliesPage: React.FC = () => {
         message="Supplier deleted successfully"
         isVisible={successDeleteSupplierPrompt}
         onClose={() => setSuccessDeleteSupplierPrompt(false)}
+      />
+      <ErrorPrompt
+        message="Failed to delete supplier"
+        isVisible={errorDeleteSupplierPrompt}
+        onClose={() => setErrorDeleteSupplierPrompt(false)}
       />
     </Layout>
   );

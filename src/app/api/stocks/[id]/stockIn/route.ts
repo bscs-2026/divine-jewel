@@ -21,7 +21,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
         
         await query(
             'INSERT INTO `stock_details` (batch_id, action, product_id, destination_branch, quantity, employee_id, note) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [batch_id, 'Add', id, branch_code, quantity, employee_id, note || null]
+            [batch_id, 'Stock In', id, branch_code, quantity, employee_id, note || null]
         );
 
         return NextResponse.json({ message: 'Stocks updated successfully' }, { status: 200 });

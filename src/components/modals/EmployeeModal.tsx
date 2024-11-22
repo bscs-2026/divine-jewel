@@ -127,6 +127,10 @@ const EmployeeModal: React.FC<EmployeeModalProps> = ({
       isValid = false;
     }
 
+    if (formData.username.length < 3) {
+      errors.username = "Username must be at least 3 characters";
+      isValid = false;
+    }
 
     if (!/^[a-zA-Z]+$/.test(formData.username)) {
       errors.username = "Username must contain only alphabetic characters";
