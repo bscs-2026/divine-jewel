@@ -202,6 +202,8 @@ const StockForm: React.FC<StockFormProps> = ({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        let hasError = false;
+
         await Promise.all(formDataList.map(async (formData, index) => {
             if (!formData.product_id || !formData.branch_code || isNaN(parseInt(formData.quantity))) {
                 alert("Please fill all required fields correctly.");
@@ -213,6 +215,7 @@ const StockForm: React.FC<StockFormProps> = ({
                 if (isTransfer) {
                     if (!destinationBranch) {
                         alert("Please select a destination branch for the transfer.");
+                        hasError = true;
                         return;
                     }
                     const stockDetails = {
@@ -227,10 +230,13 @@ const StockForm: React.FC<StockFormProps> = ({
                     response = await transferStock(stockDetails);
                     if (response.ok) {
                         setSuccessMessage("Stock successfully transferred!");
+                    } else {
+                        hasError = true;
                     }
                 } else if (isStockOut) {
                     if (!stockOutReason) {
                         alert("Please select a reason for stock out.");
+                        hasError = true;
                         return;
                     }
                     const stock = {
@@ -243,6 +249,8 @@ const StockForm: React.FC<StockFormProps> = ({
                     response = await stockOut(stock, batchID, note, stockOutReason);
                     if (response.ok) {
                         setSuccessMessage("Stock successfully marked as out!");
+                    } else {
+                        hasError = true;
                     }
                 } else if (isMarkDamaged) {
                     const stock = {
@@ -255,6 +263,8 @@ const StockForm: React.FC<StockFormProps> = ({
                     response = await markDamaged(stock, batchID, note);
                     if (response.ok) {
                         setSuccessMessage("Stock successfully marked as damaged!");
+                    } else {
+                        hasError = true;
                     }
                 } else {
                     const stock = {
@@ -267,12 +277,19 @@ const StockForm: React.FC<StockFormProps> = ({
                     response = await addStock(stock, batchID, note);
                     if (response.ok) {
                         setSuccessMessage("Stock successfully added!");
+                    } else {
+                        hasError = true;
                     }
                 }
             } catch (error) {
                 console.error("An error occurred during the API request", error);
+                hasError = true;
             }
         }));
+
+        if (!hasError) {
+            onClose();
+        }
     };
 
     return (
