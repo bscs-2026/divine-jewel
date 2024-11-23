@@ -21,20 +21,20 @@ import { FC, useEffect, useState } from "react";
 import { months } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 
-const chartData = [
-  { month: "January", orders: 5 },
-  { month: "February", orders: 113 },
-  { month: "March", orders: 1 },
-  { month: "April", orders: 73 },
-  { month: "May", orders: 209 },
-  { month: "June", orders: 214 },
-  { month: "July", orders: 87 },
-  { month: "August", orders: 2 },
-  { month: "September", orders: 0 },
-  { month: "October", orders: 0 },
-  { month: "November", orders: 0 },
-  { month: "December", orders: 0 },
-];
+// const chartData = [
+//   { month: "January", orders: 5 },
+//   { month: "February", orders: 113 },
+//   { month: "March", orders: 1 },
+//   { month: "April", orders: 73 },
+//   { month: "May", orders: 209 },
+//   { month: "June", orders: 214 },
+//   { month: "July", orders: 87 },
+//   { month: "August", orders: 2 },
+//   { month: "September", orders: 0 },
+//   { month: "October", orders: 0 },
+//   { month: "November", orders: 0 },
+//   { month: "December", orders: 0 },
+// ];
 
 const chartConfig = {
   orders: {
@@ -57,11 +57,18 @@ export const OrdersSummary: FC<OrdersSummaryProps> = ({ year }) => {
   const [isYear, setIsYear] = useState<boolean>(true);
 
   useEffect(() => {
-    fetchOrdersSummary();
-  }, []);
+    fetchOrdersSummary(isYear);
+    console.log("Years:", yearsSummary);
+  }, [isYear]);
 
-  const fetchOrdersSummary = async () => {
-    const url = `/api/sales/ordersSummary?year=${year}`;
+  const fetchOrdersSummary = async (isYear: boolean) => {
+    let url = "";
+    if (isYear) {
+      url = `/api/sales/ordersSummary?year=${year}`;
+    } else {
+      // Define the URL for the case when isYear is false
+      url = `/api/sales/ordersSummary`;
+    }
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -69,14 +76,16 @@ export const OrdersSummary: FC<OrdersSummaryProps> = ({ year }) => {
       }
       const data = await response.json();
       setOrdersSummary(data.ordersSummary);
-      console.log(data.ordersSummary);
+
     } catch (error: any) {
       console.error(error.message);
     }
   };
 
   const monthsSummary = ordersSummary.map((order) => {
-    const [yearValue, monthValue] = order.order_date.split("-");
+    const orderDate = order.order_date;
+    const [yearValue, monthValue] =
+      typeof orderDate === "string" ? orderDate.split("-") : ["", ""];
     const monthName =
       months.find((m) => m.value === monthValue)?.name || monthValue;
     return {
@@ -85,10 +94,16 @@ export const OrdersSummary: FC<OrdersSummaryProps> = ({ year }) => {
     };
   });
 
+  const yearsSummary = ordersSummary.map((order) => {
+    return {
+      month: order.order_date.toString(),
+      orders: order.orders_count,
+    };
+  });
+
   const toggleIsYear = () => {
     setIsYear((prevIsYear) => !prevIsYear);
-
-  }
+  };
 
   return (
     <Card className="shadow-md ">
@@ -99,24 +114,26 @@ export const OrdersSummary: FC<OrdersSummaryProps> = ({ year }) => {
               Orders Summary
             </CardTitle>
             <CardDescription>
-              {isYear ? `The count of Orders for ${year}.` : "The count of Orders for all years."}
+              {isYear
+                ? `The count of Orders for ${year}.`
+                : "The count of Orders for all years."}
             </CardDescription>
           </div>
-            <div className="ml-auto">
+          <div className="ml-auto">
             <Button
               className="text-sm text-gray-700 p-2 w-[130px] h-[50px] bg-[#FCE4EC] hover:bg-pink-200"
               onClick={toggleIsYear}
             >
               {isYear ? year : "All Years"}
             </Button>
-            </div>
+          </div>
         </div>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
           <LineChart
             accessibilityLayer
-            data={monthsSummary}
+            data={isYear ? monthsSummary : yearsSummary}
             margin={{
               top: 20,
               left: 12,
@@ -129,7 +146,8 @@ export const OrdersSummary: FC<OrdersSummaryProps> = ({ year }) => {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
+              tickFormatter={(value) => 
+                (isYear ? value.slice(0, 3) : value)}
             />
             <ChartTooltip
               cursor={false}

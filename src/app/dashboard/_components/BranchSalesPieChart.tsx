@@ -50,7 +50,6 @@ const BranchSalesPieChart: FC<BranchSalesPieChartProps> = ({ year, month }) => {
       }
       const data = await response.json();
       setBranchesOrders(data.branchesOrders);
-      console.log(data.branchesOrders);
     } catch (error: any) {
       console.error(error.message);
     }
@@ -78,7 +77,7 @@ const BranchSalesPieChart: FC<BranchSalesPieChartProps> = ({ year, month }) => {
   }, {} as ChartConfig);
 
   return (
-    <Card className="flex flex-col rounded-xl shadow-md">
+    <Card className="flex flex-col rounded-xl shadow-md h-full">
       <CardHeader className="items-center pb-0">
         <CardTitle className="text-xl font-bold text-gray-600">Orders Per Branch</CardTitle>
         <CardDescription>

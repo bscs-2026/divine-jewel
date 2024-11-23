@@ -23,6 +23,7 @@ import {
 import { DataTable } from "../data-table";
 import { columns } from "../columns";
 import { Pie, PieChart } from "recharts";
+import { Button } from "@/components/ui/button";
 
 const pieChartConfig = {
   visitors: {
@@ -80,14 +81,17 @@ interface TopProducts {
 
 interface BranchesSalesProps {
   branches: Branches[];
+  year: string;
+  month: string;
 }
 
-const TopProducts: FC<BranchesSalesProps> = ({ branches }) => {
+const TopProducts: FC<BranchesSalesProps> = ({ branches, year, month }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [topProducts, setTopProducts] = useState<TopProducts[]>([]);
   const [selectedCategory, setSelectedCategory] =
     useState<string>("allCategories");
   const [selectedBranch, setSelectedBranch] = useState<string>("allBranches");
+  const [isMonth, setIsMonth] = useState<boolean>(true);
 
   useEffect(() => {
     fetchCategories();
@@ -119,11 +123,15 @@ const TopProducts: FC<BranchesSalesProps> = ({ branches }) => {
     }
   };
 
+  const toggleIsMonth = () => {
+    setIsMonth((prevIsMonth) => !prevIsMonth);
+  }
+
   return (
     <div className="bg-white h-full shadow-md w-full rounded-2xl flex flex-col border border-gray-200">
-      <div className="flex flex-row">
-        <div className="m-4 font-extrabold text-xl">Top Products</div>
-        <div className="m-3">
+      <div className="mt-4 ml-4 font-extrabold text-xl">Top Products</div>
+      <div className="flex flex-row gap-3 m-4 ">  
+        <div className="">
           <Select value={selectedBranch} onValueChange={setSelectedBranch}>
             <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Branch" />
@@ -140,7 +148,7 @@ const TopProducts: FC<BranchesSalesProps> = ({ branches }) => {
             </SelectContent>
           </Select>
         </div>
-        <div className="m-3">
+        <div className="">
           <Select value={selectedCategory} onValueChange={setSelectedCategory}>
             <SelectTrigger className="w-[150px]">
               <SelectValue placeholder="Category" />
@@ -157,17 +165,14 @@ const TopProducts: FC<BranchesSalesProps> = ({ branches }) => {
             </SelectContent>
           </Select>
         </div>
-        {/* <div className="m-3">
-          <Select>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Theme" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="yearBased">Selected Year</SelectItem>
-              <SelectItem value="monthBased">Selected Month</SelectItem>
-            </SelectContent>
-          </Select>
-        </div> */}
+        <div className="">
+        <Button
+            className="text-sm text-gray-700 p-2 w-[150px] bg-[#FCE4EC] hover:bg-pink-200"
+            onClick={toggleIsMonth}
+          >
+            {isMonth ? month : year}
+          </Button>
+        </div>
       </div>
       <div className="mx-4 gap-2 flex flex-row mb-2">
         <div className="w-full">

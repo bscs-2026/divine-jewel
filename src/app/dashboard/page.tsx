@@ -95,7 +95,6 @@ export default function Home() {
       }
       const data = await response.json();
       setYearlyOrders(data.YearlyOrders);
-      console.log("Total Order:", data.YearlyOrders);
     } catch (error: any) {
       console.error(error.message);
     }
@@ -105,7 +104,6 @@ export default function Home() {
     const monthValue = months.find(m => m.name === month)?.value;
     const date = `${year}-${monthValue}`;
     const url = `/api/sales?date=${date}`;
-    console.log(date);
     try {
       const response = await fetch(url);
       if (!response.ok) {
@@ -195,6 +193,8 @@ export default function Home() {
           <div className='w-2/3'>
             <TopProducts
               branches={branches}
+              year={year}
+              month={month}
             />
           </div>
           <div className='w-1/3 '>
