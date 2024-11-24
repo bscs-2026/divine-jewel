@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getConnection } from "../../../lib/db";
+import { getConnection } from "@/lib/db";
 
 export async function POST(request: NextRequest) {
     let connection;

@@ -22,7 +22,7 @@ export const SuccessfulPrompt: React.FC<SuccessfulPromptProps> = ({
     if (isVisible) {
       const timer = setTimeout(() => {
         onClose();
-      }, 5000);
+      }, 3000);
 
       return () => clearTimeout(timer);
     }
@@ -49,7 +49,7 @@ export const DeletePrompt: React.FC<DeletePromptProps> = ({
     if (isVisible) {
       const timer = setTimeout(() => {
         onClose();
-      }, 5000);
+      }, 3000);
 
       return () => clearTimeout(timer);
     }
@@ -74,7 +74,7 @@ export const ErrorPrompt: React.FC<SuccessfulPromptProps> = ({
     if (isVisible) {
       const timer = setTimeout(() => {
         onClose();
-      }, 5000);
+      }, 3000);
 
       return () => clearTimeout(timer);
     }

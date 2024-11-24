@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import styles from '@/components/styles/Table.module.css';
 import { formatDate } from '@/lib/dateTimeHelper';
+import { ErrorPrompt } from "@/components/prompts/Prompt";
 
 interface Orders {
   order_id: number;
@@ -27,26 +28,29 @@ const RecentOrders: React.FC<RecentOrdersProps> = ({
   selectedOrders = [],
   setSelectedOrders,
 }) => {
-  const [selectAll, setSelectAll] = useState(false);
   const [sortConfig, setSortConfig] = useState<{ key: keyof Orders; direction: 'asc' | 'desc' }>({
     key: 'order_date',
     direction: 'desc',
   });
 
+  const [errorSelect, setErrorSelect] = useState<boolean>(false);
+
   const columns = useMemo(
     () => [
-      { Header: 'Order ID', accessor: 'order_id' as keyof Orders, align: 'left' },
-      { Header: 'Order Date', accessor: 'order_date' as keyof Orders, align: 'left' },
-      { Header: 'Customer', accessor: 'customer_name' as keyof Orders, align: 'left' },
-      { Header: 'Product', accessor: 'product_name' as keyof Orders, align: 'left' },
-      { Header: 'Size', accessor: 'product_size' as keyof Orders, align: 'left' },
-      { Header: 'Color', accessor: 'product_color' as keyof Orders, align: 'left' },
-      { Header: 'Qty.', accessor: 'quantity' as keyof Orders, align: 'right' },
-      { Header: 'Unit Price', accessor: 'unit_price' as keyof Orders, align: 'right' },
-      { Header: 'Discount %', accessor: 'discount_percent' as keyof Orders, align: 'right' },
+      { Header: '✔', accessor: 'select' as keyof Orders, align: 'left', sortable: false },
+      { Header: 'Order ID', accessor: 'order_id' as keyof Orders, align: 'left', sortable: true },
+      { Header: 'Order Date', accessor: 'order_date' as keyof Orders, align: 'left', sortable: true },
+      { Header: 'Customer', accessor: 'customer_name' as keyof Orders, align: 'left', sortable: true },
+      { Header: 'Product', accessor: 'product_name' as keyof Orders, align: 'left', sortable: true },
+      { Header: 'Size', accessor: 'product_size' as keyof Orders, align: 'left', sortable: true },
+      { Header: 'Color', accessor: 'product_color' as keyof Orders, align: 'left', sortable: true },
+      { Header: 'Qty.', accessor: 'quantity' as keyof Orders, align: 'right', sortable: true },
+      { Header: 'Unit Price', accessor: 'unit_price' as keyof Orders, align: 'right', sortable: true },
+      { Header: 'Disc %', accessor: 'discount_percent' as keyof Orders, align: 'right', sortable: true },
     ],
     []
   );
+
 
   const sortedOrders = useMemo(() => {
     const sortedData = [...Orderss];
@@ -61,52 +65,32 @@ const RecentOrders: React.FC<RecentOrdersProps> = ({
     return sortedData;
   }, [Orderss, sortConfig]);
 
-  const handleSort = (key: keyof Orders) => {
+  const handleSort = (key: keyof Orders, sortable: boolean) => {
+    if (!sortable) return;
     setSortConfig((prevConfig) => ({
       key,
       direction: prevConfig.key === key && prevConfig.direction === 'asc' ? 'desc' : 'asc',
     }));
   };
 
+
   const handleRowSelect = (order: Orders) => {
-    // Create a unique identifier for the row (e.g., composite key)
-    const uniqueRowIdentifier = JSON.stringify(order);
+    const isRowSelected = selectedOrders.some((o) => o.order_id === order.order_id);
 
-    // Check if the row is already selected
-    const isRowSelected = selectedOrders.some(
-      (o) => JSON.stringify(o) === uniqueRowIdentifier
-    );
-
-    if (isRowSelected) {
-      // Remove the row if it's already selected
-      setSelectedOrders(
-        selectedOrders.filter((o) => JSON.stringify(o) !== uniqueRowIdentifier)
-      );
+    if (selectedOrders.length === 0 || isRowSelected) {
+      // Toggle selection
+      const alreadySelected = selectedOrders.some((o) => JSON.stringify(o) === JSON.stringify(order));
+      if (alreadySelected) {
+        // Deselect row
+        setSelectedOrders(selectedOrders.filter((o) => JSON.stringify(o) !== JSON.stringify(order)));
+      } else {
+        // Add row
+        setSelectedOrders([...selectedOrders, order]);
+      }
     } else {
-      // Add the row if it's not selected
-      setSelectedOrders([...selectedOrders, order]);
+      setErrorSelect(true);
     }
   };
-
-  const handleSelectAll = () => {
-    if (selectAll) {
-      setSelectedOrders([]);
-    } else {
-      setSelectedOrders(sortedOrders);
-    }
-    setSelectAll(!selectAll);
-  };
-
-  useEffect(() => {
-    if (
-      selectedOrders?.length === sortedOrders?.length &&
-      sortedOrders?.length > 0
-    ) {
-      setSelectAll(true);
-    } else {
-      setSelectAll(false);
-    }
-  }, [selectedOrders, sortedOrders]);
 
   const renderSortIcon = (key: keyof Orders) => {
     const isActive = sortConfig.key === key;
@@ -129,28 +113,21 @@ const RecentOrders: React.FC<RecentOrdersProps> = ({
       <table className={styles.table}>
         <thead>
           <tr>
-            <th>
-              <input
-                type="checkbox"
-                checked={selectAll}
-                onChange={handleSelectAll}
-                aria-label="Select all rows"
-              />
-            </th>
             {columns.map((column) => (
               <th
                 key={column.accessor as string}
-                onClick={() => handleSort(column.accessor)}
+                onClick={() => handleSort(column.accessor, column.sortable)}
                 className={`${styles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign}`}
               >
                 <div className={styles.sortContent}>
                   {column.Header}
-                  {renderSortIcon(column.accessor)}
+                  {column.sortable && renderSortIcon(column.accessor, column.sortable)}
                 </div>
               </th>
             ))}
           </tr>
         </thead>
+
         <tbody>
           {sortedOrders.map((order, index) => (
             <tr
@@ -182,6 +159,12 @@ const RecentOrders: React.FC<RecentOrdersProps> = ({
           ))}
         </tbody>
       </table>
+
+      <ErrorPrompt
+        message="You can only select rows with the same Order ID."
+        isVisible={errorSelect}
+        onClose={() => setErrorSelect(false)}
+      />
     </div>
   );
 };

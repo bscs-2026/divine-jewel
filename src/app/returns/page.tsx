@@ -25,9 +25,17 @@ interface OrderDetail {
   branch_address: string;
 }
 
+interface CustomerCredit {
+  id: number;
+  customer_name: string;
+  credit_amount: number;
+  status: string;
+}
+
 export default function OrdersPage() {
   const [orders, setOrders] = useState<OrderDetail[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<OrderDetail[]>([]);
+  const [credits, setCredits] = useState<CustomerCredit[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +50,7 @@ export default function OrdersPage() {
 
   useEffect(() => {
     fetchOrders();
+    fetchCredits();
   }, []);
 
   const fetchOrders = async () => {
@@ -54,6 +63,20 @@ export default function OrdersPage() {
       const data = await response.json();
       setOrders(data.data);
       setFilteredOrders(data.data);
+    } catch (error: any) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCredits = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/credits`);
+      if (!response.ok) throw new Error('Failed to fetch credits');
+      const data = await response.json();
+      setCredits(data.data);
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -82,8 +105,6 @@ export default function OrdersPage() {
         customerName,
       };
 
-      console.log("Submitting payload to API:", JSON.stringify(payload, null, 2));
-
       const response = await fetch('/api/orders/return', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -92,26 +113,22 @@ export default function OrdersPage() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("API error response:", errorText);
+        console.error('API error response:', errorText);
         return { ok: false, message: `API error: ${response.statusText}` };
       }
 
       const result = await response.json();
-      console.log("API Response:", result);
-
-      // Return creditId and totalCredits
       return {
         ok: true,
         message: result.message,
-        creditId: result.creditId, // Check this value
+        creditId: result.creditId,
         totalCredits: result.totalCreditAmount,
       };
     } catch (error) {
-      console.error("Error during API call:", error);
-      return { ok: false, message: error.message || "Unexpected error occurred." };
+      console.error('Error during API call:', error);
+      return { ok: false, message: error.message || 'Unexpected error occurred.' };
     }
   };
-
 
   return (
     <Layout defaultTitle="Return Items">
@@ -127,15 +144,14 @@ export default function OrdersPage() {
         setSearchQuery={setSearchQuery}
         placeholder="Search orders ID"
         selectedOrders={selectedOrders}
+        credits={credits}
         returnItem={handleReturnItems}
       />
-  
       <RecentOrders
         Orderss={filteredOrders}
         selectedOrders={selectedOrders}
         setSelectedOrders={setSelectedOrders}
       />
-  
       <SuccessfulPrompt
         message="Items successfully returned!"
         isVisible={successReturnPrompt}
@@ -143,4 +159,4 @@ export default function OrdersPage() {
       />
     </Layout>
   );
-}  
+}
