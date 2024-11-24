@@ -17,13 +17,14 @@
 .leftTabs {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1rem;
     flex-wrap: nowrap;
 }
 
 .leftTabs label {
     white-space: nowrap;
 }
+
 
 .tabsContainerItem {
     padding: 0.75rem 0.75rem;
@@ -63,16 +64,18 @@
 
 .searchInput {
     padding-left: 40px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
     font-size: 14px;
-    width: 200px;
+    width: 250px;
     height: 35px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    border: 1px solid #DDDDDD;
+    border-radius: 0.5rem;
     box-sizing: border-box;
-  }
+}
 
 .searchInput::placeholder {
-    color: #b0b0b0;
+    color: #575757;
     text-align: left;
 }
 
@@ -113,14 +116,56 @@
     position: relative;
     display: inline-block;
     margin-right: 20px;
-  }
-  
-  .searchIcon {
+}
+
+.searchIcon {
     position: absolute;
     top: 50%;
     left: 10px;
     transform: translateY(-50%);
     font-size: 20px;
-    color: #ccc;
-  }
-  
+    color: #575757;
+}
+
+.heading2 {
+    color: #575757;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-right: 10px;
+    /* margin-top: 0.25rem;
+    margin-bottom: 0.25rem; */
+}
+
+.selectContainer {
+    display: flex;
+    align-items: center;
+}
+
+.tabsSelect {
+    width: 250px;
+    max-width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #DDDDDD;
+    border-radius: 0.5rem;
+    color: #575757;
+    font-size: 12px;
+}
+
+
+@media (max-width: 1366px) {
+    .tabsContainer {
+        overflow-x: auto;
+        white-space: nowrap;
+        scrollbar-width: thin; /* For modern browsers */
+    }
+    .tabsContainer::-webkit-scrollbar {
+        height: 8px; /* Scrollbar height for iPads */
+    }
+    .tabsContainer::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+    }
+    .tabsContainer::-webkit-scrollbar-track {
+        background: #f9f9f9;
+    }
+}

@@ -50,23 +50,25 @@ const CategoryTabs: React.FC<CategoryTabsProps> = ({
             className={Styles.searchInput}
           />
         </div>
-        <label className={formStyles.heading2} htmlFor="category-filter">
-          Select Category:
-        </label>
-        <select
-          className={formStyles.select}
-          id="category-filter"
-          value={filterCategory === null ? 'null' : filterCategory.toString()}
-          onChange={handleCategoryChange}
-        >
-          <option value="null">All</option>
-          {categories.map((category) => (
-            <option key={category.id} value={category.id.toString()}>
-              {category.name}
-            </option>
-          ))}
-          <option value="Archive">Archived</option>
-        </select>
+        <div className={Styles.selectContainer}>
+          <label className={Styles.heading2} htmlFor="category-filter">
+            Select Category:
+          </label>
+          <select
+            className={Styles.tabsSelect}
+            id="category-filter"
+            value={filterCategory === null ? 'null' : filterCategory.toString()}
+            onChange={handleCategoryChange}
+          >
+            <option value="null">All</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.id.toString()}>
+                {category.name}
+              </option>
+            ))}
+            <option value="Archive">Archived</option>
+          </select>
+        </div>
       </div>
 
       <div className={Styles.rightButtonGroup}>

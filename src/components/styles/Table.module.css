@@ -22,7 +22,7 @@
   padding: 0.5rem;
   color: #575757;
   font-weight: bold;
-  font-size: 16px;
+  font-size: 14px;
   border-bottom: 1px solid #e0e0e0;
 }
 
@@ -130,6 +130,31 @@
   cursor: default;
 }
 
+@media (max-width: 1366px) {
+  .th {
+    font-size: 14px;
+  }
+  
+  .td {
+    font-size: 13px;
+  }
+  
+  .tdProductName {
+    padding: 8px;
+    font-size: 12px;
+    width: 40%;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .tdStock {
+    padding: 8px;
+    font-size: 14px;
+    text-align: right;
+    width: 1%;
+    border-bottom: 1px solid #e0e0e0;
+  }
+}
 
 
-
+.icon {
+  display: flex;
+}
