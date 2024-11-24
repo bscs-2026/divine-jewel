@@ -31,7 +31,6 @@ import BranchSalesPieChart from './_components/BranchSalesPieChart';
 import { OrdersSummary } from './_components/OrdersSummary';
 import ActiveBranches from './_components/ActiveBranches';
 import Spinner from '@/components/loading/Loading';
-import { fi, se } from 'date-fns/locale';
 
 interface Sales {
   order_date: string;
