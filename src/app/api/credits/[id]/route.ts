@@ -1,6 +1,6 @@
 // src/app/api/credits/[id]/route.ts
 import { NextRequest, NextResponse } from "next/server";
-import { getConnection } from "../../../../lib/db";
+import { getConnection } from "@/lib/db";
 
 export async function GET(request: NextRequest, context: { params: { id: string } }) {
   // Await access to params to ensure they are fully available

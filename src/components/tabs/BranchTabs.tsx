@@ -1,7 +1,7 @@
 import { useEffect, useState, React } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
-import Styles from '../styles/Tabs.module.css';
-import formStyles from '../styles/Form.module.css';
+import Styles from '@/components/styles/Tabs.module.css';
+import formStyles from '@/components/styles/Form.module.css';
 import { getCookieValue } from '@/lib/clientCookieHelper';
 
 interface Branch {

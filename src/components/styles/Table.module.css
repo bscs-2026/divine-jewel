@@ -64,6 +64,14 @@
   text-align: right;
 }
 
+.sortContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-weight: bold;
+}
+
 .sortIconsLeft {
   margin-left: 2px;
 }
@@ -121,5 +129,7 @@
 .cursorDefault, .notSortable{
   cursor: default;
 }
+
+
 
 

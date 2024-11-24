@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { query } from '../../../../lib/db';
+import { query } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
     try {
-        console.log('Received request to fetch supplies by batch_id');
+        // console.log('Received request to fetch supplies by batch_id');
 
         const body = await request.json();
-        console.log('Request body:', body);
+        // console.log('Request body:', body);
 
         const { batch_id } = body;
 

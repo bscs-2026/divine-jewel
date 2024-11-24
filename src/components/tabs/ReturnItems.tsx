@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import Styles from '@/components/styles/Tabs.module.css';
-import ReturnItemsForm from '@/components/forms/ReturnItems';
 import Modal from '@/components/modals/Modal';
+import CustomersCredit from '@/components/forms/CustomersCredit';
+import ReturnItemsForm from '@/components/forms/ReturnItems';
 
 interface ReturnItemsProps {
   searchQuery: string;
@@ -18,6 +19,16 @@ interface ReturnItemsProps {
     discount_percent: number;
     unit_price_deducted: number;
   }[];
+  credits: {
+    id: number;
+    customer_name: string;
+    credit_amount: number | string;
+    credit_date: string;
+    expiration_date: string | null;
+    status: string;
+    credit_type: string;
+    description: string | null;
+  }[];
   returnItem: (
     item: {
       order_id: number;
@@ -28,7 +39,7 @@ interface ReturnItemsProps {
       unit_price: number;
       discount_percent: number;
       unit_price_deducted: number;
-      customer_name?: string
+      customer_name?: string;
       branch_name?: string;
       branch_address?: string;
       employee_id?: number;
@@ -44,21 +55,28 @@ const ReturnItemsTabs: React.FC<ReturnItemsProps> = ({
   setSearchQuery,
   placeholder = 'Search Order ID',
   selectedOrders,
+  credits,
   returnItem,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreditsModalOpen, setIsCreditsModalOpen] = useState(false);
 
   const handleReturnItemsClick = () => {
-    console.log("Selected orders:", selectedOrders);
-
     if (selectedOrders.length === 0) {
-      alert('Please select at least one order to return.');
       return;
     }
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
+  const handleViewCustomerCredits = () => {
+    setIsCreditsModalOpen(true);
+  };
+
+  const handleCloseCreditsModal = () => {
+    setIsCreditsModalOpen(false);
+  };
+
+  const handleCloseReturnItemsModal = () => {
     setIsModalOpen(false);
   };
 
@@ -76,31 +94,38 @@ const ReturnItemsTabs: React.FC<ReturnItemsProps> = ({
       </div>
 
       <div className={Styles.rightButtonGroup}>
+        {/* Return Items Button */}
         <button
-          className={`${Styles.tabsContainerItem} ${selectedOrders.length > 0 ? Styles.active : Styles.inactive
-            }`}
-          onClick={handleReturnItemsClick}
-          disabled={selectedOrders.length === 0}
-        >
-          Customer Credits
-        </button>
-   
-        <button
-          className={`${Styles.tabsContainerItem} ${selectedOrders.length > 0 ? Styles.active : Styles.inactive
-            }`}
+          className={`${Styles.tabsContainerItem} ${
+            selectedOrders.length > 0 ? Styles.active : Styles.inactive
+          }`}
           onClick={handleReturnItemsClick}
           disabled={selectedOrders.length === 0}
         >
           Return Items
         </button>
+
+        {/* Customer Credit Button */}
+        <button
+          className={`${Styles.tabsContainerItem} ${Styles.active}`}
+          onClick={handleViewCustomerCredits}
+        >
+          View Credits
+        </button>
       </div>
 
-      <Modal show={isModalOpen} onClose={handleCloseModal}>
+      {/* Customer Credits Modal */}
+      <Modal show={isCreditsModalOpen} onClose={handleCloseCreditsModal}>
+        <CustomersCredit credits={credits} />
+      </Modal>
+
+      {/* Return Items Modal */}
+      <Modal show={isModalOpen} onClose={handleCloseReturnItemsModal}>
         {selectedOrders.length > 0 && (
           <ReturnItemsForm
             selectedOrders={selectedOrders}
             returnItem={returnItem}
-            onClose={handleCloseModal}
+            onClose={handleCloseReturnItemsModal}
           />
         )}
       </Modal>
