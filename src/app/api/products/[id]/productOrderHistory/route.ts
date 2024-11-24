@@ -2,7 +2,7 @@
 // curl -X GET 'http://divine-jewel.local:8000/api/products/71/productOrderHistory' | jq .
 
 import { NextRequest, NextResponse } from 'next/server';
-import { query } from '../../../../../lib/db';
+import { query } from '@/lib/db';
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -11,8 +11,6 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
     if (!id) {
       return NextResponse.json({ error: 'product_id is required' }, { status: 400 });
     }
-
-    console.log('Fetching order history for product_id:', id);
 
     // SQL query to fetch order history
     const rows = await query(
@@ -35,8 +33,6 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       `,
       [id] // Use parameterized query to safely inject product_id
     );
-
-    console.log('Fetched order history:', rows);
 
     return NextResponse.json({ orderHistory: rows }, { status: 200 });
   } catch (error: any) {

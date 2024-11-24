@@ -24,7 +24,7 @@ export async function middleware(req: NextRequest) {
   const roleBasedRoutes: Record<number, string[]> = {
     1: ['*'], // Role 1: Admin - can access all pages
     2: ['*'], // Role 2: Assistant (Admin Assistant?) - can access all pages for now, we will adjust later
-    3: ['/orders', '/returns'], // Role 3: Cashier - can access only specific pages
+    3: ['/orders', '/stocks', '/history', '/returns'], // Role 3: Cashier - can access only specific pages
   };
 
   // Allow public routes

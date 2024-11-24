@@ -10,13 +10,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
     }
 
     try {
-        console.log(`Updating supplier with ID ${id}...`);
+        // console.log(`Updating supplier with ID ${id}...`);
         const result = await query(
             'UPDATE `suppliers` SET supplier_name = ?, contact_info = ?, address = ?, email = ?, phone_number = ? WHERE id = ?',
             [supplier_name, contact_info || null, address || null, email || null, phone_number || null, id]
         );
 
-        console.log('Updated Supplier:', result);
+        // console.log('Updated Supplier:', result);
         return NextResponse.json({ message: 'Supplier updated successfully' }, { status: 200 });
     } catch (error: any) {
         console.error('An error occurred while updating the supplier:', error);
@@ -32,10 +32,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     try {
-        console.log(`Soft deleting supplier with ID ${id}...`);
+        // console.log(`Soft deleting supplier with ID ${id}...`);
         const result = await query('DELETE FROM `suppliers` WHERE id = ?', [id]);
 
-        console.log('Deleted Supplier:', result);
+        // console.log('Deleted Supplier:', result);
         return NextResponse.json({ message: 'Supplier deleted successfully' }, { status: 200 });
     } catch (error: any) {
         console.error('An error occurred while soft deleting the supplier:', error);

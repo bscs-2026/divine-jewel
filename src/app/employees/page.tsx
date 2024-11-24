@@ -8,7 +8,7 @@ import InformationModal from "@/components/modals/InformationModal";
 import EmployeeTable from "@/components/tables/Employees";
 import { DeletePrompt, SuccessfulPrompt } from "@/components/prompts/Prompt";
 import { AddBox } from '@mui/icons-material';
-import CircularIndeterminate from '@/components/loading/Loading';
+import Spinner from '@/components/loading/Loading';
 import { se } from "date-fns/locale";
 
 
@@ -304,7 +304,7 @@ export default function EmployeesPage() {
   return (
     <Layout defaultTitle="Employees">
       {loading && (
-        <CircularIndeterminate />
+        <Spinner />
       )}
 
       <div>

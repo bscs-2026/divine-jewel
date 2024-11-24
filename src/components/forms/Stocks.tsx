@@ -49,6 +49,7 @@ interface StockFormProps {
     markDamaged: (stock: Stock, batch_id: string, note: string) => Promise<{ ok: boolean, message?: string }>;
     isMarkDamaged: boolean;
     transferStock: (stockDetails: StockDetails) => Promise<{ ok: boolean, message?: string }>;
+    loading: boolean;
     onClose: () => void;
 }
 
@@ -75,7 +76,7 @@ const StockForm: React.FC<StockFormProps> = ({
     );
 
     const [destinationBranch, setDestinationBranch] = useState("");
-    const [stockOutReason, setStockOutReason] = useState(""); // Single stock-out reason
+    const [stockOutReason, setStockOutReason] = useState("");
     const [note, setNote] = useState("");
     const [lastAction, setLastAction] = useState<boolean | null>(null);
     const [errors, setErrors] = useState<string[]>([]);
@@ -84,6 +85,7 @@ const StockForm: React.FC<StockFormProps> = ({
     const [currentTime, setCurrentTime] = useState<string>("");
     const [employeeName, setEmployeeName] = useState<string>("");
     const [employeeId, setEmployeeId] = useState<number | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
 
     useEffect(() => {
         const newBatchID = generateBatchID();
@@ -138,7 +140,7 @@ const StockForm: React.FC<StockFormProps> = ({
                 }))
             );
             setDestinationBranch("");
-            setStockOutReason(""); // Reset stock-out reason when action changes
+            setStockOutReason("");
             setNote("");
         }
         setLastAction(isTransfer);
@@ -421,6 +423,7 @@ const StockForm: React.FC<StockFormProps> = ({
                         <button
                             type="submit"
                             className={`${styles.modalMediumButton}`}
+                            disabled={loading}
                         >
                             {isTransfer ? 'Transfer Stock' : isStockOut ? 'Stock Out' : isMarkDamaged ? 'Mark as Damaged' : 'Add Stock'}
                         </button>

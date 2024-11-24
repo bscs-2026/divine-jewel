@@ -3,7 +3,7 @@
 import React, { useState, useEffect, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from '../../components/styles/PublicForm.module.css';
-import CircularIndeterminate from '@/components/loading/Loading';
+import Spinner from '@/components/loading/Loading';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 
@@ -113,7 +113,7 @@ export default function LoginPage() {
   return (
     <div className={styles.loginContainer}>
       {loading && (
-        <CircularIndeterminate />
+        <Spinner />
       )}
 
       <div className={styles.coverPhoto}>

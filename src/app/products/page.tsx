@@ -9,7 +9,7 @@ import CategoryTabs from '@/components/tabs/CategoryTabs';
 import ProductForm from '@/components/forms/Products';
 import ManageCategories from '@/components/forms/ManageCategories';
 import { DeletePrompt, SuccessfulPrompt, ErrorPrompt } from '@/components/prompts/Prompt';
-import CircularIndeterminate from '@/components/loading/Loading';
+import Spinner from '@/components/loading/Loading';
 import Modal from '@/components/modals/Modal';
 import { set } from 'date-fns';
 
@@ -23,6 +23,7 @@ interface Product {
   price: number;
   quantity: number;
   is_archive: number | boolean;
+  image_url: string;
 }
 
 interface Category {
@@ -51,6 +52,7 @@ export default function ProductsPage() {
   const [successEditCategory, setSuccessEditCategory] = useState<boolean>(false);
   const [successDeleteCategory, setSuccessDeleteCategory] = useState<boolean>(false);
   const [ErrorDeleteCategory, setErrorDeleteCategory] = useState<boolean>(false);
+  const [modalImage, setModalImage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchProducts();
@@ -212,6 +214,7 @@ export default function ProductsPage() {
       size: product.size || currentProduct.size,
       color: product.color || currentProduct.color,
       quantity: product.quantity !== undefined ? product.quantity : currentProduct.quantity,
+      image_url: product.image_url || currentProduct.image_url,
     };
 
     try {
@@ -223,6 +226,8 @@ export default function ProductsPage() {
         },
         body: JSON.stringify(updatedProduct),
       });
+
+      // console.log('Response for update:', response);
 
       if (!response.ok) {
         throw new Error('Failed to save product');
@@ -321,7 +326,7 @@ export default function ProductsPage() {
 
   return (
     <Layout defaultTitle="Products">
-      {loading && <CircularIndeterminate />}
+      {loading && <Spinner />}
 
       <CategoryTabs
         categories={categories}
@@ -339,10 +344,18 @@ export default function ProductsPage() {
         archiveProduct={archiveProduct}
         unarchiveProduct={unarchiveProduct}
         filterCategory={filterCategory}
+        onThumbnailClick={(imageUrl) => setModalImage(imageUrl)}
       />
+
+      {modalImage && (
+        <Modal show={true} onClose={() => setModalImage(null)}>
+          <img src={modalImage} alt="Full View" style={{ maxWidth: '100%', maxHeight: '90vh', borderRadius: '10px' }} />
+        </Modal>
+      )}
 
       <Modal show={isModalOpen} onClose={closeModal}>
         <ProductForm
+          loading={loading}
           categories={categories}
           currentProduct={currentProduct}
           products={products}

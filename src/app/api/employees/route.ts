@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 
 export async function GET() {
     try {
-        console.log('Fetching employees from database...');
+        // console.log('Fetching employees from database...');
         const rows = await query(
          `SELECT 
               e.*,
@@ -17,7 +17,7 @@ export async function GET() {
               ORDER BY
                 r.name ASC, e.last_name ASC, e.first_name ASC`
         );
-        console.log('Fetched employees:', rows);
+        // console.log('Fetched employees:', rows);
         return NextResponse.json({ Employees: rows }, { status: 200 });
       } catch (error: any) {
         console.error('An error occurred while fetching employees:', error);
@@ -29,15 +29,15 @@ export async function POST(request: NextRequest) {
   const { first_name, last_name, birth_date, email_address, address, contact_number, employee_type, role_id, username, password, is_archive} = await request.json();
 
   try {
-    console.log('Hashing password...');
+    // console.log('Hashing password...');
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    console.log('Adding employee to database...');
+    // console.log('Adding employee to database...');
     const result = await query(
       'INSERT INTO `employees` (first_name, last_name, address, birth_date, email_address, contact_number, employee_type, role_id, username, password, is_archive ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
       [first_name, last_name, address, birth_date, email_address, contact_number, employee_type, role_id, username, hashedPassword, 0]
     );
-    console.log('Added employee:', result);
+    // console.log('Added employee:', result);
     return NextResponse.json({ message: 'Employee added successfully' }, { status: 201 });
   } catch (error: any) {
     console.error('An error occurred while adding employee:', error);

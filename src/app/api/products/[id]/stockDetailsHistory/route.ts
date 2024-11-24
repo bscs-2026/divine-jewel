@@ -12,8 +12,6 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: 'product_id is required' }, { status: 400 });
     }
 
-    console.log('Fetching stock history for product_id:', id);
-
     // SQL query to fetch stock history
     const rows = await query(
       `
@@ -37,8 +35,6 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       `,
       [id] // Use parameterized query to safely inject product_id
     );
-
-    console.log('Fetched stock history:', rows);
 
     return NextResponse.json({ stockHistory: rows }, { status: 200 });
   } catch (error: any) {

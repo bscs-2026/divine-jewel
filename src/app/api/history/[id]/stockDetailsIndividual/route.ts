@@ -10,7 +10,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
       return NextResponse.json({ error: 'batch_id is required' }, { status: 400 });
     }
 
-    console.log('Fetching stock details for batch_id:', id);
+    // console.log('Fetching stock details for batch_id:', id);
 
     const rows = await query(`
         SELECT 
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
             sd.batch_id = ?;
     `, [id]);
 
-    console.log('Fetched stock details:', rows);
+    // console.log('Fetched stock details:', rows);
     return NextResponse.json({ stockDetails: rows }, { status: 200 });
   } catch (error: any) {
     console.error('An error occurred while fetching stock details:', error);

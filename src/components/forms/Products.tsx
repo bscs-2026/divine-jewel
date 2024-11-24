@@ -40,6 +40,8 @@ const ProductForm: React.FC<ProductFormProps> = ({
   const [originalCategory, setOriginalCategory] = useState<number | null>(null);
   const [originalSKU, setOriginalSKU] = useState<string>('');
   const [categorySelected, setCategorySelected] = useState<boolean>(false);
+  const [productImage, setProductImage] = useState<File | null>(null);
+  const [productImagePreview, setProductImagePreview] = useState<string | null>(null);
 
   useEffect(() => {
     if (editingProduct && currentProduct) {
@@ -138,10 +140,12 @@ const ProductForm: React.FC<ProductFormProps> = ({
     }
   };
 
-  const handleFormSubmit = (event: React.FormEvent) => {
+  const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
     let formIsValid = true;
     let errors: { [field: string]: string } = {};
+    let fileUrl = currentProduct?.image_url || null;
 
     if (!productSKU) {
       errors.SKU = "SKU is required";
@@ -193,6 +197,22 @@ const ProductForm: React.FC<ProductFormProps> = ({
       formIsValid = false;
     }
 
+    // Handle image upload
+    if (productImage) {
+      const formData = new FormData();
+      formData.append('file', productImage);
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        fileUrl = data.url;
+      }
+    }
+
     setValidationErrors(errors);
 
     if (!formIsValid) {
@@ -208,23 +228,31 @@ const ProductForm: React.FC<ProductFormProps> = ({
       quantity: currentProduct ? currentProduct.quantity : 1,
       size: productSize,
       color: productColor,
+      image_url: fileUrl,
     };
 
-    if (editingProduct) {
-      saveProduct(updatedProduct);
-    } else {
-      addProduct(updatedProduct);
-    }
+    try {
+      if (editingProduct) {
+        await saveProduct(updatedProduct);
+      } else {
+        await addProduct(updatedProduct);
+      }
 
-    setProductSKU('');
-    setProductName('');
-    setProductSize('');
-    setProductColor('');
-    setProductPrice('');
-    setSelectedCategory(null);
-    setValidationErrors({});
-    setCategorySelected(false);
-    onClose();
+      // Clear form after successful submission
+      setProductSKU('');
+      setProductName('');
+      setProductSize('');
+      setProductColor('');
+      setProductPrice('');
+      setSelectedCategory(null);
+      setValidationErrors({});
+      setCategorySelected(false);
+      setProductImage(null);
+      setProductImagePreview(null);
+      onClose();
+    } catch (error) {
+      console.error('Error submitting product:', error);
+    }
   };
 
   return (
@@ -322,27 +350,48 @@ const ProductForm: React.FC<ProductFormProps> = ({
             min="0"
           />
 
-          {validationErrors.duplicate && ( // <-- Added block for displaying duplicate error
+          {validationErrors.duplicate && (
             <div className={styles.errorText}>{validationErrors.duplicate}</div>
           )}
 
+          <label className={styles.modalInputLabel}>Product Image</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                setProductImage(file);
+                setProductImagePreview(URL.createObjectURL(file));
+              }
+            }}
+            className={styles.modalInput}
+          />
+          {productImagePreview && <img src={productImagePreview} alt="Preview" className={styles.imagePreview} />}
+
           <div className={styles.modalMediumButtonContainer}>
-            <button type="submit" className={styles.modalMediumButton}>
-              {editingProduct ? 'Save Product' : 'Add Product'}
-            </button>
             {editingProduct && (
               <button
                 type="button"
                 onClick={onClose}
                 className={styles.modalMediumButton}
+                disabled={loading}
               >
                 Cancel
               </button>
             )}
+            <button
+              type="submit"
+              className={styles.modalMediumButton}
+              disabled={loading}
+            >
+              {editingProduct ? 'Save Product' : 'Add Product'}
+            </button>
           </div>
-        </form>
-      </div>
-    </div>
+
+        </form >
+      </div >
+    </div >
   );
 };
 

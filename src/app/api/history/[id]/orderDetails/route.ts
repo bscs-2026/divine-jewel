@@ -11,7 +11,7 @@ export async function GET(request: NextRequest, context: { params: { id: string 
       return NextResponse.json({ error: 'order_id is required' }, { status: 400 });
     }
 
-    console.log('Fetching order details for order_id:', id);
+    // console.log('Fetching order details for order_id:', id);
 
     const rows = await query(`
       SELECT 
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest, context: { params: { id: string 
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    console.log('Fetched order details:', rows);
+    // console.log('Fetched order details:', rows);
     return NextResponse.json({ orderDetails: rows }, { status: 200 });
   } catch (error: any) {
     console.error('An error occurred while fetching order details:', error);

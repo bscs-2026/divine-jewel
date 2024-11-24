@@ -10,7 +10,7 @@ import Modal from '@/components/modals/Modal';
 import SupplyBatchForm from '@/components/forms/SupplyBatch';
 import { generateBatchID } from '@/lib/generatorHelper';
 import { DeletePrompt, SuccessfulPrompt, ErrorPrompt } from "@/components/prompts/Prompt";
-import CircularIndeterminate from '@/components/loading/Loading';
+import Spinner from '@/components/loading/Loading';
 
 interface Supplier {
   id: number;
@@ -191,7 +191,7 @@ const SuppliesPage: React.FC = () => {
   return (
     <Layout defaultTitle="Supply">
       {loading && (
-        <CircularIndeterminate />
+        <Spinner />
       )}
 
       <SupplierTabs

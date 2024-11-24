@@ -11,6 +11,7 @@ export async function GET() {
                 p.size, 
                 p.color, 
                 p.price, 
+                p.image_url,
                 s.quantity AS stock,
                 b.id AS branch_code,
                 b.name AS branch_name,

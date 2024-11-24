@@ -3,7 +3,7 @@ import { query } from '../../../lib/db';
 
 export async function GET() {
   try {
-    console.log('Fetching supply data from database...');
+    // console.log('Fetching supply data from database...');
     const rows = await query(`
       SELECT
         sd.id,
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No supplies provided or invalid format' }, { status: 400 });
     }
 
-    console.log('Inserting multiple supplies into the database...');
+    // console.log('Inserting multiple supplies into the database...');
 
     // Ensure all fields are defined and convert undefined values to null or appropriate defaults
     const values = supplies.map(
