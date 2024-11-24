@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import styles from '@/components/styles/Table.module.css';
+import modalStyles from '@/components/styles/Modal.module.css';
 
 interface Credit {
   id: number;
@@ -21,10 +22,9 @@ const CustomersCredit: React.FC<CustomersCreditProps> = ({ credits }) => {
 
   const columns = useMemo(
     () => [
-      { Header: 'ID', accessor: 'id' as keyof Credit, align: 'left', sortable: true },
+      { Header: 'Credit ID', accessor: 'id' as keyof Credit, align: 'left', sortable: true },
       { Header: 'Customer Name', accessor: 'customer_name' as keyof Credit, align: 'left', sortable: true },
       { Header: 'Credit Amount', accessor: 'credit_amount' as keyof Credit, align: 'right', sortable: true },
-      { Header: 'Status', accessor: 'status' as keyof Credit, align: 'left', sortable: true },
     ],
     []
   );
@@ -67,39 +67,43 @@ const CustomersCredit: React.FC<CustomersCreditProps> = ({ credits }) => {
   };
 
   return (
-    <div className={styles.container}>
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            {columns.map((column) => (
-              <th
-                key={column.accessor as string}
-                onClick={() => handleSort(column.accessor, column.sortable)}
-                className={`${styles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign}`}
-              >
-                <div className={styles.sortContent}>
-                  {column.Header}
-                  {column.sortable && renderSortIcon(column.accessor)}
-                </div>
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {sortedCredits.map((credit) => (
-            <tr key={credit.id} className={styles.tableRow}>
-              <td className={styles.td}>{credit.id}</td>
-              <td className={styles.td}>{credit.customer_name}</td>
-              <td className={`${styles.td} ${styles.rightAlign}`}>
-                {typeof credit.credit_amount === 'number'
-                  ? credit.credit_amount.toFixed(2)
-                  : parseFloat(credit.credit_amount || '0').toFixed(2)}
-              </td>
-              <td className={styles.td}>{credit.status}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className={modalStyles.modalContainer}>
+      <div className={modalStyles.modalContent}>
+        <div className={modalStyles.modalContentScrollable}>
+          <h2 className={modalStyles.modalHeading}>Valid Credits</h2>
+          <table className={modalStyles.modalTable}>
+            <thead>
+              <tr>
+                {columns.map((column) => (
+                  <th
+                    key={column.accessor as string}
+                    onClick={() => handleSort(column.accessor, column.sortable)}
+                    className={`${modalStyles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign}`}
+                  >
+                    <div className={styles.sortContent}>
+                      {column.Header}
+                      {column.sortable && renderSortIcon(column.accessor)}
+                    </div>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {sortedCredits.map((credit) => (
+                <tr key={credit.id} className={styles.tableRow}>
+                  <td className={modalStyles.td}>{credit.id}</td>
+                  <td className={modalStyles.td}>{credit.customer_name}</td>
+                  <td className={`${modalStyles.td} ${styles.rightAlign}`}>
+                    {typeof credit.credit_amount === 'number'
+                      ? credit.credit_amount.toFixed(2)
+                      : parseFloat(credit.credit_amount || '0').toFixed(2)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 };
