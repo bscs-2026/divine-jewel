@@ -1,5 +1,5 @@
 "use client";
-import { pinkShades } from "@/lib/constants";
+import { chartColors } from "@/lib/constants";
 import { BranchesOrders } from "../page";
 import { Pie, PieChart } from "recharts";
 import {
@@ -63,7 +63,7 @@ const BranchSalesPieChart: FC<BranchSalesPieChartProps> = ({ year, month }) => {
   const ChartData = branchesOrders.map((branch, index) => ({
     branch: branch.branch_name,
     orders: branch.orders_count,
-    fill: pinkShades[index % pinkShades.length],
+    fill: chartColors[index % chartColors.length],
   }));
 
   const chartConfig = branchesOrders.reduce((config, branch, index) => {
@@ -71,7 +71,7 @@ const BranchSalesPieChart: FC<BranchSalesPieChartProps> = ({ year, month }) => {
       label:
         branch.branch_name.charAt(0).toUpperCase() +
         branch.branch_name.slice(1),
-      color: pinkShades[index % pinkShades.length],
+      color: chartColors[index % chartColors.length],
     };
     return config;
   }, {} as ChartConfig);
@@ -111,7 +111,7 @@ const BranchSalesPieChart: FC<BranchSalesPieChartProps> = ({ year, month }) => {
           Trending up by 5.2% this month <TrendingUp className="h-4 w-4" />
         </div> */}
         <div className="leading-none text-muted-foreground mx-6 text-center">
-          Showing total orders per branch for the month of {month} {year}.
+          {isMonth ? `Showing total orders per branch for the month of ${month} ${year}.` : `Showing total orders per branch for the year ${year}.` }
         </div>
       </CardFooter>
     </Card>
