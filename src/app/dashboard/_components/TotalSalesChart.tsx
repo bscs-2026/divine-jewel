@@ -44,9 +44,9 @@ const TotalSalesChart: FC<TotalSalesChartProps> = ({ activeChart, setActiveChart
     <Card>
   <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row ">
     <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-      <CardTitle>Total Sales</CardTitle>
+      <CardTitle className='text-xl font-extrabold text-gray-600'>Total Orders</CardTitle>
       <CardDescription>
-        Showing the count of sales for the selected month.
+        Showing the orders count for the selected month.
       </CardDescription>
     </div>
     <div className="flex">
@@ -60,7 +60,7 @@ const TotalSalesChart: FC<TotalSalesChartProps> = ({ activeChart, setActiveChart
             onClick={() => setActiveChart(chart)}
           >
             <span className="text-xs text-muted-foreground">
-              Count of sales this Month
+              Orders Count this Month
             </span>
             <span className="text-lg font-bold leading-none sm:text-3xl ml-auto">
               {chartData.reduce((acc, item) => acc + item.sales, 0)}
@@ -80,7 +80,7 @@ const TotalSalesChart: FC<TotalSalesChartProps> = ({ activeChart, setActiveChart
       onClick={() => setActiveChart(chart)}
     >
       <span className="text-xs text-muted-foreground">
-        Count of sales this Year
+        Orders Count this Year
       </span>
       <span className="text-lg font-bold leading-none sm:text-3xl ml-auto">
         {yearData.reduce((acc, item) => acc + item.yearly_orders, 0)}
@@ -93,7 +93,7 @@ const TotalSalesChart: FC<TotalSalesChartProps> = ({ activeChart, setActiveChart
   <CardContent className="px-2 sm:p-6">
     {chartData.length === 0 ? (
       <div className="flex justify-center items-center h-[250px] text-gray-500">
-        <span>No Data Available on this Date.</span>
+        <span className=" text-center items-center text-gray-500 p-4 border border-gray-300 rounded-lg bg-gray-100">No Data Available on this Date.</span>
       </div>
     ) : (
       <ChartContainer

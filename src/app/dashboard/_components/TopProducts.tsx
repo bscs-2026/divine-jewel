@@ -1,260 +1,162 @@
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useEffect, useState } from "react";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select"
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card"
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
-    ChartConfig,
-    ChartContainer,
-    ChartTooltip,
-    ChartTooltipContent,
-} from "@/components/ui/chart"
-import { DataTable } from '../data-table'
-import { columns } from '../columns'
-import { Pie, PieChart } from 'recharts'
+  ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import { DataTable } from "../data-table";
+import { columns } from "../columns";
+import { Pie, PieChart } from "recharts";
+import { Button } from "@/components/ui/button";
+import { months } from "@/lib/constants";
 
-// const sales: TopProducts[] = [
-//     {
-//       name: "Hello Kitty",
-//       category: "Bracelets",
-//       quantitySold: 10,
-//       totalSales: 100,
-//     },
-//     {
-//       name: "Pikachu",
-//       category: "Earrings",
-//       quantitySold: 5,
-//       totalSales: 50,
-//     },
-//     {
-//       name: "Snoopy",
-//       category: "Necklaces",
-//       quantitySold: 3,
-//       totalSales: 30,
-//     },
-//     {
-//       id: "b4e0b1d4",
-//       name: "Doraemon",
-//       category: "Rings",
-//       quantitySold: 2,
-//       totalSales: 20,
-//     },
-//     {
-//       id: "b4e0b1d4",
-//       name: "Doraemon",
-//       category: "Rings",
-//       quantitySold: 2,
-//       totalSales: 20,
-//     },
-//     {
-//       id: "f7e9a3d3",
-//       name: "Snoopy",
-//       category: "Necklaces",
-//       quantitySold: 3,
-//       totalSales: 30,
-//     },
-//     {
-//       id: "b4e0b1d4",
-//       name: "Doraemon",
-//       category: "Rings",
-//       quantitySold: 2,
-//       totalSales: 20,
-//     },
-//     {
-//       id: "b4e0b1d4",
-//       name: "Doraemon",
-//       category: "Rings",
-//       quantitySold: 2,
-//       totalSales: 20,
-//     },
-    
-//   ];
+interface Category {
+  id: string;
+  name: string;
+  description: string;
+}
 
-  const pieChartConfig = {
-    visitors: {
-      label: "Visitors",
-    },
-    chrome: {
-      label: "Chrome",
-      color: "hsl(var(--chart-1))",
-    },
-    safari: {
-      label: "Safari",
-      color: "hsl(var(--chart-2))",
-    },
-    firefox: {
-      label: "Firefox",
-      color: "hsl(var(--chart-3))",
-    },
-    edge: {
-      label: "Edge",
-      color: "hsl(var(--chart-4))",
-    },
-    other: {
-      label: "Other",
-      color: "hsl(var(--chart-5))",
-    },
-  } satisfies ChartConfig
+interface Branches {
+  branch_name: string;
+  address_line: string;
+  branch_code: number;
+  order_count: number;
+}
 
-  const topProducts = [
-    { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-    { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-    { browser: "firefox", visitors: 187, fill: "var(--color-firefox)" },
-    { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-    { browser: "other", visitors: 90, fill: "var(--color-other)" },
-  ];
+interface TopProducts {
+  product_name: string;
+  category_name: string;
+  total_quantity_sold: number;
+  total_sales: number;
+}
 
-  interface Category {
-    id: string;
-    name: string;
-    description: string;
-  }
+interface BranchesSalesProps {
+  branches: Branches[];
+  year: string;
+  month: string;
+}
 
-  interface Branches {
-    branch_name: string;
-    address_line: string;
-    branch_code: number;
-    order_count: number;
-  };
-
-  interface TopProducts {
-    product_name: string;
-    category_name: string;
-    total_quantity_sold: number;
-    total_sales: number;
-  }
-
-  interface BranchesSalesProps {
-    branches: Branches[];
-  };
-
-const TopProducts: FC<BranchesSalesProps> = ({ branches }) => {
+const TopProducts: FC<BranchesSalesProps> = ({ branches, year, month }) => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [topProducts, setTopProducts] = useState<TopProducts[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('allCategories');
-  const [selectedBranch, setSelectedBranch] = useState<string>('allBranches');
-
+  const [selectedCategory, setSelectedCategory] =
+    useState<string>("allCategories");
+  const [selectedBranch, setSelectedBranch] = useState<string>("allBranches");
+  const [isMonth, setIsMonth] = useState<boolean>(true);
 
   useEffect(() => {
     fetchCategories();
   }, []);
 
   useEffect(() => {
-    fetchTopProduct();
-  }, [selectedCategory, selectedBranch]);
+    fetchTopProduct(isMonth);
+  }, [selectedCategory, selectedBranch, isMonth, month, year]);
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('/api/products/category');
+      const response = await fetch("/api/products/category");
       const data = await response.json();
       setCategories(data.categories);
     } catch (error: any) {
-      console.error(error.message)
+      console.error(error.message);
     }
   };
-  
-  const fetchTopProduct = async () => {
+
+  const fetchTopProduct = async (isMonth: boolean) => {
+    let url;
+    if (isMonth) {
+      const monthValue = months.find((m) => m.name === month)?.value;
+      const date = `${year}-${monthValue}`;
+      url = `/api/sales/topproducts?category=${selectedCategory}&branch=${selectedBranch}&date=${date}`;
+    } else {
+      url = `/api/sales/topproducts?category=${selectedCategory}&branch=${selectedBranch}&year=${year}`;
+    }
+
     try {
-      const response = await fetch(`/api/sales/topproducts?category=${selectedCategory}&branch=${selectedBranch}`);
+      const response = await fetch(url);
       const data = await response.json();
       setTopProducts(data.TopProducts);
     } catch (error: any) {
-      console.error(error.message)
+      console.error(error.message);
     }
+  };
+
+  const toggleIsMonth = () => {
+    setIsMonth((prevIsMonth) => !prevIsMonth);
   }
 
-
   return (
-    <div className="bg-white h-[430px] shadow-md w-full rounded-2xl flex flex-col border border-gray-200">
-    <div className="flex flex-row">
-      <div className="m-4 font-extrabold text-xl">Top Products</div>
-      <div className='m-3'>
-      <Select value={selectedBranch} onValueChange={setSelectedBranch} >
-        <SelectTrigger className="w-[200px]">
-          <SelectValue placeholder="Branch" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="allBranches">All Branches</SelectItem>
-          {branches.map((branch, index) => {
-            return (
-              <SelectItem key={index} value={branch.branch_code.toString()}>
-                {branch.branch_name}
-              </SelectItem>
-            )
-          }
-        )}
-        </SelectContent>
-      </Select>
-      </div>
-      <div className='m-3'>
-      <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-        <SelectTrigger className="w-[200px]">
-          <SelectValue placeholder="Category" />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="allCategories">All Categories</SelectItem>
-          {categories.map((category, index) => {
-            return (
-              <SelectItem key={index} value = {category.name}>
-                {category.name}
-              </SelectItem>
-            )
-          })}
-        </SelectContent>
-      </Select>
-      </div>
-    </div>
-    <div className="mx-4 gap-2 flex flex-row mb-2">
-      <div className="w-2/3">
-        <div className="bg-white rounded-xl h-[350px]">
-          <DataTable columns={columns} data={topProducts} />
+    <div className="bg-white h-full shadow-md w-full rounded-2xl flex flex-col border border-gray-200">
+      <div className="mt-4 ml-4 font-extrabold text-xl">Top Products</div>
+      <div className="flex flex-row gap-3 m-4 ">  
+        <div className="">
+          <Select value={selectedBranch} onValueChange={setSelectedBranch}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Branch" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="allBranches">All Branches</SelectItem>
+              {branches.map((branch, index) => {
+                return (
+                  <SelectItem key={index} value={branch.branch_code.toString()}>
+                    {branch.branch_name}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="">
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className="w-[150px]">
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="allCategories">All Categories</SelectItem>
+              {categories.map((category, index) => {
+                return (
+                  <SelectItem key={index} value={category.name}>
+                    {category.name}
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="">
+        <Button
+            className="text-sm text-gray-700 p-2 w-[150px] bg-[#FCE4EC] hover:bg-pink-200"
+            onClick={toggleIsMonth}
+          >
+            {isMonth ? month : year}
+          </Button>
         </div>
       </div>
-      <div className="w-1/3">
-        <Card className="flex flex-col h-[350px]">
-          <CardHeader className="items-center pb-0">
-            <CardTitle>Top Products</CardTitle>
-            <CardDescription>January - June 2024</CardDescription>
-          </CardHeader>
-          <CardContent className="flex-1 pb-0">
-            <ChartContainer
-              config={pieChartConfig}
-              className="mx-auto aspect-square max-h-[250px]"
-            >
-              <PieChart>
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent hideLabel />}
-                />
-                <Pie
-                  data={topProducts}
-                  dataKey="visitors"
-                  nameKey="browser"
-                />
-              </PieChart>
-            </ChartContainer>
-          </CardContent>
-          <CardFooter className="flex-col gap-2 text-sm mb-2">
-            <div className="leading-none text-muted-foreground">
-              Top products for the last 6 months
-            </div>
-          </CardFooter>
-        </Card>
+      <div className="mx-4 gap-2 flex flex-row mb-2">
+        <div className="w-full h-auto">
+          <div className="bg-white rounded-xl">
+            <DataTable columns={columns} data={topProducts} />
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-  )
-}
+  );
+};
 
-export default TopProducts
+export default TopProducts;
