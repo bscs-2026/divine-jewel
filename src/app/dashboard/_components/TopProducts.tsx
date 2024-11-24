@@ -24,40 +24,7 @@ import { DataTable } from "../data-table";
 import { columns } from "../columns";
 import { Pie, PieChart } from "recharts";
 import { Button } from "@/components/ui/button";
-
-const pieChartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  chrome: {
-    label: "Chrome",
-    color: "hsl(var(--chart-1))",
-  },
-  safari: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
-  },
-  firefox: {
-    label: "Firefox",
-    color: "hsl(var(--chart-3))",
-  },
-  edge: {
-    label: "Edge",
-    color: "hsl(var(--chart-4))",
-  },
-  other: {
-    label: "Other",
-    color: "hsl(var(--chart-5))",
-  },
-} satisfies ChartConfig;
-
-const topProducts = [
-  { browser: "chrome", visitors: 275, fill: "var(--color-chrome)" },
-  { browser: "safari", visitors: 200, fill: "var(--color-safari)" },
-  { browser: "firefox", visitors: 187, fill: "var(--color-firefox)" },
-  { browser: "edge", visitors: 173, fill: "var(--color-edge)" },
-  { browser: "other", visitors: 90, fill: "var(--color-other)" },
-];
+import { months } from "@/lib/constants";
 
 interface Category {
   id: string;
@@ -98,8 +65,8 @@ const TopProducts: FC<BranchesSalesProps> = ({ branches, year, month }) => {
   }, []);
 
   useEffect(() => {
-    fetchTopProduct();
-  }, [selectedCategory, selectedBranch]);
+    fetchTopProduct(isMonth);
+  }, [selectedCategory, selectedBranch, isMonth, month, year]);
 
   const fetchCategories = async () => {
     try {
@@ -111,11 +78,18 @@ const TopProducts: FC<BranchesSalesProps> = ({ branches, year, month }) => {
     }
   };
 
-  const fetchTopProduct = async () => {
+  const fetchTopProduct = async (isMonth: boolean) => {
+    let url;
+    if (isMonth) {
+      const monthValue = months.find((m) => m.name === month)?.value;
+      const date = `${year}-${monthValue}`;
+      url = `/api/sales/topproducts?category=${selectedCategory}&branch=${selectedBranch}&date=${date}`;
+    } else {
+      url = `/api/sales/topproducts?category=${selectedCategory}&branch=${selectedBranch}&year=${year}`;
+    }
+
     try {
-      const response = await fetch(
-        `/api/sales/topproducts?category=${selectedCategory}&branch=${selectedBranch}`
-      );
+      const response = await fetch(url);
       const data = await response.json();
       setTopProducts(data.TopProducts);
     } catch (error: any) {
@@ -175,8 +149,8 @@ const TopProducts: FC<BranchesSalesProps> = ({ branches, year, month }) => {
         </div>
       </div>
       <div className="mx-4 gap-2 flex flex-row mb-2">
-        <div className="w-full">
-          <div className="bg-white rounded-xl h-[350px]">
+        <div className="w-full h-auto">
+          <div className="bg-white rounded-xl">
             <DataTable columns={columns} data={topProducts} />
           </div>
         </div>

@@ -143,7 +143,7 @@ export default function Home() {
   };
 
   return (
-    <MainLayout defaultTitle="Dashboard">
+    <MainLayout defaultTitle="Sales Dashboard">
       <div className="mb-4 mx-7 flex flex-row gap-2">
         <div className="flex flex-row gap-2 m-1">
           <div>
@@ -189,7 +189,7 @@ export default function Home() {
             setActiveChart={setActiveChart}
           />
         </div>
-        <div className='flex flex-row gap-2'>
+        <div className='flex flex-row gap-2 h-auto'>
           <div className='w-2/3'>
             <TopProducts
               branches={branches}

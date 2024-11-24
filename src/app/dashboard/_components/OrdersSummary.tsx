@@ -21,21 +21,6 @@ import { FC, useEffect, useState } from "react";
 import { months } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 
-// const chartData = [
-//   { month: "January", orders: 5 },
-//   { month: "February", orders: 113 },
-//   { month: "March", orders: 1 },
-//   { month: "April", orders: 73 },
-//   { month: "May", orders: 209 },
-//   { month: "June", orders: 214 },
-//   { month: "July", orders: 87 },
-//   { month: "August", orders: 2 },
-//   { month: "September", orders: 0 },
-//   { month: "October", orders: 0 },
-//   { month: "November", orders: 0 },
-//   { month: "December", orders: 0 },
-// ];
-
 const chartConfig = {
   orders: {
     label: "orders",
@@ -58,15 +43,13 @@ export const OrdersSummary: FC<OrdersSummaryProps> = ({ year }) => {
 
   useEffect(() => {
     fetchOrdersSummary(isYear);
-    console.log("Years:", yearsSummary);
-  }, [isYear]);
+  }, [isYear, year]);
 
   const fetchOrdersSummary = async (isYear: boolean) => {
     let url = "";
     if (isYear) {
       url = `/api/sales/ordersSummary?year=${year}`;
     } else {
-      // Define the URL for the case when isYear is false
       url = `/api/sales/ordersSummary`;
     }
     try {

@@ -47,12 +47,29 @@ export async function GET(request: Request) {
       data = await query(
         `
         SELECT 
-          DATE_FORMAT(o.date, '%Y-%m') AS order_date, 
-          COUNT(o.id) AS orders_count
-        FROM rms_db.orders o
-        WHERE YEAR(o.date) = ?
-        GROUP BY order_date
-        ORDER BY order_date;
+    DATE_FORMAT(o.date, '%Y-%m') AS order_date, 
+    COUNT(DISTINCT o.id) AS orders_count
+FROM 
+    orders o
+JOIN 
+    (
+        SELECT 
+            od.order_id,
+            SUM(CASE WHEN od.status = 'paid' THEN od.quantity ELSE 0 END) AS total_paid,
+            SUM(CASE WHEN od.status = 'returned' THEN od.quantity ELSE 0 END) AS total_returned
+        FROM 
+            order_details od
+        GROUP BY 
+            od.order_id
+    ) order_summary ON o.id = order_summary.order_id
+WHERE 
+    YEAR(o.date) = ? 
+    AND (order_summary.total_paid - order_summary.total_returned) > 0 -- Net positive quantity
+GROUP BY 
+    DATE_FORMAT(o.date, '%Y-%m')
+ORDER BY 
+    order_date;
+
         `,
         [year]
       );
@@ -61,11 +78,28 @@ export async function GET(request: Request) {
       data = await query(
         `
         SELECT 
-          YEAR(o.date) AS order_date, 
-          COUNT(o.id) AS orders_count
-        FROM rms_db.orders o
-        GROUP BY order_date
-        ORDER BY order_date;
+    YEAR(o.date) AS order_date, 
+    COUNT(DISTINCT o.id) AS orders_count
+FROM 
+    orders o
+JOIN 
+    (
+        SELECT 
+            od.order_id,
+            SUM(CASE WHEN od.status = 'paid' THEN od.quantity ELSE 0 END) AS total_paid,
+            SUM(CASE WHEN od.status = 'returned' THEN od.quantity ELSE 0 END) AS total_returned
+        FROM 
+            order_details od
+        GROUP BY 
+            od.order_id
+    ) order_summary ON o.id = order_summary.order_id
+WHERE 
+    (order_summary.total_paid - order_summary.total_returned) > 0 -- Net positive quantity
+GROUP BY 
+    YEAR(o.date)
+ORDER BY 
+    order_date;
+
         `
       );
     }
