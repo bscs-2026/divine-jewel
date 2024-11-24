@@ -1,7 +1,6 @@
 import { useEffect, useState, React } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import Styles from '@/components/styles/Tabs.module.css';
-import formStyles from '@/components/styles/Form.module.css';
 import { getCookieValue } from '@/lib/clientCookieHelper';
 
 interface Branch {
@@ -71,11 +70,12 @@ const BranchTabs: React.FC<BranchTabsProps> = ({
 
         {isAllowedRole && (
           <>
-            <label className={formStyles.heading2} htmlFor="branch-filter">
+            <div className={Styles.selectContainer}>
+            <label className={Styles.heading2} htmlFor="branch-filter">
               Select Branch:
             </label>
             <select
-              className={formStyles.select}
+              className={Styles.tabsSelect}
               id="branch-filter"
               value={filterBranch === null || filterBranch === 'All' ? 'All' : filterBranch.toString()}
               onChange={handleBranchChange}
@@ -87,6 +87,7 @@ const BranchTabs: React.FC<BranchTabsProps> = ({
                 </option>
               ))}
             </select>
+            </div>
           </>
         )}
       </div>

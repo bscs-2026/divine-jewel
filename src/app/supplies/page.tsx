@@ -189,7 +189,7 @@ const SuppliesPage: React.FC = () => {
     : supplies;
 
   return (
-    <Layout defaultTitle="Supply">
+    <Layout defaultTitle="Supply Delivery Records">
       {loading && (
         <Spinner />
       )}

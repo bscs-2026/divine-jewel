@@ -4,6 +4,9 @@
   padding: 0.5rem;
   padding-top: 10px;
   box-sizing: border-box;
+  overflow-y: auto;
+  white-space: nowrap;
+  scrollbar-width: thin;
 }
 
 .heading {
@@ -263,7 +266,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 1rem 0 2rem;
+  margin: 1rem 0rem;
 }
 
 .paymentMethods, .paymentRebates {
@@ -323,7 +326,7 @@
   width: 110px;
   padding: 0.5rem;
   font-size: 13px;
-  border: 1px solid #ccc;
+  border: 1px solid #DDDDDD;
   color: #575757;
   border-radius: 4px;
   text-align: right;
@@ -503,4 +506,25 @@
   margin-top: 5px;
   text-align: right;
   justify-content: flex-end;
+}
+
+@media (max-width: 1366px) {
+  .paymentButton {
+    padding: 0.5rem 0.5rem;
+    font-size: 13px;
+  }
+  
+  .newOrderButton {
+    width: 45%;
+    padding: 0.5rem;
+    font-size: 14px;
+  }
+
+  .newOrderButton {
+    width: 45%;
+    padding: 0.5rem;
+    font-size: 14px;
+  }
+
+
 }
