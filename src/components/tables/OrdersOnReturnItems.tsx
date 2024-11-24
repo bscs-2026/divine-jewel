@@ -95,14 +95,14 @@ const RecentOrders: React.FC<RecentOrdersProps> = ({
   const renderSortIcon = (key: keyof Orders) => {
     const isActive = sortConfig.key === key;
     return (
-      <span className={key === 'quantity' ? styles.sortIconsRight : styles.sortIconsLeft}>
+      <span className={`${styles.icon} ${key === 'quantity' ? styles.sortIconsRight : styles.sortIconsLeft}`}>
         <ArrowUpward
           className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'asc' ? styles.active : ''}`}
-          style={{ fontSize: '16px' }}
+          style={{ fontSize: '14px' }}
         />
         <ArrowDownward
           className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'desc' ? styles.active : ''}`}
-          style={{ fontSize: '16px', marginLeft: '2px' }}
+          style={{ fontSize: '14px', marginLeft: '2px' }}
         />
       </span>
     );
