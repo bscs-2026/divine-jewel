@@ -30,6 +30,7 @@ import { months } from '@/lib/constants';
 import BranchSalesPieChart from './_components/BranchSalesPieChart';
 import { OrdersSummary } from './_components/OrdersSummary';
 import ActiveBranches from './_components/ActiveBranches';
+import Spinner from '@/components/loading/Loading';
 
 interface Sales {
   order_date: string;
@@ -75,6 +76,7 @@ export default function Home() {
   const [branches, setBranches] = useState<Branches[]>([]);
   const [branchesOrders, setBranchesOrders] = useState<BranchesOrders[]>([]);
   const [activeChart, setActiveChart] = useState<keyof typeof barChartConfig>("sales");
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     fetchBranchesData();
@@ -89,6 +91,7 @@ export default function Home() {
   const fetchYearlyOrders = async () => {
     const url = `/api/sales/yearlyOrders?year=${year}`;
     try {
+      setLoading(true);
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error("Failed to fetch yearly orders data");
@@ -97,6 +100,8 @@ export default function Home() {
       setYearlyOrders(data.YearlyOrders);
     } catch (error: any) {
       console.error(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -105,6 +110,7 @@ export default function Home() {
     const date = `${year}-${monthValue}`;
     const url = `/api/sales?date=${date}`;
     try {
+      setLoading(true);
       const response = await fetch(url);
       if (!response.ok) {
         throw new Error("Failed to fetch sales data");
@@ -113,11 +119,14 @@ export default function Home() {
       setSales(data.Orders);
     } catch (error: any) {
       console.error(error.message);
+    } finally {
+      setLoading(false);
     }
   };
   
   const fetchBranchesData = async () => {
     try {
+      setLoading(true);
       const response = await fetch("/api/sales/branches");
       if (!response.ok) {
         throw new Error("Failed to fetch branches data");
@@ -126,11 +135,14 @@ export default function Home() {
       setBranches(data.branches);
     } catch (error: any) {
       console.error(error.message);
+    } finally {
+      setLoading(false);
     }
   }
 
   const fetchYears = async () => {
     try {
+      setLoading(true);
       const response = await fetch('/api/sales/years');
       if (!response.ok) {
         throw new Error('Failed to fetch years');
@@ -139,11 +151,14 @@ export default function Home() {
       setYears(data.Years);
     } catch (error: any) {
       console.error(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <MainLayout defaultTitle="Sales Dashboard">
+      {loading && <Spinner />}
       <div className="mb-4 mx-7 flex flex-row gap-2">
         <div className="flex flex-row gap-2 m-1">
           <div>
@@ -187,6 +202,7 @@ export default function Home() {
             sales={sales}
             activeChart={activeChart}
             setActiveChart={setActiveChart}
+            loading={loading}
           />
         </div>
         <div className='flex flex-row gap-2 h-auto'>
