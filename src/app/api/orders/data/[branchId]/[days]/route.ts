@@ -87,7 +87,7 @@ export async function GET(req, context) {
 
         const orderData = await query(getOrderData, [Number(days), Number(branchId)]);
 
-        console.log(`Fetched order details for branch ${branchId} and the past ${days} days:`, orderData);
+        // console.log(`Fetched order details for branch ${branchId} and the past ${days} days:`, orderData);
 
         return NextResponse.json({
             success: true,

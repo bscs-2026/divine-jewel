@@ -17,7 +17,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       status,
     } = await request.json();
 
-    console.log('Updating supply_data in the database...');
+    // console.log('Updating supply_data in the database...');
 
     const result = await query(
       'UPDATE `supply_data` SET supplier_id = ?, sku = ?, material_name = ?, quantity = ?, unit_of_measure = ?, price_per_unit = ?, destination_branch_id = ?, employee_id = ?, note = ?, status = ? WHERE id = ?',
@@ -36,7 +36,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
       ]
     );
 
-    console.log('Updated Supply Data:', result);
+    // console.log('Updated Supply Data:', result);
     return NextResponse.json({ message: 'Supply data updated successfully' }, { status: 200 });
   } catch (error: any) {
     console.error('An error occurred while updating supply data:', error);
@@ -48,11 +48,11 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
   try {
     const { id } = params;
 
-    console.log(`Deleting supply_data with id ${id} from the database...`);
+    // console.log(`Deleting supply_data with id ${id} from the database...`);
 
     const result = await query('DELETE FROM `supply_data` WHERE id = ?', [id]);
 
-    console.log('Deleted Supply Data:', result);
+    // console.log('Deleted Supply Data:', result);
     return NextResponse.json({ message: 'Supply data deleted successfully' }, { status: 200 });
   } catch (error: any) {
     console.error('An error occurred while deleting supply data:', error);

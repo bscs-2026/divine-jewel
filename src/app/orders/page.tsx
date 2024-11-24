@@ -4,11 +4,11 @@
 import { useState, useEffect } from 'react';
 import Layout from '@/components/PageLayout';
 import CategoryTabs from '@/components/tabs/ProductCategoryOnTrans';
-import ProductStocksTable from '@/components/tables/ProductListOnTrans';
+import ProductList from '@/components/tables/ProductListOnOrders';
 import BranchFilter from '@/components/filters/StoreBranchOnOrders';
 import OrderForm from '@/components/forms/Orders';
 import { SuccessfulPrompt } from '@/components/prompts/Prompt';
-import CircularIndeterminate from '@/components/loading/Loading';
+import Modal from '@/components/modals/Modal';
 
 interface Product {
   product_id: number;
@@ -23,6 +23,7 @@ interface Product {
   branch_name: string;
   category_id: number;
   category_name: string;
+  image_url: string;
 }
 
 interface Branch {
@@ -41,6 +42,7 @@ export default function TransactionsPage() {
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
   const [successOrderPrompt, setSuccessOrderPrompt] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [modalImage, setModalImage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -119,15 +121,15 @@ export default function TransactionsPage() {
   const handleBranchChange = (branch: Branch | null) => {
     setSelectedBranch(branch);
     setSelectedCategory(null);
-  
+
     if (branch) {
       // Read the original expiry timestamp from a cookie
       const originalExpiry = getCookieValue('branch_id_expiry');
-  
+
       if (originalExpiry) {
         // Calculate remaining `max-age` in seconds
         const remainingTime = Math.max(0, Math.floor((parseInt(originalExpiry) - Date.now()) / 1000));
-  
+
         // Update the cookies with the remaining `max-age`
         document.cookie = `branch_id=${branch.branch_code}; path=/; max-age=${remainingTime}; SameSite=Lax`;
         document.cookie = `branch_name=${branch.branch_name}; path=/; max-age=${remainingTime}; SameSite=Lax`;
@@ -138,13 +140,13 @@ export default function TransactionsPage() {
       }
     }
   };
-  
+
   // Helper function to get a cookie by name
   const getCookieValue = (name: string) => {
     const matches = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
     return matches ? decodeURIComponent(matches[1]) : null;
   };
-  
+
 
   const handleCategoryChange = (category: string | null) => {
     setSelectedCategory(category);
@@ -189,8 +191,6 @@ export default function TransactionsPage() {
         />
       }
     >
-      {loading && <CircularIndeterminate />}
-
       <BranchFilter
         branches={branches}
         selectedBranch={selectedBranch}
@@ -204,11 +204,19 @@ export default function TransactionsPage() {
         setFilterCategory={handleCategoryChange}
       />
 
-      <ProductStocksTable
+      <ProductList
         products={filteredProducts}
         onProductSelect={handleProductSelect}
         isDisabled={!selectedBranch}
+        onThumbnailClick={(imageUrl) => setModalImage(imageUrl)}
+        loading={loading}
       />
+
+      {modalImage && (
+        <Modal show={true} onClose={() => setModalImage(null)}>
+          <img src={modalImage} alt="Full View" style={{ maxWidth: '100%', maxHeight: '90vh', borderRadius: '10px' }} />
+        </Modal>
+      )}
 
       <SuccessfulPrompt
         message="Order placed successfully!"

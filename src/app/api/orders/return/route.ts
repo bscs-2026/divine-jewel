@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     try {
         // Parse and log the incoming request body
         const body = await request.json();
-        console.log("Received payload:", JSON.stringify(body, null, 2));
+        // console.log("Received payload:", JSON.stringify(body, null, 2));
 
         const { orderId, returnItems, employeeId, customerName } = body;
 
@@ -22,11 +22,11 @@ export async function POST(request: NextRequest) {
 
         // Establish a database connection
         connection = await getConnection();
-        console.log("Database connection established.");
+        // console.log("Database connection established.");
 
         // Begin a transaction
         await connection.beginTransaction();
-        console.log("Transaction started.");
+        // console.log("Transaction started.");
 
         let totalCreditAmount = 0;
 
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
         for (const item of returnItems) {
             const { product_id, quantity, note } = item;
 
-            console.log("Processing return item:", { product_id, quantity, note });
+            // console.log("Processing return item:", { product_id, quantity, note });
 
             // Check if the order detail exists and fetch required fields
             const [orderDetailsResult] = await connection.query(
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
                 [orderId, product_id]
             );
 
-            console.log("Order details query result:", orderDetailsResult);
+            // console.log("Order details query result:", orderDetailsResult);
 
             if (!orderDetailsResult || orderDetailsResult.length === 0) {
                 throw new Error(`No order detail found for order ID ${orderId} and Product ID ${product_id}.`);
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
             // Calculate credit amount
             const creditAmount = unit_price_deducted * quantity;
             totalCreditAmount += creditAmount;
-            console.log(`Calculated credit amount for Product ID ${product_id}: ${creditAmount}`);
+            // console.log(`Calculated credit amount for Product ID ${product_id}: ${creditAmount}`);
 
             // Record the returned item in order_details
             await connection.query(
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
                  VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 'returned', ?, ?)`,
                 [orderId, product_id, sku, quantity, unit_price, discount_pct, unit_price_deducted, note, employeeId]
             );
-            console.log(`Return recorded for Product ID ${product_id}.`);
+            // console.log(`Return recorded for Product ID ${product_id}.`);
         }
 
         // Add a single store credit for the total credit amount
@@ -83,12 +83,12 @@ export async function POST(request: NextRequest) {
         );
 
         const creditId = storeCreditResult.insertId; // Fetch the inserted credit ID
-        console.log(`Single store credit issued for total amount: ${totalCreditAmount}, Credit ID: ${creditId}`);
+        // console.log(`Single store credit issued for total amount: ${totalCreditAmount}, Credit ID: ${creditId}`);
 
         // Commit the transaction
-        console.log("Committing transaction...");
+        // console.log("Committing transaction...");
         await connection.commit();
-        console.log("Transaction committed successfully.");
+        // console.log("Transaction committed successfully.");
 
         // Return a success response with the single credit ID
         const response = {
@@ -96,7 +96,7 @@ export async function POST(request: NextRequest) {
             totalCreditAmount,
             creditId, // Single credit ID
         };
-        console.log("API Response:", response);
+        // console.log("API Response:", response);
 
         return NextResponse.json(response, { status: 200 });
     } catch (error: any) {
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
 
         // Rollback transaction on error
         if (connection) {
-            console.log("Rolling back transaction...");
+            // console.log("Rolling back transaction...");
             await connection.rollback();
         }
 
@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
     } finally {
         // Release the database connection
         if (connection) {
-            console.log("Releasing database connection...");
+            // console.log("Releasing database connection...");
             connection.release();
         }
     }

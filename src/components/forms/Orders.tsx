@@ -4,11 +4,10 @@ import { AddBox, IndeterminateCheckBox, ArrowDropUp, ArrowDropDown, Add } from '
 import styles from '@/components/styles/Form.module.css';
 import { SuccessfulPrompt } from "@/components/prompts/Prompt";
 import { formatDate } from '@/lib/dateTimeHelper';
-import CircularIndeterminate from '@/components/loading/Loading';
+import Spinner from '@/components/loading/Loading';
 import Modal from '@/components/modals/Modal';
 import Receipt from '@/components/modals/OrderReceipt';
 import { getCookieValue } from '@/lib/clientCookieHelper';
-
 
 const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch, reloadData }) => {
     const [employeeName, setEmployeeName] = useState('Unknown Cashier');
@@ -56,7 +55,6 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch, relo
     const [creditId, setCreditId] = useState('');
     const [creditError, setCreditError] = useState('');
     const [loading, setLoading] = useState<boolean>(false);
-
 
     interface OrderDetail {
         order_id: number;
@@ -224,8 +222,6 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch, relo
         }
     };
 
-
-
     // Handle change of credit ID, fetch credits, and set applied credits
     const handleCreditIdChange = async (event) => {
         const id = event.target.value;
@@ -391,7 +387,7 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch, relo
 
     return (
         <div className={styles.container}>
-            {loading && <CircularIndeterminate />}
+            {loading && <Spinner />}
             {/* Order and Customer Details */}
             <div className={styles.orderDetails}>
                 <div className={styles.headerContainer}>

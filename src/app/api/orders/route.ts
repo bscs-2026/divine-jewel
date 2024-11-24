@@ -48,13 +48,13 @@ export async function POST(request: NextRequest) {
         );
 
         const orderId = orderResult.insertId;
-        console.log("Generated order_id:", orderId);
+        // console.log("Generated order_id:", orderId);
 
         // Process each order item
         for (const item of order_items) {
             const { product_id, sku, quantity, unit_price } = item;
 
-            console.log(`Processing SKU: ${sku}`);
+            // console.log(`Processing SKU: ${sku}`);
 
             const [stockResult] = await connection.query(
                 "SELECT quantity FROM `stocks` WHERE product_id = ? AND branch_code = ?",
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
                 [remainingCredits, remainingCredits, orderId, credit_id]
             );
 
-            console.log(`Credits updated for credit_id: ${credit_id}, Remaining credits: ${remainingCredits}`);
+            // console.log(`Credits updated for credit_id: ${credit_id}, Remaining credits: ${remainingCredits}`);
         }
 
         // Commit transaction

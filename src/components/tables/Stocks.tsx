@@ -16,6 +16,7 @@ interface Stock {
   product_size: string;
   product_color?: string;
   last_updated: string;
+  image_url: string;
 }
 
 interface Product {
@@ -25,12 +26,14 @@ interface Product {
   size: string;
   color: string;
   is_archive: number | boolean;
+  image_url: string;
 }
 
 interface Branch {
   id: number;
   name: string;
   address_line: string;
+  image_url: string;
 }
 
 interface StockTableProps {
@@ -41,9 +44,10 @@ interface StockTableProps {
   setSelectedStocks: (stocks: Stock[]) => void;
   products: Product[];
   branches: Branch[];
+  onThumbnailClick: (imageUrl: string) => void;
 }
 
-const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, filteredData, selectedStocks, setSelectedStocks, products, branches }) => {
+const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, filteredData, selectedStocks, setSelectedStocks, products, branches, onThumbnailClick }) => {
   const [selectAll, setSelectAll] = useState(false);
   const [sortConfig, setSortConfig] = useState<{ key: keyof Stock; direction: 'asc' | 'desc' }>({
     key: 'product_name',
@@ -57,16 +61,15 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, filteredD
   // Define columns for the table
   const columns = useMemo(
     () => [
-      { Header: 'Product', accessor: 'product_name' as keyof Stock, align: 'left' },
-      { Header: 'SKU', accessor: 'product_SKU' as keyof Stock, align: 'left' },
-      // { Header: 'Category', accessor: 'category_name' as keyof Stock, align: 'left' },
-      { Header: 'Size', accessor: 'product_size' as keyof Stock, align: 'left' },
-      { Header: 'Color', accessor: 'product_color' as keyof Stock, align: 'left' },
-      { Header: 'Branch', accessor: 'branch_name' as keyof Stock, align: 'left' },
-      // { Header: 'Address', accessor: 'branch_address' as keyof Stock, align: 'left' },
-      { Header: 'Quantity', accessor: 'quantity' as keyof Stock, align: 'right' },
-      { Header: 'Damaged', accessor: 'damaged' as keyof Stock, align: 'right' },
-      { Header: 'Last Updated', accessor: 'last_updated' as keyof Stock, align: 'right' },
+      { Header: 'Image', accessor: 'image_url' as keyof Product, align: 'left', sortable: false },
+      { Header: 'Product', accessor: 'product_name' as keyof Stock, align: 'left', sortable: true },
+      { Header: 'SKU', accessor: 'product_SKU' as keyof Stock, align: 'left', sortable: true },
+      { Header: 'Size', accessor: 'product_size' as keyof Stock, align: 'left', sortable: true },
+      { Header: 'Color', accessor: 'product_color' as keyof Stock, align: 'left', sortable: true },
+      { Header: 'Branch', accessor: 'branch_name' as keyof Stock, align: 'left', sortable: true },
+      { Header: 'Quantity', accessor: 'quantity' as keyof Stock, align: 'right', sortable: true },
+      { Header: 'Damaged', accessor: 'damaged' as keyof Stock, align: 'right', sortable: true },
+      { Header: 'Last Updated', accessor: 'last_updated' as keyof Stock, align: 'right', sortable: true },
     ],
     []
   );
@@ -74,12 +77,14 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, filteredD
   // Define columns for Stock Summary table
   const summaryColumns = useMemo(
     () => [
-      { Header: 'Product', accessor: 'name' as keyof Product, align: 'left' },
-      { Header: 'SKU', accessor: 'SKU' as keyof Product, align: 'left' },
+      { Header: 'Image', accessor: 'image_url' as keyof Product, align: 'left', sortable: false },
+      { Header: 'Product', accessor: 'name' as keyof Product, align: 'left', sortable: true },
+      { Header: 'SKU', accessor: 'SKU' as keyof Product, align: 'left', sortable: true },
       ...branches.map((branch) => ({
         Header: branch.name,
-        accessor: branch.id as number, // Dynamic accessor for branch columns
+        accessor: branch.id as number,
         align: 'right',
+        sortable: true,
       })),
     ],
     [branches]
@@ -126,6 +131,10 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, filteredD
 
   // Handle column header click for sorting
   const handleSort = (key: keyof Stock) => {
+    const column = columns.find((col) => col.accessor === key);
+    console.log(`handleSort called for column: ${key}, sortable: ${column?.sortable}`);
+    if (!column?.sortable) return;
+
     let direction: 'asc' | 'desc' = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
@@ -133,44 +142,49 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, filteredD
     setSortConfig({ key, direction });
   };
 
-  // Sort Stock Summary table
-  const sortedStockSummary = useMemo(() => {
-    if (!stockSummary) return [];
+  // const sortedStockSummary = useMemo(() => {
+  //   if (!stockSummary) return [];
 
-    const summaryData = products.map((product) => ({
-      ...product,
-      branches: branches.map((branch) => ({
-        branchId: branch.id,
-        quantity: stockSummary[product.id]?.[branch.id] || 0,
-      })),
-    }));
+  //   const summaryData = products.map((product) => ({
+  //     ...product,
+  //     branches: branches.map((branch) => ({
+  //       branchId: branch.id,
+  //       quantity: stockSummary[product.id]?.[branch.id] || 0,
+  //     })),
+  //   }));
 
-    summaryData.sort((a, b) => {
-      const valueA =
-        typeof summarySortConfig.key === 'number'
-          ? a.branches.find((branch) => branch.branchId === summarySortConfig.key)?.quantity || 0
-          : a[summarySortConfig.key] || '';
-      const valueB =
-        typeof summarySortConfig.key === 'number'
-          ? b.branches.find((branch) => branch.branchId === summarySortConfig.key)?.quantity || 0
-          : b[summarySortConfig.key] || '';
+  //   summaryData.sort((a, b) => {
+  //     const valueA =
+  //       typeof summarySortConfig.key === 'number'
+  //         ? a.branches.find((branch) => branch.branchId === summarySortConfig.key)?.quantity || 0
+  //         : a[summarySortConfig.key] || '';
+  //     const valueB =
+  //       typeof summarySortConfig.key === 'number'
+  //         ? b.branches.find((branch) => branch.branchId === summarySortConfig.key)?.quantity || 0
+  //         : b[summarySortConfig.key] || '';
 
-      if (valueA < valueB) return summarySortConfig.direction === 'asc' ? -1 : 1;
-      if (valueA > valueB) return summarySortConfig.direction === 'asc' ? 1 : -1;
-      return 0;
-    });
+  //     if (valueA < valueB) return summarySortConfig.direction === 'asc' ? -1 : 1;
+  //     if (valueA > valueB) return summarySortConfig.direction === 'asc' ? 1 : -1;
+  //     return 0;
+  //   });
 
-    return summaryData;
-  }, [products, branches, stockSummary, summarySortConfig]);
+  //   return summaryData;
+  // }, [products, branches, stockSummary, summarySortConfig]);
 
   // Handle sorting in Stock Summary table
   const handleSummarySort = (key: keyof Product | number) => {
+    const column = summaryColumns.find((col) => col.accessor === key);
+    if (!column?.sortable) {
+      console.log(`Column ${key} is not sortable.`);
+      return; // Skip sorting if the column is not sortable
+    }
     let direction: 'asc' | 'desc' = 'asc';
     if (summarySortConfig.key === key && summarySortConfig.direction === 'asc') {
       direction = 'desc';
     }
     setSummarySortConfig({ key, direction });
   };
+
 
   // Handle individual row selection
   const handleRowSelect = (stock: Stock) => {
@@ -202,6 +216,9 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, filteredD
 
   // Render sort icons with Material Icons
   const renderSortIcon = (key: keyof Stock) => {
+    const column = columns.find((col) => col.accessor === key);
+    if (!column?.sortable) return null;
+
     const isActive = sortConfig.key === key;
     return (
       <span className={key === 'quantity' ? styles.sortIconsRight : styles.sortIconsLeft}>
@@ -219,6 +236,9 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, filteredD
 
   // Render sort icons for Stock Summary table
   const renderSummarySortIcon = (key: keyof Product | number) => {
+    const column = summaryColumns.find((col) => col.accessor === key);
+    if (!column?.sortable) return null;
+
     const isActive = summarySortConfig.key === key;
     return (
       <span>
@@ -268,24 +288,38 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, filteredD
               {columns.map((column) => (
                 <th
                   key={column.accessor as string}
-                  onClick={() => handleSort(column.accessor)}
-                  className={`${styles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign
+                  onClick={() => column.sortable && handleSort(column.accessor)}
+                  className={`${styles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign} ${!column.sortable ? styles.nonSortable : ''
                     }`}
                 >
                   <div className={`${styles.sortContent}`}>
                     {column.Header}
-                    {renderSortIcon(column.accessor)}
+                    {column.sortable && renderSortIcon(column.accessor)}
                   </div>
                 </th>
               ))}
             </tr>
           </thead>
+
         )}
 
         <tbody>
           {stockSummary
             ? sortedFilteredData.map((product) => (
               <tr key={product.id} className={styles.tableRow} style={{ cursor: 'default' }}>
+                <td className={styles.td}>
+                  {product.image_url ? (
+                    <img
+                      src={product.image_url}
+                      alt={product.name}
+                      className={styles.thumbnail}
+                      onClick={() => onThumbnailClick(product.image_url)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                  ) : (
+                    <span>No Image</span>
+                  )}
+                </td>
                 <td className={styles.td}>{product.name}</td>
                 <td className={styles.td}>{product.SKU || 'N/A'}</td>
                 {branches.map((branch) => (
@@ -312,6 +346,19 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, filteredD
                     aria-label={`Select row ${stock.id}`}
                   />
                 </td>
+                <td className={styles.td}>
+                  {stock.image_url ? (
+                    <img
+                      src={stock.image_url}
+                      alt={stock.product_name}
+                      className={styles.thumbnail}
+                      onClick={() => onThumbnailClick(stock.image_url)}
+                      style={{ cursor: 'pointer' }}
+                    />
+                  ) : (
+                    <span>No Image</span>
+                  )}
+                </td>
                 <td className={styles.td}>{stock.product_name}</td>
                 <td className={styles.td}>{stock.product_SKU || 'N/A'}</td>
                 <td className={styles.td}>{stock.product_size || 'N/A'}</td>
@@ -323,9 +370,7 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, stockSummary, filteredD
                 <td className={`${styles.td} ${styles.rightAlign}`}>
                   {stock.damaged}
                 </td>
-                <td
-                  className={`{styles.td} ${styles.rightAlign}`}
-                >
+                <td className={`${styles.td} ${styles.rightAlign}`}>
                   {formatDate(stock.last_updated, 'Asia/Manila')}
                 </td>
               </tr>

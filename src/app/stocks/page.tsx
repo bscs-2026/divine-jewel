@@ -8,11 +8,9 @@ import StockForm from '@/components/forms/Stocks';
 import BranchTabs from '@/components/tabs/BranchTabs';
 import ManageBranches from '@/components/forms/ManageBranches';
 import Modal from '@/components/modals/Modal';
-import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
 import { DeletePrompt, SuccessfulPrompt, ErrorPrompt } from "@/components/prompts/Prompt";
-import CircularIndeterminate from '@/components/loading/Loading';
+import Spinner from '@/components/loading/Loading';
 import { Product } from '@/types';
-import { set } from 'date-fns';
 
 interface Stock {
     id: number;
@@ -28,6 +26,7 @@ interface Stock {
     product_color: string;
     branch_name: string;
     last_updated: string;
+    image_url: string;
 }
 
 interface Product {
@@ -80,6 +79,7 @@ export default function StocksPage() {
     const [successDeleteBranchPrompt, setSuccessDeleteBranchPrompt] = useState<boolean>(false);
     const [ErrorDeleteBranch, setErrorDeleteBranch] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
+    const [modalImage, setModalImage] = useState<string | null>(null);
 
     useEffect(() => {
         fetchData();
@@ -449,7 +449,7 @@ export default function StocksPage() {
 
     return (
         <Layout defaultTitle="Stocks">
-            {loading && <CircularIndeterminate />}
+            {loading && <Spinner />}
 
             <BranchTabs
                 branches={branches}
@@ -475,11 +475,19 @@ export default function StocksPage() {
                 setSelectedStocks={setSelectedStocks}
                 products={products}
                 branches={branches}
+                onThumbnailClick={(imageUrl) => setModalImage(imageUrl)}
             />
+
+            {modalImage && (
+                <Modal show={true} onClose={() => setModalImage(null)}>
+                    <img src={modalImage} alt="Full View" style={{ maxWidth: '100%', maxHeight: '90vh', borderRadius: '10px' }} />
+                </Modal>
+            )}
 
             <Modal show={isModalOpen} onClose={() => closeModal(true)}>
                 {selectedStocks.length > 0 && (
                     <StockForm
+                        loading={loading}
                         products={products}
                         branches={branches}
                         addStock={addStock}

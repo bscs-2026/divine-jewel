@@ -6,7 +6,7 @@ import StockDetailsTable from '../../components/tables/StockDetailsHistory';
 import HistoryTabs from '../../components/tabs/HistoryTabs';
 import Modal from '../../components/modals/Modal';
 import LargeModal from '../../components/modals/LargeModal';
-import CircularIndeterminate from '@/components/loading/Loading';
+import Spinner from '@/components/loading/Loading';
 import BatchStockDetailsHistory from '@/components/modals/BatchStockDetailsHistory';
 import Receipt from '@/components/modals/OrderReceipt';
 import ProductListOnHistory from '@/components/tables/ProductListOnHistory';
@@ -264,7 +264,7 @@ const HistoryPage: React.FC = () => {
 
   return (
     <Layout defaultTitle="History">
-      {loading && <CircularIndeterminate />}
+      {loading && <Spinner />}
       <div>
         <HistoryTabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
 

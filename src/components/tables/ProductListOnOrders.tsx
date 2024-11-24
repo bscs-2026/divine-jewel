@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
-import styles from '../styles/Table.module.css';
+import styles from '@/components/styles/Table.module.css';
+import { ProgressLoader } from '@/components/loading/Loading';
 
 interface Product {
     id: number;
@@ -10,15 +11,18 @@ interface Product {
     SKU?: string;
     size?: string;
     color?: string;
+    image_url?: string;
 }
 
 interface ProductListProps {
     products: Product[];
     onProductSelect: (product: Product) => void;
     isDisabled: boolean;
+    onThumbnailClick: (imageUrl: string) => void;
+    loading?: boolean;
 }
 
-const ProductList: React.FC<ProductListProps> = ({ products, onProductSelect, isDisabled }) => {
+const ProductList: React.FC<ProductListProps> = ({ products, onProductSelect, isDisabled, onThumbnailClick, loading = false}) => {
     const [sortConfig, setSortConfig] = useState<{ key: keyof Product; direction: 'asc' | 'desc' }>({
         key: 'name',
         direction: 'asc',
@@ -26,12 +30,13 @@ const ProductList: React.FC<ProductListProps> = ({ products, onProductSelect, is
 
     const columns = useMemo(
         () => [
-            { Header: 'Product', accessor: 'name' as keyof Product, align: 'left' },
-            { Header: 'SKU', accessor: 'SKU' as keyof Product, align: 'left' },
-            { Header: 'Size', accessor: 'size' as keyof Product, align: 'left' },
-            { Header: 'Color', accessor: 'color' as keyof Product, align: 'left' },
-            { Header: 'Stock', accessor: 'stock' as keyof Product, align: 'right' },
-            { Header: 'Price', accessor: 'price' as keyof Product, align: 'right' },
+            { Header: 'Image', accessor: 'image_url' as keyof Product, align: 'left', sortable: false },
+            { Header: 'Product', accessor: 'name' as keyof Product, align: 'left', sortable: true },
+            { Header: 'SKU', accessor: 'SKU' as keyof Product, align: 'left', sortable: true },
+            { Header: 'Size', accessor: 'size' as keyof Product, align: 'left', sortable: true },
+            { Header: 'Color', accessor: 'color' as keyof Product, align: 'left', sortable: true },
+            { Header: 'Stock', accessor: 'stock' as keyof Product, align: 'right', sortable: true },
+            { Header: 'Price', accessor: 'price' as keyof Product, align: 'right', sortable: true },
         ],
         []
     );
@@ -52,7 +57,8 @@ const ProductList: React.FC<ProductListProps> = ({ products, onProductSelect, is
         return sortedData;
     }, [products, sortConfig]);
 
-    const handleSort = (key: keyof Product) => {
+    const handleSort = (key: keyof Product, sortable: boolean) => {
+        if (!sortable) return;
         let direction: 'asc' | 'desc' = 'asc';
         if (sortConfig.key === key && sortConfig.direction === 'asc') {
             direction = 'desc';
@@ -70,26 +76,42 @@ const ProductList: React.FC<ProductListProps> = ({ products, onProductSelect, is
         const isActive = sortConfig.key === key;
         return (
             <span className={key === 'stock' || key === 'price' ? styles.sortIconsRight : styles.sortIconsLeft} >
-                {/* <ArrowUpward className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'asc' ? styles.active : ''}`} />
-                <ArrowDownward className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'desc' ? styles.active : ''}`}  /> */}
+                {/* <ArrowUpward
+                    className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'asc' ? styles.active : ''}`}
+                    style={{ fontSize: '16px' }}
+                />
+                <ArrowDownward
+                    className={`${styles.sortIcon} ${isActive && sortConfig.direction === 'desc' ? styles.active : ''}`}
+                    style={{ fontSize: '16px', marginLeft: '2px' }}
+                /> */}
             </span>
         );
     };
-
     return (
         <div className={`${styles.container} ${isDisabled ? styles.disabledContainer : ''}`}>
+            {loading && <ProgressLoader />}
             <table className={styles.table}>
                 <thead>
                     <tr>
                         {columns.map((column) => (
                             <th
                                 key={column.accessor as string}
-                                onClick={() => handleSort(column.accessor)}
-                                className={`${styles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign}`}
+                                onClick={() => handleSort(column.accessor, column.sortable)}
+                                className={`${styles.th} ${column.align === 'right' ? styles.thRightAlign : styles.thLeftAlign} ${!column.sortable ? styles.notSortable : ''
+                                    }`}
                             >
                                 <div className={styles.sortableHeaderContent}>
                                     {column.Header}
-                                    {renderSortIcon(column.accessor)}
+                                    {column.sortable && sortConfig.key === column.accessor && (
+                                        <span className={styles.sortIcon} style={{ fontSize: '16px', marginLeft: '2px' }}>
+                                            {sortConfig.direction === 'asc' ? (
+                                                <ArrowUpward fontSize="inherit" />
+                                            ) : (
+                                                <ArrowDownward fontSize="inherit" />
+                                            )}
+                                        </span>
+                                    )}
+
                                 </div>
                             </th>
                         ))}
@@ -99,9 +121,26 @@ const ProductList: React.FC<ProductListProps> = ({ products, onProductSelect, is
                     {sortedProducts.map((product, index) => (
                         <tr
                             key={product.id ? product.id : `product-${index}`}
-                            className={`${styles.tableRow} ${(!product.stock || product.stock <= 0) ? styles.disabledRow : ''}`}
+                            className={`${styles.tableRow} ${(!product.stock || product.stock <= 0) ? styles.disabledRow : ''
+                                }`}
                             onClick={() => handleRowClick(product)}
                         >
+                            <td className={styles.td}>
+                                {product.image_url ? (
+                                    <img
+                                        src={product.image_url}
+                                        alt={product.name}
+                                        className={styles.thumbnail}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onThumbnailClick(product.image_url!);
+                                        }}
+                                        style={{ cursor: 'pointer' }}
+                                    />
+                                ) : (
+                                    <span>No Image</span>
+                                )}
+                            </td>
                             <td className={styles.tdProductName}>{product.name}</td>
                             <td className={styles.td}>{product.SKU || 'N/A'}</td>
                             <td className={styles.td}>{product.size || 'N/A'}</td>
@@ -115,6 +154,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, onProductSelect, is
                         </tr>
                     ))}
                 </tbody>
+
 
             </table>
         </div>

@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartLine, faMoneyCheck, faHistory, faBox, faBoxes, faWarehouse, faUsers, faHeartCrack } from '@fortawesome/free-solid-svg-icons';
 import styles from '@/components/styles/Layout.module.css';
-import CircularIndeterminate from '@/components/loading/Loading';
+import Spinner from '@/components/loading/Loading';
 import { getCookieValue } from '@/lib/clientCookieHelper';
 import { hasAccess } from '@/lib/pageAccessHelper';
 
@@ -85,10 +85,15 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
           {renderNavItem('/returns', 'Returns', faHeartCrack)}
         </ul>
       </div>
-      <button className={`${styles.logoutButton} mt-auto mx-auto`} onClick={handleLogout}>
-        Logout
+      <button
+        className={`${styles.logoutButton} mt-auto mx-auto`}
+        onClick={handleLogout}
+        disabled={loading}
+      >
+        {loading ? 'Logging out...' : 'Logout'}
       </button>
-      {loading && <CircularIndeterminate />}
+
+      {loading && <Spinner />}
     </div>
   );
 };

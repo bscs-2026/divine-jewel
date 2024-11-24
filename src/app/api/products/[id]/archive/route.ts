@@ -1,6 +1,6 @@
 // src/app/api/products/[id]/archive/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { query } from '../../../../../lib/db';
+import { query } from '@/lib/db';
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
     try {
@@ -15,14 +15,10 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
             return NextResponse.json({ error: 'Invalid value for is_archive' }, { status: 400 });
         }
 
-        console.log('Updating product in database...');
-
         const result = await query(
             'UPDATE `products` SET is_archive = ? WHERE id = ?',
             [is_archive, id]
         );
-
-        console.log('Updated product:', result);
 
         return NextResponse.json({ message: 'Product updated successfully' }, { status: 200 });
     } catch (error: any) {
