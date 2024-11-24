@@ -69,15 +69,15 @@ const ReturnItemsTabs: React.FC<ReturnItemsProps> = ({
   };
 
   const handleViewCustomerCredits = () => {
-    setIsCreditsModalOpen(true); // Opens the modal when the button is clicked
+    setIsCreditsModalOpen(true);
   };
 
   const handleCloseCreditsModal = () => {
-    setIsCreditsModalOpen(false); // Closes the Customer Credits modal
+    setIsCreditsModalOpen(false);
   };
 
   const handleCloseReturnItemsModal = () => {
-    setIsModalOpen(false); // Closes the Return Items modal
+    setIsModalOpen(false);
   };
 
   return (
@@ -116,7 +116,7 @@ const ReturnItemsTabs: React.FC<ReturnItemsProps> = ({
 
       {/* Customer Credits Modal */}
       <Modal show={isCreditsModalOpen} onClose={handleCloseCreditsModal}>
-        <CustomersCredit credits={credits} /> {/* Render the credits table */}
+        <CustomersCredit credits={credits} />
       </Modal>
 
       {/* Return Items Modal */}

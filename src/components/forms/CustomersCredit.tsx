@@ -70,7 +70,11 @@ const CustomersCredit: React.FC<CustomersCreditProps> = ({ credits }) => {
     <div className={modalStyles.modalContainer}>
       <div className={modalStyles.modalContent}>
         <div className={modalStyles.modalContentScrollable}>
-          <h2 className={modalStyles.modalHeading}>Valid Credits</h2>
+          <h2 className={modalStyles.modalHeading}>Customer's Credit</h2>
+          <p className={modalStyles.receiptNotice}>
+            These are the current active and valid credits registered in the system.<br />
+            Use this information to track and manage customer credits effectively.
+          </p>
           <table className={modalStyles.modalTable}>
             <thead>
               <tr>
