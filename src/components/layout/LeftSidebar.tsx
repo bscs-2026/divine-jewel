@@ -65,14 +65,21 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ onSelectTitle }) => {
           <Link href="/">
             <img src="/img/divine-jewel-logo.png" alt="Divine Jewel Logo" className={styles.logo} />
           </Link>
-          <img
+          {/* <img
             src="/img/divine.png"
             alt="Divine"
             className={`${styles.avatar} rounded-full`}
-          />
+          /> */}
+
+        <div>
           <p className={`${styles.greeting} text-black`}>
-            {employeeFirstName ? `Hello, ${employeeFirstName}!` : 'Loading...'}
+            Hello,
           </p>
+          <p className={`${styles.greetingName} text-black`}>
+            {employeeFirstName ? `${employeeFirstName}!` : 'Loading...'}
+          </p>
+        </div>
+
         </div>
         <ul className={`${styles.navList}`}>
           {renderNavItem('/dashboard', 'Dashboard', faChartLine)}
