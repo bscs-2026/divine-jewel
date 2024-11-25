@@ -157,8 +157,17 @@ const OrderForm = ({ selectedProducts, setSelectedProducts, selectedBranch, relo
 
     const handleQuantityChange = (productId, delta) => {
         setProductQuantities((prevQuantities) => {
-            const newQuantity = Math.max(0, (prevQuantities[productId] || 1) + delta);
+
+            const product = selectedProducts.find(p => p.product_id === productId);
+            const availableStock = product ? product.stock : 0; // Ensure the product has stock information
+    
+            // Ensure the new quantity doesn't exceed the available stock
+            const newQuantity = Math.max(0, Math.min((prevQuantities[productId] || 1) + delta, availableStock));
             return { ...prevQuantities, [productId]: newQuantity };
+
+            // const newQuantity = Math.max(0, (prevQuantities[productId] || 1) + delta);
+            // return { ...prevQuantities, [productId]: newQuantity };
+            
         });
     };
 
