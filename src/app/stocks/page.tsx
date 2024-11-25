@@ -439,8 +439,9 @@ export default function StocksPage() {
             return stocks.filter((stock) => {
                 const searchMatch = stock.product_name.toLowerCase().includes(query);
                 const branchMatch = filterBranch === "All" || stock.branch_code === Number(filterBranch);
+                const activeProduct = products.find((product) => product.id === stock.product_id && !product.is_archive);
 
-                return searchMatch && branchMatch;
+                return searchMatch && branchMatch  && activeProduct;
             });
         }
     }, [stocks, stockSummary, products, filterBranch, searchQuery]);
