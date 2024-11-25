@@ -105,6 +105,7 @@ const ProductListOnHistory: React.FC<ProductListOnHistoryProps> = ({
                 </div>
               </th>
             ))}
+            <th className={styles.th}></th>
           </tr>
         </thead>
         <tbody>
