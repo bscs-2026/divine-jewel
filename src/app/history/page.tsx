@@ -88,7 +88,7 @@ interface Product {
 }
 
 const HistoryPage: React.FC = () => {
-  const [selectedTab, setSelectedTab] = useState<'transaction' | 'stocks' | 'productHistory'>('stocks');
+  const [selectedTab, setSelectedTab] = useState<'transaction' | 'stocks' | 'productHistory'>('transaction');
   const [stockDetailsGroup, setStockDetailsGroup] = useState<StockDetailGroup[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
@@ -268,16 +268,16 @@ const HistoryPage: React.FC = () => {
       <div>
         <HistoryTabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
 
-        {selectedTab === 'stocks' && (
-          <StockDetailsTable stockDetails={stockDetailsGroup} onViewAction={handleViewStockAction} />
-        )}
-
         {selectedTab === 'transaction' && (
           <OrdersTable orders={orders} onViewAction={handleViewOrderAction} />
         )}
 
         {selectedTab === 'productHistory' && (
           <ProductListOnHistory products={products} onViewAction={handleViewProductHistory} />
+        )}
+
+        {selectedTab === 'stocks' && (
+          <StockDetailsTable stockDetails={stockDetailsGroup} onViewAction={handleViewStockAction} />
         )}
 
         {/* Modal for Stock Details */}
