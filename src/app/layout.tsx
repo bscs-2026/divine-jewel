@@ -17,6 +17,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="bg-white">
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+      </head>
       {/* Apply Poppins font to the entire body */}
       <body className={poppins.className}>{children}</body>
     </html>
