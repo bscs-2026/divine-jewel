@@ -2,13 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import * as React from "react";
-import { format } from "date-fns"
-import { Calendar as CalendarIcon } from "lucide-react"
-
-import { Check, ChevronsUpDown, TrendingUp } from "lucide-react"
-import { Bar, BarChart, CartesianGrid, XAxis, Pie, PieChart, YAxis } from "recharts"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
 import MainLayout from '@/components/MainLayout';
 import {
   Select,
@@ -16,30 +9,34 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import {
-  ChartConfig,
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart"
+} from "@/components/ui/select";
+import Spinner from '@/components/loading/Loading';
 import TotalSalesChart from './_components/TotalSalesChart';
+import TotalOrdersChart from './_components/TotalOrdersChart';
 import TopProducts from './_components/TopProducts';
-import LocationSales from './_components/ActiveBranches';
-import { months } from '@/lib/constants';
 import BranchSalesPieChart from './_components/BranchSalesPieChart';
 import { OrdersSummary } from './_components/OrdersSummary';
 import ActiveBranches from './_components/ActiveBranches';
-import Spinner from '@/components/loading/Loading';
+import { months } from '@/lib/constants';
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 interface Sales {
+  sales_date: string;
+  total_sales: number;
+}
+
+interface Orders {
   order_date: string;
   order_count: number;
 }
 
+interface Returns {
+  returns_date: string;
+  total_returns: number;
+}
+
 interface YearsData {
   year: string;
-  yearly_orders: number;
 }
 
 interface Branches {
@@ -50,74 +47,91 @@ interface Branches {
   inCharge: string;
 }
 
-export interface BranchesOrders {
-  branch_name: string;
-  branch_code: number;
-  orders_count: number;
-  orders_date: string;
-}
-
 const barChartConfig = {
   sales: {
     label: "Sales",
-    color: "#FCB6D7",
+    color: "#4C96D7",
   },
-} satisfies ChartConfig
+  orders: {
+    label: "Orders",
+    color: "#D77E4C",
+  },
+} satisfies ChartConfig;
 
 export default function Home() {
   const currentYear = new Date().getFullYear().toString();
   const currentMonth = months[new Date().getMonth()].name;
 
-  const [yearlyOrders, setYearlyOrders] = useState<YearsData[]>([]);
   const [years, setYears] = useState<YearsData[]>([]);
   const [year, setYear] = useState<string>(currentYear);
   const [month, setMonth] = useState<string>(currentMonth);
-  const [sales, setSales] = useState<Sales[]>([]);
+
+  const [totalSalesValue, setTotalSalesValue] = useState<number | null>(null);
+  const [totalOrdersValue, setTotalOrdersValue] = useState<number | null>(null);
+  const [totalReturnsValue, setTotalReturnsValue] = useState<number | null>(null);
   const [branches, setBranches] = useState<Branches[]>([]);
-  const [branchesOrders, setBranchesOrders] = useState<BranchesOrders[]>([]);
-  const [activeChart, setActiveChart] = useState<keyof typeof barChartConfig>("sales");
+
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    fetchTotalSales();
+    fetchTotalOrders();
+    fetchTotalReturns();
     fetchBranchesData();
     fetchYears();
   }, []);
 
   useEffect(() => {
-    fetchSales();
-    fetchYearlyOrders();
+    fetchYears();
+  }, [year]);
+
+  useEffect(() => {
+    fetchTotalReturns();
   }, [year, month]);
 
-  const fetchYearlyOrders = async () => {
-    const url = `/api/sales/yearlyOrders?year=${year}`;
+  const fetchTotalSales = async () => {
     try {
       setLoading(true);
-      const response = await fetch(url);
+      const response = await fetch("/api/dashboard/sales/totalSales");
       if (!response.ok) {
-        throw new Error("Failed to fetch yearly orders data");
+        throw new Error("Failed to fetch total sales value");
       }
       const data = await response.json();
-      setYearlyOrders(data.YearlyOrders);
-    } catch (error: any) {
+      setTotalSalesValue(parseFloat(data.totalSales));
+    } catch (error) {
       console.error(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchSales = async () => {
-    const monthValue = months.find(m => m.name === month)?.value;
-    const date = `${year}-${monthValue}`;
-    const url = `/api/sales?date=${date}`;
+  const fetchTotalOrders = async () => {
     try {
       setLoading(true);
-      const response = await fetch(url);
+      const response = await fetch("/api/dashboard/orders/totalOrders");
       if (!response.ok) {
-        throw new Error("Failed to fetch sales data");
+        throw new Error("Failed to fetch total orders value");
       }
       const data = await response.json();
-      setSales(data.Orders);
-    } catch (error: any) {
+      setTotalOrdersValue(parseFloat(data.totalOrders));
+    } catch (error) {
+      console.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // New function to fetch total returns
+  const fetchTotalReturns = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/dashboard/returns/totalReturns?year=${year}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch total returns value");
+      }
+      const data = await response.json();
+      setTotalReturnsValue(parseFloat(data.totalReturns));
+    } catch (error) {
       console.error(error.message);
     } finally {
       setLoading(false);
@@ -133,23 +147,23 @@ export default function Home() {
       }
       const data = await response.json();
       setBranches(data.branches);
-    } catch (error: any) {
+    } catch (error) {
       console.error(error.message);
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const fetchYears = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/sales/years');
+      const response = await fetch("/api/sales/years");
       if (!response.ok) {
-        throw new Error('Failed to fetch years');
+        throw new Error("Failed to fetch years");
       }
       const data = await response.json();
       setYears(data.Years);
-    } catch (error: any) {
+    } catch (error) {
       console.error(error.message);
     } finally {
       setLoading(false);
@@ -159,11 +173,49 @@ export default function Home() {
   return (
     <MainLayout defaultTitle="Dashboard">
       {loading && <Spinner />}
-      <div className="mb-4 mx-7 flex flex-row gap-2">
-        <div className="flex flex-row gap-2 m-1">
+      {/* Combined Total Sales, Orders Card and Selectors */}
+      <div className="mb-4 mx-7 flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Card
+            className="relative z-30 flex flex-col justify-center gap-1 border-t px-4 py-3 text-left border-l-[1px] border-[#CCCCCC] bg-[#FCE4EC] sm:border-l sm:border-t-0 sm:px-6 sm:py-4 w-[160px] h-[80px]"
+          >
+            <CardHeader className="flex flex-col">
+              <span className="text-xs text-muted-foreground">Total Sales</span>
+              <span className="text-md font-bold leading-none sm:text-md text-[#575757]">
+                {totalSalesValue !== null ? `₱${totalSalesValue.toFixed(2)}` : "0.00"}
+              </span>
+            </CardHeader>
+          </Card>
+
+          <Card
+            className="relative z-30 flex flex-col justify-center gap-1 border-t px-4 py-3 text-left border-l-[1px] border-[#CCCCCC] bg-[#FCE4EC] sm:border-l sm:border-t-0 sm:px-6 sm:py-4 w-[160px] h-[80px]"
+          >
+            <CardHeader className="flex flex-col">
+              <span className="text-xs text-muted-foreground">Total Orders</span>
+              <span className="text-md font-bold leading-none sm:text-md text-[#575757]">
+                {totalOrdersValue !== null ? `${totalOrdersValue.toFixed(0)}` : "0"}
+              </span>
+            </CardHeader>
+          </Card>
+
+          {/* New Card for Total Returns */}
+          <Card
+            className="relative z-30 flex flex-col justify-center gap-1 border-t px-4 py-3 text-left border-l-[1px] border-[#CCCCCC] bg-[#FCE4EC] sm:border-l sm:border-t-0 sm:px-6 sm:py-4 w-[160px] h-[80px]"
+          >
+            <CardHeader className="flex flex-col">
+              <span className="text-xs text-muted-foreground">Total Returns</span>
+              <span className="text-md font-bold leading-none sm:text-md text-[#575757]">
+                {totalReturnsValue !== null ? `${totalReturnsValue.toFixed(0)}` : "0"}
+              </span>
+            </CardHeader>
+          </Card>
+        </div>
+
+        {/* Year and Month Selectors */}
+        <div className="flex flex-row gap-2">
           <div>
             <Select value={year} onValueChange={setYear}>
-              <SelectTrigger className="w-[180px] h-[50px] ">
+              <SelectTrigger className="w-[180px] h-[50px]">
                 <SelectValue placeholder="Year">{year}</SelectValue>
               </SelectTrigger>
               <SelectContent>
@@ -172,7 +224,7 @@ export default function Home() {
                     <SelectItem key={index} value={year.year}>
                       {year.year}
                     </SelectItem>
-                  )
+                  );
                 })}
               </SelectContent>
             </Select>
@@ -195,55 +247,43 @@ export default function Home() {
           </div>
         </div>
       </div>
-      <div className="flex flex-col gap-2 mx-8 ">
-        <div className='flex flex-row gap-2'>
-          <div className='w-1/2'>
-            <ActiveBranches
-              branches={branches}
-            />
-          </div>
-          <div className='w-1/2'>
-            <OrdersSummary
-              year={year}
-            />
-          </div>
-        </div>
-        <div className="bg-gray-100 w-full rounded-2xl">
-          <TotalSalesChart
-            yearData={yearlyOrders}
-            sales={sales}
-            activeChart={activeChart}
-            setActiveChart={setActiveChart}
-            loading={loading}
-          />
-        </div>
-        <div className='flex flex-row gap-2 h-auto mb-4'>
-          <div className='w-2/3'>
-            <TopProducts
-              branches={branches}
-              year={year}
-              month={month}
-            />
-          </div>
-          <div className='w-1/3 '>
-            <BranchSalesPieChart
-              year={year}
-              month={month}
-            />
+
+      {/* Main Dashboard Content */}
+      <div className="flex flex-col gap-2 mx-8">
+        <div className="w-full rounded-2xl">
+          {/* Sales and Orders Charts */}
+          <div className="flex flex-row gap-4 w-full">
+            <div className="flex-1">
+              <TotalSalesChart year={year} month={month} loading={loading} />
+            </div>
+            <div className="flex-1">
+              <TotalOrdersChart
+                year={year}
+                month={month}
+                loading={loading}
+                totalReturnsValue={totalReturnsValue}
+              />
+            </div>
           </div>
         </div>
-        {/* <div className='flex flex-row gap-2 mb-4'>
-          <div className='w-1/2'>
-            <ActiveBranches
-              branches={branches}
-            />
+
+        {/* Other components */}
+        <div className="flex flex-row gap-2 h-auto">
+          <div className="w-2/3">
+            <TopProducts branches={branches} year={year} month={month} />
           </div>
-          <div className='w-1/2'>
-            <OrdersSummary 
-              year={year}
-            />
+          <div className="w-1/3">
+            <BranchSalesPieChart year={year} month={month} />
           </div>
-        </div> */}
+        </div>
+        <div className="flex flex-row gap-4 w-full">
+          <div className="flex-1">
+            <ActiveBranches branches={branches} />
+          </div>
+          {/* <div className="w-1/2">
+            <OrdersSummary year={year} />
+          </div> */}
+        </div>
       </div>
     </MainLayout>
   );

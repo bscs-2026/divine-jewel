@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     DATE_FORMAT(o.date, '%Y-%m-%d') AS order_date,
     COUNT(DISTINCT o.id) AS order_count
 FROM 
-    rms_db.orders o
+    orders o
 JOIN 
     (
         SELECT 
@@ -25,7 +25,7 @@ JOIN
             SUM(CASE WHEN od.status = 'paid' THEN od.quantity ELSE 0 END) AS total_paid,
             SUM(CASE WHEN od.status = 'returned' THEN od.quantity ELSE 0 END) AS total_returned
         FROM 
-            rms_db.order_details od
+            order_details od
         GROUP BY 
             od.order_id
     ) order_summary ON o.id = order_summary.order_id

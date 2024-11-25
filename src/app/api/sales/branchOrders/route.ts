@@ -28,7 +28,7 @@ export async function GET(request: Request) {
     COUNT(DISTINCT valid_orders.order_id) AS orders_count,
     DATE_FORMAT(valid_orders.date, '%Y-%m') AS orders_date
 FROM 
-    rms_db.branches b
+    branches b
 LEFT JOIN 
     (
         SELECT 
@@ -38,9 +38,9 @@ LEFT JOIN
             SUM(CASE WHEN od.status = 'paid' THEN od.quantity ELSE 0 END) AS total_paid,
             SUM(CASE WHEN od.status = 'returned' THEN od.quantity ELSE 0 END) AS total_returned
         FROM 
-            rms_db.orders o
+            orders o
         JOIN 
-            rms_db.order_details od ON o.id = od.order_id
+            order_details od ON o.id = od.order_id
         GROUP BY 
             o.id
         HAVING 
@@ -66,7 +66,7 @@ ORDER BY
     COUNT(DISTINCT valid_orders.order_id) AS orders_count,
     YEAR(valid_orders.date) AS orders_year
 FROM 
-    rms_db.branches b
+    branches b
 LEFT JOIN 
     (
         SELECT 
@@ -76,9 +76,9 @@ LEFT JOIN
             SUM(CASE WHEN od.status = 'paid' THEN od.quantity ELSE 0 END) AS total_paid,
             SUM(CASE WHEN od.status = 'returned' THEN od.quantity ELSE 0 END) AS total_returned
         FROM 
-            rms_db.orders o
+            orders o
         JOIN 
-            rms_db.order_details od ON o.id = od.order_id
+            order_details od ON o.id = od.order_id
         GROUP BY 
             o.id
         HAVING 

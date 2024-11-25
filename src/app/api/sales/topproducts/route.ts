@@ -30,13 +30,13 @@ export async function GET(request: Request) {
           SUM(od.quantity) AS total_quantity_sold, 
           SUM(od.quantity * p.price) AS total_sales 
         FROM 
-          rms_db.order_details od 
+          order_details od 
         JOIN 
-          rms_db.products p ON od.product_id = p.id 
+          products p ON od.product_id = p.id 
         JOIN 
-          rms_db.category c ON p.category_id = c.id 
+          category c ON p.category_id = c.id 
         LEFT JOIN 
-          rms_db.orders o ON od.order_id = o.id 
+          orders o ON od.order_id = o.id 
         WHERE 
           YEAR(o.date) = ? AND MONTH(o.date) = ? 
           ${category && category !== "allCategories" ? "AND c.name = ?" : ""}
@@ -57,13 +57,13 @@ export async function GET(request: Request) {
           SUM(od.quantity) AS total_quantity_sold, 
           SUM(od.quantity * p.price) AS total_sales 
         FROM 
-          rms_db.order_details od 
+          order_details od 
         JOIN 
-          rms_db.products p ON od.product_id = p.id 
+          products p ON od.product_id = p.id 
         JOIN 
-          rms_db.category c ON p.category_id = c.id 
+          category c ON p.category_id = c.id 
         LEFT JOIN 
-          rms_db.orders o ON od.order_id = o.id 
+          orders o ON od.order_id = o.id 
         WHERE 
           YEAR(o.date) = ? 
           ${category && category !== "allCategories" ? "AND c.name = ?" : ""}

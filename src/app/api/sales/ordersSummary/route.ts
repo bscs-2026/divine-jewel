@@ -14,7 +14,7 @@
 //       `SELECT 
 //         DATE_FORMAT(o.date, '%Y-%m') AS order_date, 
 //         COUNT(o.id) AS orders_count
-//         FROM rms_db.orders o
+//         FROM orders o
 //         WHERE YEAR(o.date) = ?
 //         GROUP BY order_date
 //         ORDER BY order_date;
