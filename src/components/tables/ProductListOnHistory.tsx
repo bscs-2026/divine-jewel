@@ -15,6 +15,7 @@ interface Product {
   quantity: number;
   is_archive: number | boolean;
   [key: string]: any;
+  image_url?: string;
 }
 
 interface ProductListOnHistoryProps {
@@ -34,6 +35,7 @@ const ProductListOnHistory: React.FC<ProductListOnHistoryProps> = ({
   // Define columns for the table
   const columns = useMemo(
     () => [
+      { Header: 'Image', accessor: 'image_url' as keyof Product, align: 'left', sortable: false },
       { Header: 'Product', accessor: 'name' as keyof Product, align: 'left' },
       { Header: 'SKU', accessor: 'SKU' as keyof Product, align: 'left' },
       { Header: 'Category', accessor: 'category_name' as keyof Product, align: 'left' },
@@ -70,6 +72,7 @@ const ProductListOnHistory: React.FC<ProductListOnHistoryProps> = ({
   };
 
   const renderSortIcon = (key: keyof Product) => {
+    if (key === 'image_url') return null;
     const isActive = sortConfig.key === key;
     return (
       <span className={key === 'price' || key === 'stock' ? styles.sortIconsRight : styles.sortIconsLeft}>
@@ -107,6 +110,22 @@ const ProductListOnHistory: React.FC<ProductListOnHistoryProps> = ({
         <tbody>
           {sortedProducts.map(product => (
             <tr key={product.id} className={styles.tableRow} onClick={() => onViewAction(product.id)}>
+              <td className={styles.td}>
+                {product.image_url ? (
+                  <img
+                    src={product.image_url}
+                    alt={product.name}
+                    className={styles.thumbnail}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // onThumbnailClick(product.image_url!);
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  />
+                ) : (
+                  <span>No Image</span>
+                )}
+              </td>
               <td className={styles.td}>{product.name}</td>
               <td className={styles.td}>{product.SKU}</td>
               <td className={styles.td}>{product.category_name}</td>
