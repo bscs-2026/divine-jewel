@@ -123,7 +123,7 @@ export default function Home() {
       setLoading(false);
     }
   };
-  
+
   const fetchBranchesData = async () => {
     try {
       setLoading(true);
@@ -196,6 +196,18 @@ export default function Home() {
         </div>
       </div>
       <div className="flex flex-col gap-2 mx-8 ">
+        <div className='flex flex-row gap-2'>
+          <div className='w-1/2'>
+            <ActiveBranches
+              branches={branches}
+            />
+          </div>
+          <div className='w-1/2'>
+            <OrdersSummary
+              year={year}
+            />
+          </div>
+        </div>
         <div className="bg-gray-100 w-full rounded-2xl">
           <TotalSalesChart
             yearData={yearlyOrders}
@@ -205,7 +217,7 @@ export default function Home() {
             loading={loading}
           />
         </div>
-        <div className='flex flex-row gap-2 h-auto'>
+        <div className='flex flex-row gap-2 h-auto mb-4'>
           <div className='w-2/3'>
             <TopProducts
               branches={branches}
@@ -214,13 +226,13 @@ export default function Home() {
             />
           </div>
           <div className='w-1/3 '>
-              <BranchSalesPieChart 
-                year={year}
-                month={month}
-              />
+            <BranchSalesPieChart
+              year={year}
+              month={month}
+            />
           </div>
         </div>
-        <div className='flex flex-row gap-2 mb-4'>
+        {/* <div className='flex flex-row gap-2 mb-4'>
           <div className='w-1/2'>
             <ActiveBranches
               branches={branches}
@@ -231,7 +243,7 @@ export default function Home() {
               year={year}
             />
           </div>
-        </div>
+        </div> */}
       </div>
     </MainLayout>
   );
