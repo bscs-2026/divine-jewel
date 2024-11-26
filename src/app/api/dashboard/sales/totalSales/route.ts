@@ -9,6 +9,9 @@ export async function GET() {
                 SUM(quantity * unit_price_deducted) AS total_sales
             FROM 
                 order_details
+            WHERE 
+                status = 'paid'
+                AND DATE IS NOT NULL
         `;
 
         const result = await query(sqlQuery);
