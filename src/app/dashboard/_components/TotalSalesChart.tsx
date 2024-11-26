@@ -127,9 +127,9 @@ const TotalSalesChart: FC<TotalSalesChartProps> = ({ year, month, loading }) => 
   const maxValue = Math.max(...salesChartData.map((data) => data.total_sales || 0), 0);
 
   return (
-    <div className="flex flex-wrap">
-      <Card className="flex-1">
-        <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
+    <div className="flex flex-wrap h-full">
+      <Card className="flex-1 ">
+        <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row h-14">
           <div className="flex w-full">
             <button
               data-active={activeView === "yearly"}
@@ -157,7 +157,7 @@ const TotalSalesChart: FC<TotalSalesChartProps> = ({ year, month, loading }) => 
             </button>
           </div>
         </CardHeader>
-        <div className="px-2 sm:p-6">
+        <div className="sm:p-4">
           {loading ? (
             <Spinner />
           ) : salesChartData.length === 0 ? (

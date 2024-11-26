@@ -252,8 +252,8 @@ export default function Home() {
       <div className="flex flex-col gap-2 mx-8">
         <div className="w-full rounded-2xl">
           {/* Sales and Orders Charts */}
-          <div className="flex flex-row gap-4 w-full">
-            <div className="flex-1">
+          <div className="flex flex-row gap-2 w-full">
+            <div className="flex-1 h-auto">
               <TotalSalesChart year={year} month={month} loading={loading} />
             </div>
             <div className="flex-1">
@@ -276,7 +276,7 @@ export default function Home() {
             <BranchSalesPieChart year={year} month={month} />
           </div>
         </div>
-        <div className="flex flex-row gap-4 w-full">
+        <div className="flex flex-row gap-4 w-full mb-4">
           <div className="flex-1">
             <ActiveBranches branches={branches} />
           </div>
