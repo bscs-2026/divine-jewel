@@ -41,6 +41,7 @@ const TotalOrdersChart: FC<TotalOrdersChartProps> = ({ year, month, loading }) =
       const response = await fetch(`/api/dashboard/orders`);
       if (!response.ok) throw new Error("Failed to fetch yearly orders");
       const data = await response.json();
+      // console.log("[DEBUG] Yearly Orders API Response:", data.yearlyOrders);
       setYearlyOrders(data.yearlyOrders || []);
     } catch {
       setYearlyOrders([]);
@@ -132,17 +133,22 @@ const TotalOrdersChart: FC<TotalOrdersChartProps> = ({ year, month, loading }) =
   const mergeData = (ordersData: any[], returnsData: any[], dateKeyOrders: string, dateKeyReturns: string) => {
     const mergedData = ordersData.map((order) => {
       const orderDate = order[dateKeyOrders] ? String(order[dateKeyOrders]).trim() : ""; // Ensure it’s a string
+
+      // Find matching return data
       const matchingReturn = returnsData.find((ret) => {
         const returnDate = ret[dateKeyReturns] ? String(ret[dateKeyReturns]).trim() : ""; // Ensure it’s a string
         return returnDate === orderDate;
       });
 
-      const month = activeView === "monthly" && orderDate ? parseInt(orderDate.split("-")[1]) : undefined;
+      // Extract year and month for yearly and monthly views
+      const orderYear = activeView === "yearly" && orderDate ? parseInt(orderDate.split("-")[0]) : undefined;
+      const orderMonth = activeView === "monthly" && orderDate ? parseInt(orderDate.split("-")[1]) : undefined;
 
+      // Construct merged item
       const mergedItem = {
         orders_date: orderDate,
-        orders_year: year,
-        orders_month: month,
+        orders_year: orderYear,
+        orders_month: orderMonth,
         total_orders: Number(order.total_orders || 0),
         total_returns: matchingReturn ? Number(matchingReturn.total_returns || 0) : 0,
       };
@@ -152,6 +158,7 @@ const TotalOrdersChart: FC<TotalOrdersChartProps> = ({ year, month, loading }) =
 
     return mergedData;
   };
+
 
   // Merge Orders and Returns based on active view (daily, monthly, yearly)
   const ordersChartData =
@@ -181,29 +188,36 @@ const TotalOrdersChart: FC<TotalOrdersChartProps> = ({ year, month, loading }) =
           <div className="flex w-full">
             <button
               data-active={activeView === "yearly"}
-              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 text-center bg-[#FCE4EC] rounded-tl-[0.75rem] ${activeView === "yearly" ? "bg-[#F9BDBB] font-bold" : ""
+              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 h-[48px] text-center bg-[#FCE4EC] rounded-tl-[0.75rem] ${activeView === "yearly" ? "bg-[#F9BDBB] font-bold" : "font-medium"
                 }`}
               onClick={() => setActiveView("yearly")}
             >
-              <span className="text-xs text-muted-foreground">Yearly Orders & Returns</span>
+              <span className="text-xs text-muted-foreground leading-5">
+                Yearly Orders & Returns
+              </span>
             </button>
             <button
               data-active={activeView === "monthly"}
-              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 text-center bg-[#FCE4EC] border-l-0 border-r-0 ${activeView === "monthly" ? "bg-[#F9BDBB] font-bold" : ""
+              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 h-[48px] text-center bg-[#FCE4EC] border-l-0 border-r-0 ${activeView === "monthly" ? "bg-[#F9BDBB] font-bold" : "font-medium"
                 }`}
               onClick={() => setActiveView("monthly")}
             >
-              <span className="text-xs text-muted-foreground">Monthly Orders & Returns</span>
+              <span className="text-xs text-muted-foreground leading-5">
+                Monthly Orders & Returns
+              </span>
             </button>
             <button
               data-active={activeView === "daily"}
-              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 text-center bg-[#FCE4EC] rounded-tr-[0.75rem] ${activeView === "daily" ? "bg-[#F9BDBB] font-bold" : ""
+              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 h-[48px] text-center bg-[#FCE4EC] rounded-tr-[0.75rem] ${activeView === "daily" ? "bg-[#F9BDBB] font-bold" : "font-medium"
                 }`}
               onClick={() => setActiveView("daily")}
             >
-              <span className="text-xs text-muted-foreground">Daily Orders & Returns</span>
+              <span className="text-xs text-muted-foreground leading-5">
+                Daily Orders & Returns
+              </span>
             </button>
           </div>
+
         </CardHeader>
         <div className="sm:p-4">
           {loading ? (
