@@ -55,7 +55,7 @@ const ActiveBranches: FC<BranchesSalesProps> = ({ branches }) => {
 
   return (
     <div className="flex flex-col bg-white rounded-2xl shadow-md border border-gray-200 h-full">
-      <div className="m-4 font-extrabold text-xl">Active Branches</div>
+      <div className="m-4 font-extrabold text-xl">Store Branches</div>
       <div className="mx-4 overflow-auto flex-1">
         <Table>
           <TableHeader>

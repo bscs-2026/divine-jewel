@@ -10,10 +10,10 @@ export async function GET(request: Request) {
         b.id AS branch_code, 
         COUNT(o.id) AS order_count,
         CONCAT(u.first_name, ' ', u.last_name) AS inCharge
-      FROM rms_db.branches b
-      LEFT JOIN rms_db.orders o ON b.id = o.branch_code
-      LEFT JOIN rms_db.sessions s ON b.id = s.branch_id
-      LEFT JOIN rms_db.employees u ON s.user_id = u.id
+      FROM branches b
+      LEFT JOIN orders o ON b.id = o.branch_code
+      LEFT JOIN sessions s ON b.id = s.branch_id
+      LEFT JOIN employees u ON s.user_id = u.id
       GROUP BY b.id
       ORDER BY b.id`
     );

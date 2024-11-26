@@ -1,157 +1,228 @@
-
-import React, { FC, useEffect, useMemo, useState } from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { BarChart, CartesianGrid, XAxis, Bar } from 'recharts';
+import React, { FC, useEffect, useState } from "react";
+import { Card, CardHeader } from "@/components/ui/card";
+import { BarChart, CartesianGrid, XAxis, YAxis, Bar } from "recharts";
 import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-import Spinner from '@/components/loading/Loading';
+} from "@/components/ui/chart";
+import Spinner from "@/components/loading/Loading";
 
 const barChartConfig = {
   sales: {
     label: "Sales",
-    color: "#FCB6D7",
+    color: "#4C96D7", // Sales chart color
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 interface TotalSalesChartProps {
-  yearData: YearsData[];
-  sales: Sales[];
-  activeChart: keyof typeof barChartConfig;
-  setActiveChart: (chart: keyof typeof barChartConfig) => void;
+  year: string;
+  month: string;
   loading: boolean;
 }
 
-interface Sales {
-  order_date: string;
-  order_count: number;
-}
+const TotalSalesChart: FC<TotalSalesChartProps> = ({ year, month, loading }) => {
+  const [monthlySales, setMonthlySales] = useState<any[]>([]);
+  const [dailySales, setDailySales] = useState<any[]>([]);
+  const [yearlySales, setYearlySales] = useState<any[]>([]);
+  const [activeView, setActiveView] = useState<"yearly" | "monthly" | "daily">("daily");
 
-interface YearsData {
-  year: string;
-  yearly_orders: number;
-}
+  const fetchYearlySales = async () => {
+    try {
+      const response = await fetch(`/api/dashboard/sales`);
+      if (!response.ok) throw new Error("Failed to fetch yearly sales");
+      const data = await response.json();
+      setYearlySales(Array.isArray(data.yearlySales) ? data.yearlySales : []);
+    } catch {
+      setYearlySales([]);
+    }
+  };
 
-const TotalSalesChart: FC<TotalSalesChartProps> = ({ activeChart, setActiveChart, sales, yearData, loading }) => {
+  const generateDefaultMonths = (year: string) => {
+    return Array.from({ length: 12 }, (_, index) => {
+      const month = (index + 1).toString().padStart(2, "0");
+      return { sales_month: `${year}-${month}`, total_sales: 0 };
+    });
+  };
 
-  const chartData = sales.map((sale) => ({
-    date: sale.order_date,
-    sales: sale.order_count,
-  }));
+  const fetchMonthlySales = async () => {
+    try {
+      const response = await fetch(`/api/dashboard/sales?year=${year}`);
+      if (!response.ok) throw new Error("Failed to fetch monthly sales");
+      const data = await response.json();
+      const fetchedMonthlySales = Array.isArray(data.monthlySales)
+        ? data.monthlySales
+        : [];
+      const defaultMonths = generateDefaultMonths(year);
+      const mergedMonthlySales = defaultMonths.map((month) => {
+        const match = fetchedMonthlySales.find(
+          (sale) => sale.sales_month === month.sales_month
+        );
+        return match ? match : month;
+      });
+      setMonthlySales(mergedMonthlySales);
+    } catch {
+      setMonthlySales(generateDefaultMonths(year));
+    }
+  };
+
+  const generateFullMonthDates = (year: string, month: string) => {
+    const numericMonth = isNaN(Number(month))
+      ? new Date(`${month} 1, ${year}`).getMonth() + 1
+      : parseInt(month);
+
+    const daysInMonth = new Date(parseInt(year), numericMonth, 0).getDate();
+    return Array.from({ length: daysInMonth }, (_, day) => {
+      const date = `${year}-${numericMonth.toString().padStart(2, "0")}-${(day + 1)
+        .toString()
+        .padStart(2, "0")}`;
+      return { sales_date: date, total_sales: 0 };
+    });
+  };
+
+  const fetchDailySales = async () => {
+    try {
+      const response = await fetch(`/api/dashboard/sales?year=${year}&month=${month}`);
+      if (!response.ok) throw new Error("Failed to fetch daily sales");
+      const data = await response.json();
+      const fetchedDailySales = Array.isArray(data.dailySales) ? data.dailySales : [];
+      const fullMonthDates = generateFullMonthDates(year, month);
+      const mergedDailySales = fullMonthDates.map((date) => {
+        const match = fetchedDailySales.find(
+          (sale) => sale.sales_date === date.sales_date
+        );
+        return match ? match : date;
+      });
+      setDailySales(mergedDailySales);
+    } catch {
+      setDailySales(generateFullMonthDates(year, month));
+    }
+  };
+
+  useEffect(() => {
+    if (activeView === "yearly") {
+      fetchYearlySales();
+    } else if (activeView === "monthly") {
+      fetchMonthlySales();
+    } else if (activeView === "daily") {
+      fetchDailySales();
+    }
+  }, [activeView, year, month]);
+
+  const salesChartData =
+    activeView === "yearly"
+      ? yearlySales
+      : activeView === "monthly"
+        ? monthlySales
+        : dailySales;
+
+  const dataKey =
+    activeView === "yearly"
+      ? "sales_year"
+      : activeView === "monthly"
+        ? "sales_month"
+        : "sales_date";
+
+  const maxValue = Math.max(...salesChartData.map((data) => data.total_sales || 0), 0);
 
   return (
-    <Card>
-      <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row ">
-        <div className="flex flex-1 flex-col justify-center gap-1 px-6 py-5 sm:py-6">
-          <CardTitle className='text-xl font-extrabold text-gray-600'>Total Orders</CardTitle>
-          <CardDescription>
-            Showing the orders count for the selected month.
-          </CardDescription>
-        </div>
-        <div className="flex">
-          {["sales"].map((key) => {
-            const chart = key as keyof typeof barChartConfig;
-            return (
-              <button
-                key={chart}
-                data-active={activeChart === chart}
-                className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6"
-                onClick={() => setActiveChart(chart)}
-              >
-                <span className="text-xs text-muted-foreground">
-                  Orders Count this Month
-                </span>
-                <span className="text-lg font-bold leading-none sm:text-3xl ml-auto">
-                  {chartData.reduce((acc, item) => acc + item.sales, 0)}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-        <div className="flex">
-          {["sales"].map((key) => {
-            const chart = key as keyof typeof barChartConfig;
-            return (
-              <button
-                key={chart}
-                data-active={activeChart === chart}
-                className="relative z-30 flex flex-1 flex-col justify-center gap-1 border-t px-6 py-4 text-left even:border-l data-[active=true]:bg-muted/50 sm:border-l sm:border-t-0 sm:px-8 sm:py-6 "
-                onClick={() => setActiveChart(chart)}
-              >
-                <span className="text-xs text-muted-foreground">
-                  Orders Count this Year
-                </span>
-                <span className="text-lg font-bold leading-none sm:text-3xl ml-auto">
-                  {yearData.reduce((acc, item) => acc + item.yearly_orders, 0)}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-      </CardHeader>
-      <CardContent className="px-2 sm:p-6">
-        {loading ? (
-          <div className="flex justify-center items-center h-[250px] text-gray-500">
-            <Spinner />
-          </div>
-        ) : chartData.length === 0 ? (
-          <div className="flex justify-center items-center h-[250px] text-gray-500">
-            <span className="text-center text-gray-500 p-4 border border-gray-300 rounded-lg bg-gray-100">
-              No Data Available on this Date.
-            </span>
-          </div>
-        ) : (
-          <ChartContainer
-            config={barChartConfig}
-            className="aspect-auto h-[250px] w-full"
-          >
-            <BarChart
-              accessibilityLayer
-              data={chartData}
-              margin={{
-                left: 12,
-                right: 12,
-              }}
+    <div className="flex flex-wrap">
+      <Card className="flex-1">
+        <CardHeader className="flex flex-col items-stretch space-y-0 border-b p-0 sm:flex-row">
+          <div className="flex w-full">
+            <button
+              data-active={activeView === "yearly"}
+              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 text-center bg-[#D6EAF8] rounded-tl-[0.75rem] ${activeView === "yearly" ? "bg-[#AED6F1] font-bold" : ""
+                }`}
+              onClick={() => setActiveView("yearly")}
             >
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="date"
-                tickLine={false}
-                axisLine={false}
-                tickMargin={8}
-                minTickGap={32}
-                tickFormatter={(value) => {
-                  const date = new Date(value);
-                  return date.toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  });
-                }}
-              />
-              <ChartTooltip
-                content={
-                  <ChartTooltipContent
-                    className="w-[150px]"
-                    nameKey="views"
-                    labelFormatter={(value) => {
-                      return new Date(value).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      });
-                    }}
-                  />
-                }
-              />
-              <Bar dataKey="sales" fill={`var(--color-${activeChart})`} />
-            </BarChart>
-          </ChartContainer>
-        )}
-      </CardContent>
-    </Card>
+              <span className="text-xs text-muted-foreground">Yearly Sales</span>
+            </button>
+            <button
+              data-active={activeView === "monthly"}
+              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 text-center bg-[#D6EAF8] border-l-0 border-r-0 ${activeView === "monthly" ? "bg-[#AED6F1] font-bold" : ""
+                }`}
+              onClick={() => setActiveView("monthly")}
+            >
+              <span className="text-xs text-muted-foreground">Monthly Sales</span>
+            </button>
+            <button
+              data-active={activeView === "daily"}
+              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 text-center bg-[#D6EAF8] rounded-tr-[0.75rem] border-r-0 border-l ${activeView === "daily" ? "bg-[#AED6F1] font-bold" : ""
+                }`}
+              onClick={() => setActiveView("daily")}
+            >
+              <span className="text-xs text-muted-foreground">Daily Sales</span>
+            </button>
+          </div>
+        </CardHeader>
+        <div className="px-2 sm:p-6">
+          {loading ? (
+            <Spinner />
+          ) : salesChartData.length === 0 ? (
+            <div className="text-center text-gray-500">No Data Available</div>
+          ) : (
+            <ChartContainer config={barChartConfig} className="aspect-auto h-[250px] w-full">
+              {/* <BarChart
+                data={salesChartData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid vertical={false} />
+                <XAxis dataKey={dataKey} />
+                <YAxis domain={[0, maxValue]} />
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      formatter={(value: number, name: string) =>
+                        name === "total_sales"
+                          ? [`Total Sales: ₱${value.toFixed(2)}`, ""]
+                          : [`${name}: ${value}`, ""]
+                      }
+                    />
+                  }
+                />
+                <Bar dataKey="total_sales" fill="#4C96D7" name="Total Sales" />
+              </BarChart> */}
+              <BarChart
+                data={salesChartData}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
+                <CartesianGrid vertical={false} />
+                <XAxis
+                  dataKey={dataKey}
+                  tickFormatter={(tick) => {
+                    if (activeView === "yearly") {
+                      return tick;
+                    } else if (activeView === "monthly") {
+                      const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                      const [year, month] = tick.split("-");
+                      return monthNames[parseInt(month, 10) - 1] || tick;
+                    } else {
+                      return tick;
+                    }
+                  }}
+                />
+                <YAxis domain={[0, maxValue]} />
+                <ChartTooltip
+                  content={
+                    <ChartTooltipContent
+                      formatter={(value: number, name: string) =>
+                        name === "total_sales"
+                          ? [`Total Sales: ₱${value.toFixed(2)}`, ""]
+                          : [`${name}: ${value}`, ""]
+                      }
+                    />
+                  }
+                />
+                <Bar dataKey="total_sales" fill="#4C96D7" name="Total Sales" />
+              </BarChart>
+
+            </ChartContainer>
+          )}
+        </div>
+      </Card>
+    </div>
   );
 };
 

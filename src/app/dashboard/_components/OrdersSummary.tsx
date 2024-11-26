@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 const chartConfig = {
   orders: {
     label: "orders",
-    color: "#FCB6D7",
+    color: "#4C96D7",
   },
 } satisfies ChartConfig;
 
