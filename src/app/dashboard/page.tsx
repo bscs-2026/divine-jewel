@@ -157,7 +157,7 @@ export default function Home() {
   };
 
   return (
-    <MainLayout defaultTitle="Sales Dashboard">
+    <MainLayout defaultTitle="Dashboard">
       {loading && <Spinner />}
       <div className="mb-4 mx-7 flex flex-row gap-2">
         <div className="flex flex-row gap-2 m-1">

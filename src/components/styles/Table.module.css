@@ -3,10 +3,12 @@
 .container {
   background-color: white;
   padding: 1rem;
+  padding-top: 0rem;
   border-radius: 0.5rem;
   box-shadow: 0 -0.5rem 1rem rgba(0, 0, 0, 0.1), 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
   overflow-y: auto;
   height: 700px;
+  /* height: calc(100vh - 100px - 100px); */
   width: 100%;
 }
 
@@ -19,11 +21,15 @@
 }
 
 .th {
-  padding: 0.5rem;
+  padding: 0.8rem;
   color: #575757;
   font-weight: bold;
   font-size: 14px;
   border-bottom: 1px solid #e0e0e0;
+
+  position: sticky; 
+  top: 0;
+  background-color: white;
 }
 
 .td {

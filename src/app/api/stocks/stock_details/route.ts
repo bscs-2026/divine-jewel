@@ -47,8 +47,8 @@ export async function POST(request: NextRequest) {
             // Insert a new record for the destination branch
             console.log('Destination branch does not exist. Inserting new record...');
             const destinationInsertResult = await query(
-                'INSERT INTO `stocks` (product_id, branch_code, quantity) VALUES (?, ?, ?)',
-                [product_id, destination_branch, quantity]
+                'INSERT INTO `stocks` (product_id, branch_code, quantity, damaged) VALUES (?, ?, ?, ?)',
+                [product_id, destination_branch, quantity, 0]
             );
             console.log('Inserted new stock record:', destinationInsertResult);
         }

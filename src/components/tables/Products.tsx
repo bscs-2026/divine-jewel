@@ -115,7 +115,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 </div>
               </th>
             ))}
-            <th className={`${styles.td} ${styles.rightAlign}`}>Actions</th>
+            <th className={`${styles.th} ${styles.rightAlign}`}>Actions</th>
           </tr>
         </thead>
         <tbody>
