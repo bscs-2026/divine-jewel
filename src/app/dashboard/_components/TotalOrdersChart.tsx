@@ -188,7 +188,7 @@ const TotalOrdersChart: FC<TotalOrdersChartProps> = ({ year, month, loading }) =
           <div className="flex w-full">
             <button
               data-active={activeView === "yearly"}
-              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 h-[48px] text-center bg-[#FCE4EC] rounded-tl-[0.75rem] ${activeView === "yearly" ? "bg-[#F9BDBB] font-bold" : "font-medium"
+              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 C9E9D2text-center bg-[#C9E9D2] rounded-tl-[0.75rem] ${activeView === "yearly" ? "bg-[#F9BDBB] font-bold" : "font-medium"
                 }`}
               onClick={() => setActiveView("yearly")}
             >
@@ -198,7 +198,7 @@ const TotalOrdersChart: FC<TotalOrdersChartProps> = ({ year, month, loading }) =
             </button>
             <button
               data-active={activeView === "monthly"}
-              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 h-[48px] text-center bg-[#FCE4EC] border-l-0 border-r-0 ${activeView === "monthly" ? "bg-[#F9BDBB] font-bold" : "font-medium"
+              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 C9E9D2text-center bg-[#C9E9D2] border-l-0 border-r-0 ${activeView === "monthly" ? "bg-[#F9BDBB] font-bold" : "font-medium"
                 }`}
               onClick={() => setActiveView("monthly")}
             >
@@ -208,7 +208,7 @@ const TotalOrdersChart: FC<TotalOrdersChartProps> = ({ year, month, loading }) =
             </button>
             <button
               data-active={activeView === "daily"}
-              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 h-[48px] text-center bg-[#FCE4EC] rounded-tr-[0.75rem] ${activeView === "daily" ? "bg-[#F9BDBB] font-bold" : "font-medium"
+              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 C9E9D2text-center bg-[#C9E9D2] rounded-tr-[0.75rem] ${activeView === "daily" ? "bg-[#F9BDBB] font-bold" : "font-medium"
                 }`}
               onClick={() => setActiveView("daily")}
             >
@@ -217,7 +217,6 @@ const TotalOrdersChart: FC<TotalOrdersChartProps> = ({ year, month, loading }) =
               </span>
             </button>
           </div>
-
         </CardHeader>
         <div className="sm:p-4">
           {loading ? (

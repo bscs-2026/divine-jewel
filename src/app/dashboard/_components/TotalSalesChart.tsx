@@ -133,7 +133,7 @@ const TotalSalesChart: FC<TotalSalesChartProps> = ({ year, month, loading }) => 
           <div className="flex w-full">
             <button
               data-active={activeView === "yearly"}
-              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 text-center bg-[#D6EAF8] rounded-tl-[0.75rem] ${activeView === "yearly" ? "bg-[#AED6F1] font-bold" : ""
+              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 text-center bg-[#D6EAF8] rounded-tl-[0.75rem] ${activeView === "yearly" ? "bg-[#F9BDBB] font-bold" : "font-medium"
                 }`}
               onClick={() => setActiveView("yearly")}
             >
@@ -141,7 +141,7 @@ const TotalSalesChart: FC<TotalSalesChartProps> = ({ year, month, loading }) => 
             </button>
             <button
               data-active={activeView === "monthly"}
-              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 text-center bg-[#D6EAF8] border-l-0 border-r-0 ${activeView === "monthly" ? "bg-[#AED6F1] font-bold" : ""
+              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 text-center bg-[#D6EAF8] border-l-0 border-r-0 ${activeView === "monthly" ? "bg-[#AED6F1] font-bold" : "font-medium"
                 }`}
               onClick={() => setActiveView("monthly")}
             >
@@ -149,7 +149,7 @@ const TotalSalesChart: FC<TotalSalesChartProps> = ({ year, month, loading }) => 
             </button>
             <button
               data-active={activeView === "daily"}
-              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 text-center bg-[#D6EAF8] rounded-tr-[0.75rem] border-r-0 border-l ${activeView === "daily" ? "bg-[#AED6F1] font-bold" : ""
+              className={`relative z-30 flex flex-1 flex-col justify-center items-center gap-1 px-6 py-4 text-center bg-[#D6EAF8] rounded-tr-[0.75rem] border-r-0 border-l ${activeView === "daily" ? "bg-[#AED6F1] font-bold" : "font-medium"
                 }`}
               onClick={() => setActiveView("daily")}
             >
